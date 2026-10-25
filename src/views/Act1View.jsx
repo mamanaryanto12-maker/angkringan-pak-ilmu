@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { ArrowRight, Sparkles, CheckCircle2, AlertCircle, Search, Layers, Lightbulb, Compass, FileText, Check } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { ArrowRight, Sparkles, CheckCircle2, AlertCircle, Search, Layers, Lightbulb, Compass, FileText, Check, X } from 'lucide-react';
 import { soundManager } from '../utils/audio.js';
-import { ACT_1_DATA } from '../data/gameData.js';
+import { ACT_1_VARIANTS, SORT_ITEMS_POOL, shuffleArray } from '../data/gameData.js';
 import MiniGameGuideBanner from '../components/MiniGameGuideBanner.jsx';
 
 export default function Act1View({
@@ -11,18 +11,51 @@ export default function Act1View({
   inspectedObjects,
   setInspectedObjects,
   onOpenTicket,
-  onOpenHelp
+  onOpenHelp,
+  sessionIndex = 0
 }) {
   const [activeTab, setActiveTab] = useState('explore'); // 'explore' | 'sort'
   const [selectedObject, setSelectedObject] = useState(null);
   const [lastDiscoveredNote, setLastDiscoveredNote] = useState(null);
-  
+
+  // Ambil varian objek dan catatan sesuai sesi aktif
+  const activeVariant = useMemo(() => {
+    return ACT_1_VARIANTS[sessionIndex % ACT_1_VARIANTS.length];
+  }, [sessionIndex]);
+
+  // Siapkan 6 item sortir dinamis (3 bahan, 3 alat) berdasarkan sesi
+  const initialSortItems = useMemo(() => {
+    const bahanPool = SORT_ITEMS_POOL.filter(i => i.category === 'bahan');
+    const alatPool = SORT_ITEMS_POOL.filter(i => i.category === 'alat');
+    const bStart = (sessionIndex * 2) % bahanPool.length;
+    const aStart = (sessionIndex * 2) % alatPool.length;
+    const pickedBahan = [
+      bahanPool[bStart % bahanPool.length],
+      bahanPool[(bStart + 1) % bahanPool.length],
+      bahanPool[(bStart + 2) % bahanPool.length]
+    ];
+    const pickedAlat = [
+      alatPool[aStart % alatPool.length],
+      alatPool[(aStart + 1) % alatPool.length],
+      alatPool[(aStart + 2) % alatPool.length]
+    ];
+    return shuffleArray([...pickedBahan, ...pickedAlat]);
+  }, [sessionIndex]);
+
   // State untuk Sorting Game
-  const [poolItems, setPoolItems] = useState(ACT_1_DATA.sortItems);
+  const [poolItems, setPoolItems] = useState(initialSortItems);
   const [bahanBasket, setBahanBasket] = useState([]);
   const [alatBasket, setAlatBasket] = useState([]);
   const [sortFeedback, setSortFeedback] = useState(null);
   const [draggedItem, setDraggedItem] = useState(null);
+
+  // Reset item pool jika sesi berubah
+  useEffect(() => {
+    setPoolItems(initialSortItems);
+    setBahanBasket([]);
+    setAlatBasket([]);
+    setSortFeedback(null);
+  }, [initialSortItems]);
 
   // Klik objek interaktif di gerobak
   const handleInspectObject = (obj) => {
@@ -35,18 +68,14 @@ export default function Act1View({
     }
 
     // Cek apakah ada sobekan catatan tersembunyi di objek ini
-    if (obj.id === 'ceret') {
-      checkFindNote('note-1');
-    } else if (obj.id === 'cangkir_blirik') {
-      checkFindNote('note-2');
-    } else if (obj.id === 'toples_rempah') {
-      checkFindNote('note-3');
+    if (obj.hasHiddenNote && obj.noteId) {
+      checkFindNote(obj.noteId);
     }
   };
 
   const checkFindNote = (noteId) => {
     if (!collectedNotes.some(n => n.id === noteId)) {
-      const noteToFind = ACT_1_DATA.hiddenNotes.find(n => n.id === noteId);
+      const noteToFind = activeVariant.hiddenNotes.find(n => n.id === noteId);
       if (noteToFind) {
         soundManager.playPaperRustle();
         soundManager.playPlaceSuccess();
@@ -73,7 +102,7 @@ export default function Act1View({
       soundManager.playPlaceSuccess();
       setSortFeedback({
         type: 'success',
-        message: `Tepat sekali! '${item.name}' berhasil ditempatkan di wadah ${targetCategory === 'bahan' ? 'Rempah Alami' : 'Piranti Seduh'}.`
+        message: `Tepat sekali: '${item.name}' berhasil ditempatkan di wadah ${targetCategory === 'bahan' ? 'Rempah Alami' : 'Piranti Seduh'}.`
       });
 
       setPoolItems(prev => prev.filter(i => i.id !== item.id));
@@ -102,74 +131,86 @@ export default function Act1View({
         <div>
           <div className="act-subtitle">
             <Sparkles size={14} />
-            Zona {ACT_1_DATA.zone}
+            Zona Aku Berkarya • Variasi Sesi {sessionIndex + 1} ({activeVariant.name})
           </div>
-          <h2 className="act-main-title">{ACT_1_DATA.title}</h2>
+          <h2 className="act-main-title">Babak 1: Pesanan Pertama</h2>
         </div>
 
         {/* Status Ringkas Checklist */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
           <span style={{
             background: inspectedObjects.length >= 4 ? 'var(--color-teal-soft)' : 'var(--bg-parchment)',
             border: `1.5px solid ${inspectedObjects.length >= 4 ? 'var(--color-teal)' : 'var(--border-strong)'}`,
             color: inspectedObjects.length >= 4 ? 'var(--color-teal-dark)' : 'var(--text-muted)',
-            padding: '5px 14px',
+            padding: '5px 12px',
             borderRadius: '20px',
-            fontSize: '0.8rem',
-            fontWeight: 800
+            fontSize: '0.78rem',
+            fontWeight: 800,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '4px'
           }}>
-            1. Benda Diperiksa: {inspectedObjects.length} / 6 {inspectedObjects.length >= 4 && '✓'}
+            {inspectedObjects.length >= 4 && <Check size={13} color="var(--color-teal)" />}
+            Benda: {inspectedObjects.length} / 6
           </span>
 
           <span style={{
             background: collectedNotes.length === 3 ? 'var(--color-teal-soft)' : 'var(--bg-parchment)',
             border: `1.5px solid ${collectedNotes.length === 3 ? 'var(--color-teal)' : 'var(--border-strong)'}`,
             color: collectedNotes.length === 3 ? 'var(--color-teal-dark)' : 'var(--text-muted)',
-            padding: '5px 14px',
+            padding: '5px 12px',
             borderRadius: '20px',
-            fontSize: '0.8rem',
-            fontWeight: 800
+            fontSize: '0.78rem',
+            fontWeight: 800,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '4px'
           }}>
-            2. Catatan Tersembunyi: {collectedNotes.length} / 3 {collectedNotes.length === 3 && '✓'}
+            {collectedNotes.length === 3 && <Check size={13} color="var(--color-teal)" />}
+            Catatan: {collectedNotes.length} / 3
           </span>
 
           <span style={{
             background: isSortingComplete ? 'var(--color-teal-soft)' : 'var(--bg-parchment)',
             border: `1.5px solid ${isSortingComplete ? 'var(--color-teal)' : 'var(--border-strong)'}`,
             color: isSortingComplete ? 'var(--color-teal-dark)' : 'var(--text-muted)',
-            padding: '5px 14px',
+            padding: '5px 12px',
             borderRadius: '20px',
-            fontSize: '0.8rem',
-            fontWeight: 800
+            fontSize: '0.78rem',
+            fontWeight: 800,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '4px'
           }}>
-            3. Penataan: {6 - poolItems.length} / 6 {isSortingComplete && '✓'}
+            {isSortingComplete && <Check size={13} color="var(--color-teal)" />}
+            Penataan: {6 - poolItems.length} / 6
           </span>
         </div>
       </div>
 
       {/* Navigasi Sub-Tab Babak 1 */}
-      <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
+      <div style={{ display: 'flex', gap: '10px', marginBottom: '16px', flexWrap: 'wrap' }}>
         <button
           onClick={() => {
             soundManager.playClickSound();
             setActiveTab('explore');
           }}
           style={{
-            padding: '12px 22px',
+            padding: '10px 18px',
             borderRadius: 'var(--radius-sm)',
             background: activeTab === 'explore' ? 'var(--color-teal)' : '#FFF',
             border: `2px solid ${activeTab === 'explore' ? 'var(--color-teal-dark)' : 'var(--border-strong)'}`,
             color: activeTab === 'explore' ? '#FFF' : 'var(--text-primary)',
             fontWeight: 800,
-            fontSize: '0.9rem',
+            fontSize: '0.88rem',
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
             boxShadow: activeTab === 'explore' ? '0 4px 12px rgba(53, 140, 136, 0.25)' : 'var(--shadow-soft)'
           }}
         >
-          <Search size={18} />
-          <span>1. Eksplorasi Meja Gerobak ({inspectedObjects.length} / {ACT_1_DATA.objects.length})</span>
+          <Search size={17} />
+          <span>1. Eksplorasi Meja Gerobak ({inspectedObjects.length} / {activeVariant.objects.length})</span>
         </button>
 
         <button
@@ -178,25 +219,24 @@ export default function Act1View({
             setActiveTab('sort');
           }}
           style={{
-            padding: '12px 22px',
+            padding: '10px 18px',
             borderRadius: 'var(--radius-sm)',
             background: activeTab === 'sort' ? 'var(--color-teal)' : '#FFF',
             border: `2px solid ${activeTab === 'sort' ? 'var(--color-teal-dark)' : (isExploreComplete ? 'var(--color-gold-deep)' : 'var(--border-strong)')}`,
             color: activeTab === 'sort' ? '#FFF' : 'var(--text-primary)',
             fontWeight: 800,
-            fontSize: '0.9rem',
+            fontSize: '0.88rem',
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            boxShadow: activeTab === 'sort' ? '0 4px 12px rgba(53, 140, 136, 0.25)' : 'var(--shadow-soft)',
-            animation: (isExploreComplete && !isSortingComplete && activeTab !== 'sort') ? 'pulseTap 2s infinite ease-in-out' : 'none'
+            boxShadow: activeTab === 'sort' ? '0 4px 12px rgba(53, 140, 136, 0.25)' : 'var(--shadow-soft)'
           }}
         >
-          <Layers size={18} />
+          <Layers size={17} />
           <span>2. Penataan Bahan & Piranti ({6 - poolItems.length} / 6)</span>
           {isExploreComplete && !isSortingComplete && (
-            <span style={{ background: 'var(--color-gold)', color: '#000', fontSize: '0.7rem', padding: '2px 6px', borderRadius: '10px' }}>
-              Langkah Berikutnya 👉
+            <span style={{ background: 'var(--color-gold)', color: '#000', fontSize: '0.72rem', padding: '2px 8px', borderRadius: '10px', fontWeight: 800 }}>
+              Lanjut ke Sini
             </span>
           )}
         </button>
@@ -205,17 +245,16 @@ export default function Act1View({
       {/* TAMPILAN 1: EKSPLORASI GEROBAK */}
       {activeTab === 'explore' && (
         <div>
-          {/* Banner Petunjuk Spesifik Tab Eksplorasi */}
           <MiniGameGuideBanner
             title="Cara Bermain: Eksplorasi Benda di Meja Gerobak"
-            tag="Panduan Aktivitas 1"
+            tag="Aktivitas 1: Pengamatan & Penemuan"
             steps={[
-              "Ketuk atau klik setiap gambar benda di meja gerobak (Ceret, Toples, Cangkir, Jurnal, Lentera, Tiket).",
-              "Perhatikan tanda centang hijau ✓ yang muncul setelah benda diperiksa.",
-              "Temukan 3 sobekan resep rahasia yang terselip di balik Ceret Tiga Tingkat, Cangkir Blirik, dan Toples Rempah.",
-              "Setelah minimal 4 benda diperiksa dan 3 catatan ditemukan, beralihlah ke tab '2. Penataan Bahan & Piranti'."
+              "Ketuk setiap benda di atas meja gerobak untuk mengamati fungsi dan ciri fisiknya.",
+              "Perhatikan tanda centang hijau yang muncul setelah benda berhasil diperiksa.",
+              "Temukan 3 sobekan resep kuno Pak Ilmu yang terselip di antara benda-benda gerobak.",
+              "Setelah minimal 4 benda diperiksa dan 3 catatan ditemukan, lanjutkan ke tab '2. Penataan Bahan & Piranti'."
             ]}
-            tip="Benda yang belum diperiksa memiliki penanda oranye '👆 Klik Periksa'. Ketuk untuk membacanya!"
+            tip="Benda di atas gerobak yang belum diperiksa memiliki penanda 'Periksa Objek'. Ketuk untuk membaca keterangannya."
             onOpenHelp={onOpenHelp}
           />
 
@@ -223,7 +262,7 @@ export default function Act1View({
           {lastDiscoveredNote && (
             <div className="discovery-toast-card">
               <div className="discovery-toast-text">
-                <h5>📜 Sobekan Resep Baru Ditemukan! ({collectedNotes.length} / 3 Terkumpul)</h5>
+                <h5>Sobekan Resep Baru Ditemukan ({collectedNotes.length} / 3 Terkumpul)</h5>
                 <p>“{lastDiscoveredNote.text}” — <em>Tersimpan otomatis ke Jurnal Kawruh.</em></p>
               </div>
               <button
@@ -231,14 +270,18 @@ export default function Act1View({
                 style={{
                   background: 'var(--bg-parchment)',
                   border: '1px solid var(--border-strong)',
-                  padding: '4px 10px',
+                  padding: '5px 12px',
                   borderRadius: '12px',
                   fontSize: '0.76rem',
                   fontWeight: 700,
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px'
                 }}
               >
-                Tutup Notifikasi ✕
+                <span>Tutup</span>
+                <X size={13} />
               </button>
             </div>
           )}
@@ -249,16 +292,16 @@ export default function Act1View({
               
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px' }}>
                 <span style={{ fontSize: '0.86rem', color: 'var(--color-teal-dark)', fontWeight: 800 }}>
-                  MEJA GEROBAK ANGKRINGAN PAK ILMU
+                  MEJA GEROBAK ANGKRINGAN PAK ILMU ({activeVariant.name.toUpperCase()})
                 </span>
                 <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
                   Ketuk setiap benda untuk memeriksa ciri dan menemukan petunjuk rahasia
                 </span>
               </div>
 
-              {/* Grid 6 Objek dengan Visual Cues */}
+              {/* Grid 6 Objek dengan Visual Cues Bersih Tanpa Emoji */}
               <div className="counter-grid-objects">
-                {ACT_1_DATA.objects.map((obj) => {
+                {activeVariant.objects.map((obj) => {
                   const isInspected = inspectedObjects.some(o => o.id === obj.id);
 
                   return (
@@ -270,10 +313,10 @@ export default function Act1View({
                       tabIndex={0}
                       title={`Klik untuk memeriksa ${obj.name}`}
                     >
-                      {/* Visual Cue: Penunjuk Jari jika belum diperiksa */}
                       {!isInspected && (
                         <div className="interactive-cue-badge">
-                          👆 Klik Periksa
+                          <Search size={11} />
+                          <span>Periksa Objek</span>
                         </div>
                       )}
 
@@ -298,128 +341,131 @@ export default function Act1View({
 
               {/* Panel Hasil Pemeriksaan Objek */}
               {selectedObject ? (
-                <div className="object-inspection-panel">
-                  <span className="inspection-badge">{selectedObject.name}</span>
-                  <p className="inspection-text">{selectedObject.desc}</p>
+                <div className="inspect-drawer" style={{ display: 'block' }}>
+                  <div className="inspect-header">
+                    <div>
+                      <span className="inspect-category">{selectedObject.tag}</span>
+                      <h3 className="inspect-title">{selectedObject.name}</h3>
+                    </div>
+                    <button
+                      className="btn-secondary-action"
+                      style={{ padding: '6px 14px', fontSize: '0.8rem' }}
+                      onClick={() => setSelectedObject(null)}
+                    >
+                      Tutup Penjelasan
+                    </button>
+                  </div>
+
+                  <p className="inspect-body">{selectedObject.desc}</p>
+
+                  <div className="inspect-clue-box">
+                    <span className="inspect-clue-label">Kearifan Seduhan Pak Ilmu:</span>
+                    <p style={{ fontStyle: 'italic', margin: 0 }}>“{selectedObject.clue}”</p>
+                  </div>
+
+                  {selectedObject.hasHiddenNote && (
+                    <div style={{
+                      marginTop: '12px',
+                      background: 'var(--color-teal-soft)',
+                      border: '1px solid var(--color-teal)',
+                      padding: '10px 14px',
+                      borderRadius: 'var(--radius-sm)',
+                      fontSize: '0.84rem',
+                      color: 'var(--color-teal-dark)',
+                      fontWeight: 700,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}>
+                      <CheckCircle2 size={16} />
+                      <span>Catatan Resep Rahasia telah tercatat ke dalam Jurnal Kawruh!</span>
+                    </div>
+                  )}
                 </div>
               ) : (
-                <div className="object-inspection-panel" style={{ borderColor: 'var(--border-natural)', background: 'var(--bg-parchment)' }}>
-                  <span className="inspection-badge" style={{ background: 'var(--border-strong)', color: 'var(--text-primary)' }}>Petunjuk Aksi</span>
-                  <p className="inspection-text" style={{ color: 'var(--text-muted)' }}>
-                    Pilih salah satu benda di atas meja gerobak untuk mengamati fungsi dan mencari sobekan resep yang terselip.
-                  </p>
+                <div style={{
+                  background: 'var(--bg-parchment)',
+                  border: '1.5px dashed var(--border-strong)',
+                  borderRadius: 'var(--radius-sm)',
+                  padding: '24px',
+                  textAlign: 'center',
+                  marginTop: '16px',
+                  color: 'var(--text-muted)',
+                  fontSize: '0.9rem'
+                }}>
+                  Pilih salah satu benda di atas meja gerobak untuk membaca fungsi dan petunjuk rahasianya.
                 </div>
               )}
             </div>
 
-            {/* Sisi Kanan: Tiket & Catatan Rahasia */}
-            <div className="angkringan-sidebar">
-              {/* Kartu Tiket Ringkas */}
-              <div className="ticket-paper" style={{ padding: '18px' }}>
-                <div className="ticket-header" style={{ marginBottom: '10px' }}>
-                  <span style={{ fontWeight: 800, fontSize: '0.95rem', color: 'var(--text-primary)' }}>
-                    Tiket Pesanan
-                  </span>
-                  <button
-                    onClick={onOpenTicket}
-                    style={{
-                      background: 'var(--color-bata)',
-                      color: '#FFF',
-                      fontSize: '0.74rem',
-                      fontWeight: 700,
-                      padding: '4px 10px',
-                      borderRadius: '4px'
-                    }}
-                  >
-                    Buka Utuh
-                  </button>
-                </div>
-                <p style={{ fontSize: '0.86rem', color: 'var(--text-secondary)', fontStyle: 'italic', lineHeight: '1.5', marginBottom: '8px' }}>
-                  “Tenggorokan tercekat debu jalanan, sendi ngilu didera angin malam... Butuh kehangatan penentram batin...”
-                </p>
+            {/* Panel Sisi: Panduan Catatan Terkumpul */}
+            <div className="notes-tracker-panel">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
+                <FileText size={20} color="var(--color-orange)" />
+                <h4 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                  Sobekan Resep ({collectedNotes.length} / 3)
+                </h4>
               </div>
 
-              {/* Kotak Catatan Terkumpul */}
-              <div className="notes-collected-box">
-                <div className="notes-collected-header">
-                  <h3>Sobekan Catatan Kuno</h3>
-                  <span className="notes-counter-badge">{collectedNotes.length} / 3</span>
-                </div>
+              <p style={{ fontSize: '0.84rem', color: 'var(--text-secondary)', lineHeight: '1.5', marginBottom: '14px' }}>
+                Pak Ilmu menyelipkan 3 serpihan naskah resep rahasia di antara piranti gerobak. Temukan ketiganya untuk merangkai resep di Babak 2.
+              </p>
 
-                {collectedNotes.length === 0 ? (
-                  <p style={{ fontSize: '0.84rem', color: 'var(--text-muted)', fontStyle: 'italic', lineHeight: '1.45' }}>
-                    Belum ada catatan ditemukan. Coba amati Ceret Tiga Tingkat, Cangkir Blirik, dan Toples Kaca!
-                  </p>
-                ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    {collectedNotes.map((note) => (
-                      <div key={note.id} className="note-scrap-item">
-                        <span style={{ fontSize: '0.82rem' }}>“{note.text}”</span>
+              <div className="collected-notes-list">
+                {[1, 2, 3].map((num) => {
+                  const note = collectedNotes[num - 1];
+
+                  return (
+                    <div key={num} className={`note-snippet-card ${note ? 'found' : 'empty'}`}>
+                      <div className="note-snippet-header">
+                        <span>Serpihan Resep #{num}</span>
+                        <span>{note ? 'Telah Ditemukan' : 'Belum Terbaca'}</span>
                       </div>
-                    ))}
-                  </div>
-                )}
+                      <p className="note-snippet-text">
+                        {note ? `“${note.text}”` : '(Periksa benda-benda lain di meja gerobak untuk menemukan serpihan ini...)'}
+                      </p>
+                    </div>
+                  );
+                })}
               </div>
+
+              {/* Rekomendasi Lanjut */}
+              {isExploreComplete && (
+                <div style={{
+                  marginTop: '16px',
+                  background: 'var(--color-teal-soft)',
+                  border: '1px solid var(--color-teal)',
+                  padding: '12px',
+                  borderRadius: 'var(--radius-sm)',
+                  fontSize: '0.84rem',
+                  color: 'var(--color-teal-dark)',
+                  lineHeight: '1.45',
+                  fontWeight: 700
+                }}>
+                  Semua 3 serpihan resep telah terkumpul! Buka tab '2. Penataan Bahan & Piranti' untuk menuntaskan babak ini.
+                </div>
+              )}
             </div>
           </div>
         </div>
       )}
 
-      {/* TAMPILAN 2: MINI-GAME SORTING (DRAG & DROP) */}
+      {/* TAMPILAN 2: SORTING/PENATAAN BAHAN DAN ALAT */}
       {activeTab === 'sort' && (
-        <div className="sorting-container">
-          {/* Banner Petunjuk Spesifik Tab Penataan */}
+        <div>
           <MiniGameGuideBanner
             title="Cara Bermain: Penataan Bahan Rempah & Piranti Seduh"
-            tag="Panduan Aktivitas 2"
+            tag="Aktivitas 2: Klasifikasi Pengetahuan"
             steps={[
-              "Pilih cara interaksi yang paling nyaman: Tarik (drag) item ke wadah tujuan, ATAU klik tombol '+ Rempah' / '+ Piranti' di bawah nama item.",
-              "Kelompokkan bahan alami (Jahe Emprit, Gula Jawa Aren, Sereh Wangi) ke dalam 'Wadah Rempah Alami'.",
-              "Kelompokkan peralatan fisik (Ceret Tembaga, Cangkir Blirik, Sendok Kayu) ke dalam 'Rak Piranti Seduh'.",
-              "Jika seluruh 6 item telah tertata rapi, tombol 'Lanjut ke Babak 2' di bagian bawah layar akan aktif."
+              "Amati kartu bahan atau alat yang tersedia pada rak persiapan di bawah.",
+              "Tarik kartu (drag & drop) atau klik tombol '+ Rempah' / '+ Piranti' pada masing-masing kartu.",
+              "Kelompokkan ke dalam wadah yang sesuai: Rempah Alami (Jahe, Sereh, Gula Aren, Cengkeh, Kayu Manis) atau Piranti Seduh (Ceret, Cangkir, Sendok, Cobek, Saringan).",
+              "Selesaikan seluruh 6 kartu untuk membuka kunci menuju Babak 2."
             ]}
-            tip="Jika salah menempatkan, sistem akan memberikan petunjuk perbaikan tanpa langsung menyelesaikan tantangan."
+            tip="Pahami perbedaan antara bahan rimpang hasil bumi dan peralatan seduh tradisional."
             onOpenHelp={onOpenHelp}
           />
 
-          <div style={{
-            background: '#FFF',
-            border: '1.5px solid var(--border-natural)',
-            borderRadius: 'var(--radius-md)',
-            padding: '16px 22px',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            boxShadow: 'var(--shadow-soft)'
-          }}>
-            <div>
-              <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                Pengelompokan Bahan Alami & Piranti Seduh
-              </h3>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
-                Tarik item ke wadah yang sesuai, atau klik tombol transfer cepat di tiap kartu item.
-              </p>
-            </div>
-            {isSortingComplete && (
-              <span style={{
-                background: 'var(--color-teal-soft)',
-                color: 'var(--color-teal-dark)',
-                border: '1.5px solid var(--color-teal)',
-                padding: '6px 16px',
-                borderRadius: '24px',
-                fontSize: '0.84rem',
-                fontWeight: 800,
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px'
-              }}>
-                <CheckCircle2 size={16} />
-                Seluruh 6 Item Tertata Rapi!
-              </span>
-            )}
-          </div>
-
-          {/* Umpan Balik Tindakan */}
           {sortFeedback && (
             <div style={{
               background: sortFeedback.type === 'success' ? 'var(--color-teal-soft)' : 'var(--color-bata-soft)',
@@ -430,22 +476,28 @@ export default function Act1View({
               color: sortFeedback.type === 'success' ? 'var(--color-teal-dark)' : 'var(--color-bata-dark)',
               display: 'flex',
               alignItems: 'center',
-              gap: '10px'
+              gap: '10px',
+              marginBottom: '16px',
+              fontWeight: 700
             }}>
               {sortFeedback.type === 'success' ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
               <span>{sortFeedback.message}</span>
             </div>
           )}
 
-          {/* Pool Item Berserakan */}
-          <div className="sorting-pool">
-            <span style={{ fontSize: '0.82rem', color: 'var(--color-orange)', fontWeight: 800, width: '100%', marginBottom: '4px' }}>
-              Item Berserakan di Meja ({poolItems.length} Tersisa):
-            </span>
+          {/* Rak Item yang Belum Dikelompokkan */}
+          <div className="sorting-pool-area">
             {poolItems.length === 0 ? (
-              <span style={{ fontSize: '0.88rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
-                Semua bahan dan piranti telah tertata dengan rapi pada tempatnya.
-              </span>
+              <div style={{
+                width: '100%',
+                padding: '16px',
+                textAlign: 'center',
+                color: 'var(--color-teal-dark)',
+                fontWeight: 800,
+                fontSize: '0.95rem'
+              }}>
+                Seluruh 6 bahan dan piranti telah tertata rapi pada wadahnya masing-masing!
+              </div>
             ) : (
               poolItems.map((item) => (
                 <div
@@ -485,8 +537,8 @@ export default function Act1View({
               onDrop={() => handleDropTo('bahan')}
             >
               <div className="dropzone-header">
-                <span style={{ width: '12px', height: '12px', borderRadius: '50%', background: 'var(--color-orange)' }} />
-                <h4>🎯 Wadah Rempah Alami ({bahanBasket.length})</h4>
+                <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: 'var(--color-orange)' }} />
+                <h4>Wadah Rempah Alami ({bahanBasket.length})</h4>
               </div>
               <div className="dropzone-items-list">
                 {bahanBasket.length === 0 ? (
@@ -522,8 +574,8 @@ export default function Act1View({
               onDrop={() => handleDropTo('alat')}
             >
               <div className="dropzone-header">
-                <span style={{ width: '12px', height: '12px', borderRadius: '50%', background: 'var(--color-teal)' }} />
-                <h4>🎯 Rak Piranti Seduh ({alatBasket.length})</h4>
+                <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: 'var(--color-teal)' }} />
+                <h4>Rak Piranti Seduh ({alatBasket.length})</h4>
               </div>
               <div className="dropzone-items-list">
                 {alatBasket.length === 0 ? (
@@ -567,9 +619,6 @@ export default function Act1View({
           onClick={() => {
             soundManager.playActCompletion();
             onCompleteAct();
-          }}
-          style={{
-            animation: isAct1Ready ? 'pulseTap 2s infinite ease-in-out' : 'none'
           }}
         >
           <span>Lanjut ke Babak 2: Resep yang Hilang</span>

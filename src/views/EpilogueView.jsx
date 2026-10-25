@@ -1,15 +1,40 @@
-import React, { useState } from 'react';
-import { ArrowRight, Sparkles, CheckCircle2, RotateCcw, Lightbulb, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { ArrowRight, Sparkles, CheckCircle2, RotateCcw, AlertCircle, X, Check } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { soundManager } from '../utils/audio.js';
-import { EPILOGUE_DATA } from '../data/gameData.js';
+import { EPILOGUE_VARIANTS, shuffleArray } from '../data/gameData.js';
 import MiniGameGuideBanner from '../components/MiniGameGuideBanner.jsx';
 
-export default function EpilogueView({ onCompleteEpilogue, onOpenHelp }) {
+export default function EpilogueView({ onCompleteEpilogue, onOpenHelp, sessionIndex = 0 }) {
   const [placedWords, setPlacedWords] = useState([]);
   const [isNoteSubmitted, setIsNoteSubmitted] = useState(false);
 
-  const availableTokens = EPILOGUE_DATA.tokens;
+  // Ambil variasi refleksi epilog berdasarkan sesi
+  const currentVariant = useMemo(() => {
+    return EPILOGUE_VARIANTS[sessionIndex % EPILOGUE_VARIANTS.length];
+  }, [sessionIndex]);
+
+  // Acak posisi kata di pool secara nyata agar tidak langsung tersusun sesuai jawaban benar
+  const initialShuffledTokens = useMemo(() => {
+    let tokens = shuffleArray(currentVariant.tokens);
+    const targetSentence = currentVariant.correctSentence;
+    let attempts = 0;
+    while (tokens.map(t => t.text).join(' ') === targetSentence && attempts < 10) {
+      tokens = shuffleArray(currentVariant.tokens);
+      attempts++;
+    }
+    if (tokens.map(t => t.text).join(' ') === targetSentence && tokens.length > 1) {
+      const temp = tokens[0];
+      tokens[0] = tokens[1];
+      tokens[1] = temp;
+    }
+    return tokens;
+  }, [currentVariant]);
+
+  useEffect(() => {
+    setPlacedWords([]);
+    setIsNoteSubmitted(false);
+  }, [currentVariant]);
 
   const handleToggleWord = (token) => {
     soundManager.playClickSound();
@@ -21,7 +46,7 @@ export default function EpilogueView({ onCompleteEpilogue, onOpenHelp }) {
       setPlacedWords(nextWords);
 
       const currentSentence = nextWords.map(t => t.text).join(' ');
-      if (currentSentence === EPILOGUE_DATA.correctSentence) {
+      if (currentSentence === currentVariant.correctSentence) {
         soundManager.playPlaceSuccess();
       }
     }
@@ -33,8 +58,8 @@ export default function EpilogueView({ onCompleteEpilogue, onOpenHelp }) {
   };
 
   const currentSentence = placedWords.map(t => t.text).join(' ');
-  const isSentenceCorrect = currentSentence === EPILOGUE_DATA.correctSentence;
-  const isAllWordsPlaced = placedWords.length === availableTokens.length;
+  const isSentenceCorrect = currentSentence === currentVariant.correctSentence;
+  const isAllWordsPlaced = placedWords.length === currentVariant.tokens.length;
 
   const handleSubmitToJar = () => {
     soundManager.playActCompletion();
@@ -72,7 +97,7 @@ export default function EpilogueView({ onCompleteEpilogue, onOpenHelp }) {
           textTransform: 'uppercase'
         }}>
           <Sparkles size={15} />
-          Epilog Simbolik Pameran
+          Epilog Simbolik Pameran • Tema: {currentVariant.theme}
         </div>
 
         <h2 style={{ fontSize: '2.1rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '8px' }}>
@@ -82,12 +107,12 @@ export default function EpilogueView({ onCompleteEpilogue, onOpenHelp }) {
         {/* Panduan Kontekstual Epilog */}
         <div style={{ maxWidth: '780px', width: '100%', margin: '0 auto 16px auto' }}>
           <MiniGameGuideBanner
-            tag="Epilog Simbolik • Toples Kawruh"
+            tag="Epilog Simbolik: Toples Kawruh"
             title="Cara Merumuskan & Menyimpan Pesan Hikmah"
             steps={[
-              "Ketuk kata-kata di pool atas secara berurutan untuk menyusun kalimat hikmah penutup.",
-              "Jika salah memasukkan urutan, ketuk kata yang terpasang pada kotak kalimat di bawah untuk membatalkannya, atau klik 'Atur Ulang'.",
-              "Setelah kalimat berbunyi 'Pengetahuan Menjadi Berarti Ketika Dibagikan', tekan tombol 'Masukkan Pelajaran ke Toples Kawruh'.",
+              "Ketuk kata-kata di pool atas (yang telah diacak posisinya) untuk merangkai pesan hikmah penutup.",
+              "Jika salah memasukkan urutan kata, ketuk kata yang terpasang pada kotak kalimat di bawah untuk membatalkannya, atau klik 'Atur Ulang'.",
+              "Setelah kalimat hikmah tersusun lengkap dan benar, tekan tombol 'Masukkan Pelajaran ke Toples Kawruh'.",
               "Pesan hikmahmu akan tersimpan abadi di dalam toples kaca untuk diteruskan kepada pengunjung pameran berikutnya."
             ]}
             tip="Kalimat ini merangkum filosofi Gredupedia #7 Karsa Kala: karya dan pengetahuan baru menemukan arti sejatinya saat dibagikan untuk meringankan beban sesama."
@@ -122,17 +147,17 @@ export default function EpilogueView({ onCompleteEpilogue, onOpenHelp }) {
               gap: '6px'
             }}>
               <CheckCircle2 size={16} color="var(--color-teal)" />
-              <span>Kawruh Berhasil Tersimpan di Toples!</span>
+              <span>Kawruh Berhasil Tersimpan di Toples</span>
             </div>
           )}
         </div>
 
-        {/* INTERAKSI WORD PUZZLE */}
+        {/* INTERAKSI WORD PUZZLE (DENGAN PENGACAKAN AWAL) */}
         {!isNoteSubmitted ? (
           <div className="word-puzzle-assembly">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
               <span style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                Ketuk Kata di Bawah untuk Menyusun Pesan Hikmah ({placedWords.length} / {availableTokens.length} kata):
+                Ketuk Kata di Bawah untuk Menyusun Pesan Hikmah ({placedWords.length} / {currentVariant.tokens.length} kata):
               </span>
               {placedWords.length > 0 && (
                 <button
@@ -156,9 +181,9 @@ export default function EpilogueView({ onCompleteEpilogue, onOpenHelp }) {
               )}
             </div>
 
-            {/* Pool Kata */}
+            {/* Pool Kata yang Diacak Posisinya */}
             <div className="word-tokens-pool">
-              {availableTokens.map((token) => {
+              {initialShuffledTokens.map((token) => {
                 const isPlaced = placedWords.some(t => t.id === token.id);
 
                 return (
@@ -178,7 +203,7 @@ export default function EpilogueView({ onCompleteEpilogue, onOpenHelp }) {
             <div className="word-sentence-target">
               {placedWords.length === 0 ? (
                 <span style={{ fontSize: '0.92rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
-                  (Ketuk kata di atas secara berurutan...)
+                  (Ketuk kata di atas secara berurutan sesuai makna hikmah...)
                 </span>
               ) : (
                 placedWords.map((token) => (
@@ -187,10 +212,10 @@ export default function EpilogueView({ onCompleteEpilogue, onOpenHelp }) {
                     className="word-placed-pill"
                     onClick={() => handleToggleWord(token)}
                     title="Klik untuk membatalkan kata ini"
-                    style={{ cursor: 'pointer' }}
+                    style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                   >
                     <span>{token.text}</span>
-                    <span style={{ fontSize: '0.78rem', opacity: 0.85 }}>✕</span>
+                    <X size={12} style={{ opacity: 0.8 }} />
                   </div>
                 ))
               )}
@@ -231,7 +256,7 @@ export default function EpilogueView({ onCompleteEpilogue, onOpenHelp }) {
                 gap: '8px'
               }}>
                 <CheckCircle2 size={16} />
-                <span>Kalimat Hikmah Sempurna Terangkai! Siap dimasukkan ke Toples Kawruh.</span>
+                <span>Kalimat Hikmah Sempurna Terangkai. Siap dimasukkan ke Toples Kawruh.</span>
               </div>
             )}
 
@@ -280,7 +305,7 @@ export default function EpilogueView({ onCompleteEpilogue, onOpenHelp }) {
               color: 'var(--text-primary)',
               marginBottom: '24px'
             }}>
-              “{EPILOGUE_DATA.reflectionMessage}”
+              “{currentVariant.reflectionMessage}”
             </blockquote>
 
             <button

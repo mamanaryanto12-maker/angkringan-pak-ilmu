@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <defs>
+    <linearGradient id="lemongrassGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#FBF8DC"/>
+      <stop offset="25%" stop-color="#E1EDB7"/>
+      <stop offset="60%" stop-color="#7CA343"/>
+      <stop offset="100%" stop-color="#3C6418"/>
+    </linearGradient>
+    <linearGradient id="leafGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#6F9936"/>
+      <stop offset="100%" stop-color="#2D5414"/>
+    </linearGradient>
+  </defs>
+  <!-- Bayangan Dasar -->
+  <ellipse cx="50" cy="88" rx="28" ry="6" fill="#2C221E" opacity="0.18"/>
+
+  <!-- Daun Menjuntai Belakang -->
+  <path d="M48,50 C44,30 30,16 16,14 C26,24 38,36 44,52 Z" fill="url(#leafGrad)" opacity="0.85"/>
+  <path d="M54,48 C62,26 74,16 88,12 C78,22 66,36 58,52 Z" fill="url(#leafGrad)" opacity="0.85"/>
+
+  <!-- Batang Sereh 1 (Kiri) -->
+  <path d="M42,86 C40,86 38,82 40,74 L46,38 C46,30 42,20 38,16 C42,20 48,28 50,38 L46,74 C47,82 45,86 42,86 Z" 
+        fill="url(#lemongrassGrad)" stroke="#3C5C1B" stroke-width="1.8"/>
+
+  <!-- Batang Sereh 2 (Tengah Utama) -->
+  <path d="M50,88 C48,88 46,84 48,76 L51,32 C51,22 49,14 46,8 C51,12 55,22 55,32 L53,76 C54,84 52,88 50,88 Z" 
+        fill="url(#lemongrassGrad)" stroke="#3C5C1B" stroke-width="2"/>
+
+  <!-- Batang Sereh 3 (Kanan) -->
+  <path d="M58,85 C56,85 54,81 56,73 L58,40 C58,32 64,22 68,18 C64,24 62,32 61,40 L61,73 C62,81 60,85 58,85 Z" 
+        fill="url(#lemongrassGrad)" stroke="#3C5C1B" stroke-width="1.8"/>
+
+  <!-- Memar Rimpang Bawah (Tanda Memar Sereh Ditumbuk) -->
+  <ellipse cx="49" cy="82" rx="9" ry="5" fill="#C2D68C" stroke="#4F7524" stroke-width="1.2" opacity="0.8"/>
+  <path d="M44,80 L54,84 M43,83 L55,81" stroke="#365415" stroke-width="1.2" stroke-linecap="round"/>
+
+  <!-- Tali Pengikat Alami Bambu/Pandan -->
+  <rect x="42" y="60" width="16" height="5" rx="2" fill="#D9A84E" stroke="#7A5212" stroke-width="1.4"/>
+  <line x1="43" y1="62.5" x2="57" y2="62.5" stroke="#996D19" stroke-width="1"/>
+</svg>

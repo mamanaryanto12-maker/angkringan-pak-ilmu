@@ -1,30 +1,87 @@
-import React, { useState } from 'react';
-import { ArrowRight, Sparkles, CheckCircle2, AlertCircle, Puzzle, ListOrdered, GitCompare, ArrowUp, ArrowDown, Lightbulb, Compass, Check } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { ArrowRight, Sparkles, CheckCircle2, AlertCircle, Puzzle, ListOrdered, GitCompare, ArrowUp, ArrowDown, Check } from 'lucide-react';
 import { soundManager } from '../utils/audio.js';
-import { ACT_2_DATA } from '../data/gameData.js';
+import { ACT_2_PUZZLE_VARIANTS, ACT_2_SEQUENCE_VARIANTS, MATCHING_PAIRS_POOL, shuffleArray, derangeSequence } from '../data/gameData.js';
 import MiniGameGuideBanner from '../components/MiniGameGuideBanner.jsx';
 
-export default function Act2View({ onCompleteAct, gameMode, onOpenHelp }) {
+export default function Act2View({ onCompleteAct, gameMode, onOpenHelp, sessionIndex = 0 }) {
   const [subTab, setSubTab] = useState('puzzle'); // 'puzzle' | 'sequence' | 'matching'
   
-  // State 1: Jigsaw Puzzle (4 slot)
+  // ------------------------------------------------------------------------
+  // VARIATION 1: JIGSAW PUZZLE (DENGAN VARIASI NASKAH & PENGACAKAN AWAL)
+  // ------------------------------------------------------------------------
+  const activePuzzle = useMemo(() => {
+    return ACT_2_PUZZLE_VARIANTS[sessionIndex % ACT_2_PUZZLE_VARIANTS.length];
+  }, [sessionIndex]);
+
+  // Acak kepingan puzzle di awal agar posisi kepingan tidak tersusun 1-4
+  const initialShuffledPieces = useMemo(() => {
+    let pieces = shuffleArray(activePuzzle.pieces);
+    // Pastikan kepingan pertama bukan kepingan slot 0
+    if (pieces[0].slot === 0 && pieces.length > 1) {
+      const temp = pieces[0];
+      pieces[0] = pieces[1];
+      pieces[1] = temp;
+    }
+    return pieces;
+  }, [activePuzzle]);
+
   const [placedPieces, setPlacedPieces] = useState([null, null, null, null]);
   const [selectedPiece, setSelectedPiece] = useState(null);
   const [puzzleFeedback, setPuzzleFeedback] = useState(null);
 
-  // State 2: Sequencing (Urutan Seduh)
-  const [sequenceOrder, setSequenceOrder] = useState([
-    ACT_2_DATA.sequenceSteps[2], // Step 3
-    ACT_2_DATA.sequenceSteps[0], // Step 1
-    ACT_2_DATA.sequenceSteps[3], // Step 4
-    ACT_2_DATA.sequenceSteps[1], // Step 2
-  ]);
+  useEffect(() => {
+    setPlacedPieces([null, null, null, null]);
+    setSelectedPiece(null);
+    setPuzzleFeedback(null);
+  }, [activePuzzle]);
+
+  // ------------------------------------------------------------------------
+  // VARIATION 2: SEQUENCING URUTAN SEDUH (DENGAN PENGACAKAN NYATA)
+  // ------------------------------------------------------------------------
+  const activeSequence = useMemo(() => {
+    return ACT_2_SEQUENCE_VARIANTS[sessionIndex % ACT_2_SEQUENCE_VARIANTS.length];
+  }, [sessionIndex]);
+
+  const [sequenceOrder, setSequenceOrder] = useState(() => {
+    return derangeSequence(activeSequence.steps);
+  });
   const [seqFeedback, setSeqFeedback] = useState(null);
 
-  // State 3: Matching Pairs
+  useEffect(() => {
+    setSequenceOrder(derangeSequence(activeSequence.steps));
+    setSeqFeedback(null);
+  }, [activeSequence]);
+
+  // ------------------------------------------------------------------------
+  // VARIATION 3: KHASIAT DAN RAGA (POOL 6 PASANGAN & PENGACAKAN MANDIRI)
+  // ------------------------------------------------------------------------
+  const selectedPairs = useMemo(() => {
+    const startIdx = (sessionIndex * 2) % MATCHING_PAIRS_POOL.length;
+    const p1 = MATCHING_PAIRS_POOL[startIdx % MATCHING_PAIRS_POOL.length];
+    const p2 = MATCHING_PAIRS_POOL[(startIdx + 1) % MATCHING_PAIRS_POOL.length];
+    const p3 = MATCHING_PAIRS_POOL[(startIdx + 2) % MATCHING_PAIRS_POOL.length];
+    return [p1, p2, p3];
+  }, [sessionIndex]);
+
+  // Acak posisi kartu kondisi di kolom kiri dan racikan di kolom kanan secara independen
+  const shuffledConditions = useMemo(() => {
+    return shuffleArray(selectedPairs);
+  }, [selectedPairs]);
+
+  const shuffledRemedies = useMemo(() => {
+    return shuffleArray(selectedPairs);
+  }, [selectedPairs]);
+
   const [selectedCondition, setSelectedCondition] = useState(null);
   const [matchedPairs, setMatchedPairs] = useState([]);
   const [matchFeedback, setMatchFeedback] = useState(null);
+
+  useEffect(() => {
+    setSelectedCondition(null);
+    setMatchedPairs([]);
+    setMatchFeedback(null);
+  }, [selectedPairs]);
 
   // Jigsaw Handlers
   const handleSelectPiece = (piece) => {
@@ -37,7 +94,7 @@ export default function Act2View({ onCompleteAct, gameMode, onOpenHelp }) {
     if (!selectedPiece) {
       setPuzzleFeedback({
         type: 'info',
-        message: 'Pilih salah satu sobekan resep di kolom kiri terlebih dahulu sebelum mengeklik slot.'
+        message: 'Pilih salah satu kepingan resep di kolom kiri terlebih dahulu sebelum mengeklik slot.'
       });
       return;
     }
@@ -50,13 +107,13 @@ export default function Act2View({ onCompleteAct, gameMode, onOpenHelp }) {
       setSelectedPiece(null);
       setPuzzleFeedback({
         type: 'success',
-        message: `Kepingan ${slotIdx + 1} pas terpasang pada bingkai naskah!`
+        message: `Kepingan Bagian ${slotIdx + 1} pas terpasang pada bingkai naskah.`
       });
     } else {
       soundManager.playClickSound();
       setPuzzleFeedback({
         type: 'error',
-        message: `Sobekan ini belum pas pada Slot ${slotIdx + 1}. Perhatikan alur teks resep dari membakar jahe (1), mememarkan sereh (2), menyeduh air panas (3), hingga mengaduk gula aren (4).`
+        message: `Kepingan ini belum pas pada Slot Bagian ${slotIdx + 1}. Cermati kesinambungan teks narasi dari awal penyambutan, penyiapan rempah, penyeduhan, hingga penutup.`
       });
     }
   };
@@ -80,7 +137,7 @@ export default function Act2View({ onCompleteAct, gameMode, onOpenHelp }) {
       soundManager.playPlaceSuccess();
       setSeqFeedback({
         type: 'success',
-        message: 'Luar biasa! Seluruh 4 tahapan peracikan wedang telah tersusun runtut dari empati mendengarkan hingga menyajikan.'
+        message: 'Luar biasa! Seluruh 4 tahapan peracikan wedang telah tersusun runtut dari awal mendengarkan hingga penyajian.'
       });
     } else {
       setSeqFeedback(null);
@@ -101,7 +158,7 @@ export default function Act2View({ onCompleteAct, gameMode, onOpenHelp }) {
       soundManager.playClickSound();
       setMatchFeedback({
         type: 'info',
-        message: 'Pilih keluhan di kolom kiri (Kondisi & Keluhan) terlebih dahulu sebelum memilih racikan.'
+        message: 'Pilih keluhan di kolom kiri (Kondisi Jiwa atau Raga) terlebih dahulu sebelum memilih racikan rempah.'
       });
       return;
     }
@@ -112,18 +169,18 @@ export default function Act2View({ onCompleteAct, gameMode, onOpenHelp }) {
       setSelectedCondition(null);
       setMatchFeedback({
         type: 'success',
-        message: `Tepat sekali! ${item.explanation}`
+        message: `Tepat sekali: ${item.explanation}`
       });
     } else {
       soundManager.playClickSound();
       setMatchFeedback({
         type: 'error',
-        message: 'Kombinasi rempah tersebut belum tepat untuk meredakan keluhan ini. Telaah kembali khasiat rimpangnya.'
+        message: 'Kombinasi rempah tersebut belum tepat untuk meredakan keluhan ini. Telaah kembali khasiat zat alaminya.'
       });
     }
   };
 
-  const isMatchingComplete = matchedPairs.length === ACT_2_DATA.matchingPairs.length;
+  const isMatchingComplete = matchedPairs.length === selectedPairs.length;
   const completedChallengesCount = (isPuzzleComplete ? 1 : 0) + (isSequenceComplete ? 1 : 0) + (isMatchingComplete ? 1 : 0);
   const isAct2Ready = isPuzzleComplete && isSequenceComplete && isMatchingComplete;
 
@@ -134,9 +191,9 @@ export default function Act2View({ onCompleteAct, gameMode, onOpenHelp }) {
         <div>
           <div className="act-subtitle">
             <Sparkles size={14} />
-            Zona {ACT_2_DATA.zone} {gameMode === 'duo' && '• Diskusi Bersama'}
+            Zona Kita Berkarya • Variasi Sesi {sessionIndex + 1} ({activePuzzle.title})
           </div>
-          <h2 className="act-main-title">{ACT_2_DATA.title}</h2>
+          <h2 className="act-main-title">Babak 2: Resep yang Hilang</h2>
         </div>
 
         {/* Status Ringkas Sub-Misi */}
@@ -152,13 +209,13 @@ export default function Act2View({ onCompleteAct, gameMode, onOpenHelp }) {
               fontSize: '0.78rem',
               fontWeight: 800,
               cursor: 'pointer',
-              display: 'flex',
+              display: 'inline-flex',
               alignItems: 'center',
               gap: '4px'
             }}
           >
-            {isPuzzleComplete ? <Check size={13} color="var(--color-teal)" /> : <span>1.</span>}
-            Puzzle: {isPuzzleComplete ? 'Selesai ✓' : 'Belum'}
+            {isPuzzleComplete && <Check size={13} color="var(--color-teal)" />}
+            1. Puzzle: {isPuzzleComplete ? 'Selesai' : 'Belum'}
           </button>
 
           <button
@@ -172,13 +229,13 @@ export default function Act2View({ onCompleteAct, gameMode, onOpenHelp }) {
               fontSize: '0.78rem',
               fontWeight: 800,
               cursor: 'pointer',
-              display: 'flex',
+              display: 'inline-flex',
               alignItems: 'center',
               gap: '4px'
             }}
           >
-            {isSequenceComplete ? <Check size={13} color="var(--color-teal)" /> : <span>2.</span>}
-            Urutan Seduh: {isSequenceComplete ? 'Selesai ✓' : 'Belum'}
+            {isSequenceComplete && <Check size={13} color="var(--color-teal)" />}
+            2. Urutan Seduh: {isSequenceComplete ? 'Selesai' : 'Belum'}
           </button>
 
           <button
@@ -192,13 +249,13 @@ export default function Act2View({ onCompleteAct, gameMode, onOpenHelp }) {
               fontSize: '0.78rem',
               fontWeight: 800,
               cursor: 'pointer',
-              display: 'flex',
+              display: 'inline-flex',
               alignItems: 'center',
               gap: '4px'
             }}
           >
-            {isMatchingComplete ? <Check size={13} color="var(--color-teal)" /> : <span>3.</span>}
-            Khasiat: {matchedPairs.length} / 3 {isMatchingComplete && '✓'}
+            {isMatchingComplete && <Check size={13} color="var(--color-teal)" />}
+            3. Khasiat: {matchedPairs.length} / {selectedPairs.length}
           </button>
         </div>
       </div>
@@ -225,7 +282,8 @@ export default function Act2View({ onCompleteAct, gameMode, onOpenHelp }) {
           }}
         >
           <Puzzle size={17} />
-          <span>1. Jigsaw Resep Kuno {isPuzzleComplete && '✓'}</span>
+          <span>1. Jigsaw Resep Kuno</span>
+          {isPuzzleComplete && <Check size={14} color="#FFF" />}
         </button>
 
         <button
@@ -248,7 +306,8 @@ export default function Act2View({ onCompleteAct, gameMode, onOpenHelp }) {
           }}
         >
           <ListOrdered size={17} />
-          <span>2. Urutan Seduh {isSequenceComplete && '✓'}</span>
+          <span>2. Urutan Seduh</span>
+          {isSequenceComplete && <Check size={14} color="#FFF" />}
         </button>
 
         <button
@@ -271,7 +330,8 @@ export default function Act2View({ onCompleteAct, gameMode, onOpenHelp }) {
           }}
         >
           <GitCompare size={17} />
-          <span>3. Khasiat & Raga ({matchedPairs.length} / 3) {isMatchingComplete && '✓'}</span>
+          <span>3. Khasiat & Raga ({matchedPairs.length} / {selectedPairs.length})</span>
+          {isMatchingComplete && <Check size={14} color="#FFF" />}
         </button>
       </div>
 
@@ -279,14 +339,14 @@ export default function Act2View({ onCompleteAct, gameMode, onOpenHelp }) {
       {subTab === 'puzzle' && (
         <div>
           <MiniGameGuideBanner
-            tag="Tantangan 1 • Jigsaw Resep Kuno"
-            title="Cara Menyusun Kertas Resep Kuno Pak Ilmu"
+            tag="Tantangan 1: Rekonstruksi Naskah Resep"
+            title={`Cara Menyusun: ${activePuzzle.title}`}
             steps={[
-              "Pilih salah satu sobekan resep di panel kiri (klik kepingan hingga berwarna oranye).",
-              "Klik slot kosong pada bingkai kanan (Slot 1 sampai 4) sesuai alur teks resep kuno.",
-              "Susun keempat kepingan hingga seluruh formula Wedang Uwuh Luhur terbaca utuh dan bermakna."
+              "Pilih salah satu kepingan resep di panel kiri (posisi kepingan telah diacak).",
+              "Klik slot kosong pada bingkai kanan (Slot Bagian 1 sampai 4) sesuai kesinambungan alur naskah.",
+              "Susun keempat kepingan hingga seluruh formula resep kuno terbaca utuh dan bermakna."
             ]}
-            tip="Kepingan 1 bercerita tentang jahe bakar, kepingan 2 tentang sereh dan cengkeh, kepingan 3 tentang guyuran air mendidih, dan kepingan 4 tentang adukan gula aren."
+            tip="Baca teks pada setiap kepingan untuk mengenali alur dari tahap pembuka, penyelarasan rempah, penyeduhan, hingga penutup."
             onOpenHelp={onOpenHelp}
           />
 
@@ -310,18 +370,18 @@ export default function Act2View({ onCompleteAct, gameMode, onOpenHelp }) {
           )}
 
           <div className="puzzle-assembly-arena">
-            {/* Pool Kepingan Resep */}
+            {/* Pool Kepingan Resep Acak */}
             <div className="puzzle-pieces-pool">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                 <span style={{ fontSize: '0.82rem', fontWeight: 800, color: 'var(--color-orange)', textTransform: 'uppercase' }}>
-                  Kepingan Sobekan Resep:
+                  Kepingan Sobekan Resep (Acak):
                 </span>
                 <span style={{ fontSize: '0.76rem', color: 'var(--text-muted)' }}>
                   {placedPieces.filter(Boolean).length} / 4 Terpasang
                 </span>
               </div>
 
-              {ACT_2_DATA.puzzlePieces.map((piece) => {
+              {initialShuffledPieces.map((piece) => {
                 const isPlaced = placedPieces.some(p => p && p.id === piece.id);
                 const isSelected = selectedPiece && selectedPiece.id === piece.id;
 
@@ -339,10 +399,12 @@ export default function Act2View({ onCompleteAct, gameMode, onOpenHelp }) {
                         justifyContent: 'center',
                         color: 'var(--color-teal-dark)',
                         fontSize: '0.82rem',
-                        fontWeight: 700
+                        fontWeight: 700,
+                        gap: '6px'
                       }}
                     >
-                      ✓ {piece.title} Telah Terpasang di Bingkai
+                      <Check size={14} color="var(--color-teal)" />
+                      <span>{piece.title} Telah Terpasang di Bingkai</span>
                     </div>
                   );
                 }
@@ -356,13 +418,13 @@ export default function Act2View({ onCompleteAct, gameMode, onOpenHelp }) {
                   >
                     {!isSelected && (
                       <div className="interactive-cue-badge" style={{ fontSize: '0.66rem' }}>
-                        👆 Klik Kepingan
+                        <span>Pilih Kepingan</span>
                       </div>
                     )}
                     <span className="piece-slot-indicator">{piece.title}</span>
                     <p className="piece-text">“{piece.text}”</p>
                     <span style={{ fontSize: '0.74rem', color: isSelected ? 'var(--color-orange)' : 'var(--color-teal-dark)', fontWeight: 800 }}>
-                      {isSelected ? '👉 Sekarang Klik Slot Kosong di Kanan' : 'Klik untuk Memilih'}
+                      {isSelected ? 'Pilih Slot Tujuan di Bingkai Kanan' : 'Klik untuk Memilih'}
                     </span>
                   </div>
                 );
@@ -376,8 +438,9 @@ export default function Act2View({ onCompleteAct, gameMode, onOpenHelp }) {
                   Bingkai Naskah Resep Kuno (4 Bagian):
                 </span>
                 {isPuzzleComplete && (
-                  <span style={{ fontSize: '0.78rem', color: 'var(--color-teal)', fontWeight: 800 }}>
-                    Naskah Utuh Terbaca ✓
+                  <span style={{ fontSize: '0.78rem', color: 'var(--color-teal)', fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    <Check size={13} />
+                    Naskah Utuh Terbaca
                   </span>
                 )}
               </div>
@@ -396,7 +459,7 @@ export default function Act2View({ onCompleteAct, gameMode, onOpenHelp }) {
                     {placed ? (
                       <div>
                         <span style={{ fontSize: '0.74rem', color: 'var(--color-teal)', fontWeight: 800, textTransform: 'uppercase' }}>
-                          Bagian {slotIdx + 1} ✓
+                          Bagian {slotIdx + 1}
                         </span>
                         <p style={{ fontSize: '0.88rem', color: 'var(--text-primary)', lineHeight: '1.5', marginTop: '4px', fontStyle: 'italic' }}>
                           “{placed.text}”
@@ -408,7 +471,7 @@ export default function Act2View({ onCompleteAct, gameMode, onOpenHelp }) {
                           Slot Bagian #{slotIdx + 1}
                         </span>
                         <p style={{ fontSize: '0.78rem', color: isReadyToPlace ? 'var(--color-orange)' : 'var(--text-muted)', marginTop: '4px', fontWeight: isReadyToPlace ? 700 : 500 }}>
-                          {selectedPiece ? '👉 Klik untuk Merekatkan Kepingan ke Sini' : 'Pilih kepingan di kiri terlebih dahulu'}
+                          {selectedPiece ? 'Klik untuk merekatkan kepingan ke sini' : 'Pilih kepingan di kiri terlebih dahulu'}
                         </p>
                       </div>
                     )}
@@ -422,8 +485,8 @@ export default function Act2View({ onCompleteAct, gameMode, onOpenHelp }) {
           {isPuzzleComplete && (
             <div className="discovery-toast-card" style={{ marginTop: '20px' }}>
               <div className="discovery-toast-text">
-                <h5>Naskah Resep Berhasil Direkonstruksi!</h5>
-                <p>Formula Wedang Uwuh Luhur telah terbaca secara utuh. Lanjutkan ke langkah berikutnya untuk menyusun urutan peracikan.</p>
+                <h5>Naskah Resep Berhasil Direkonstruksi</h5>
+                <p>Formula wedang tradisional telah tersusun utuh. Lanjutkan ke tantangan berikutnya untuk menyusun urutan peracikan.</p>
               </div>
               <button
                 className="btn-primary-action"
@@ -445,12 +508,12 @@ export default function Act2View({ onCompleteAct, gameMode, onOpenHelp }) {
       {subTab === 'sequence' && (
         <div style={{ maxWidth: '860px', margin: '0 auto', width: '100%' }}>
           <MiniGameGuideBanner
-            tag="Tantangan 2 • Urutan Seduh"
-            title="Cara Menyusun 4 Tahapan Peracikan Wedang"
+            tag="Tantangan 2: Urutan Peracikan"
+            title={`Cara Menyusun: ${activeSequence.title}`}
             steps={[
-              "Perhatikan 4 kartu tahapan peracikan di bawah yang posisinya masih acak.",
-              "Klik tombol panah ke atas (▲) atau ke bawah (▼) untuk memindahkan urutan kartu.",
-              "Urutkan secara kronologis: (1) Mendengarkan keluhan, (2) Mememarkan jahe & sereh, (3) Mengguyur air mendidih, (4) Melarutkan gula aren & menyajikan."
+              "Perhatikan 4 kartu tahapan peracikan di bawah yang posisinya telah diacak secara acak.",
+              "Klik tombol panah ke atas (▲) atau ke bawah (▼) untuk menaikkan atau menurunkan posisi kartu.",
+              "Susun secara logis dari tahap penyambutan pelanggan, penyiapan rimpang, perebusan/penyeduhan, hingga penyajian hangat."
             ]}
             tip="Pak Ilmu selalu mengajarkan: empati mendengarkan harus mendahului tindakan menyentuh rempah."
             onOpenHelp={onOpenHelp}
@@ -498,8 +561,9 @@ export default function Act2View({ onCompleteAct, gameMode, onOpenHelp }) {
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     {isStepCorrect && (
-                      <span style={{ fontSize: '0.74rem', color: 'var(--color-teal-dark)', fontWeight: 800 }}>
-                        Posisi Tepat ✓
+                      <span style={{ fontSize: '0.74rem', color: 'var(--color-teal-dark)', fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                        <Check size={12} />
+                        Posisi Tepat
                       </span>
                     )}
                     <div className="sequence-controls">
@@ -532,7 +596,7 @@ export default function Act2View({ onCompleteAct, gameMode, onOpenHelp }) {
           {isSequenceComplete && (
             <div className="discovery-toast-card" style={{ marginTop: '20px' }}>
               <div className="discovery-toast-text">
-                <h5>Urutan Peracikan Telah Selaras!</h5>
+                <h5>Urutan Peracikan Telah Selaras</h5>
                 <p>Tahapan seduh wedang tradisional telah tersusun kronologis. Saatnya mencocokkan ramuan rempah dengan kondisi raga.</p>
               </div>
               <button
@@ -555,12 +619,12 @@ export default function Act2View({ onCompleteAct, gameMode, onOpenHelp }) {
       {subTab === 'matching' && (
         <div>
           <MiniGameGuideBanner
-            tag="Tantangan 3 • Khasiat & Raga"
+            tag="Tantangan 3: Pemetaan Khasiat Rempah"
             title="Cara Mencocokkan Kondisi Jiwa & Raga dengan Rempah"
             steps={[
-              "Pilih salah satu kartu kondisi/keluhan di kolom kiri (Kondisi Jiwa atau Raga).",
-              "Pilih racikan rempah penyembuh yang tepat di kolom kanan.",
-              "Ulangi hingga ketiga pasangan keluhan dan khasiat rempah terhubung dengan benar."
+              "Pilih salah satu kartu kondisi pada kolom kiri (posisi telah diacak secara mandiri).",
+              "Pilih racikan rempah penyembuh yang tepat pada kolom kanan.",
+              "Hubungkan seluruh pasangan keluhan dan khasiat rempah dengan benar."
             ]}
             tip="Jahe emprit mengatasi hawa dingin di tulang, cengkeh & sereh menenangkan pikiran lelah, dan gula aren memulihkan tenaga fisik."
             onOpenHelp={onOpenHelp}
@@ -586,18 +650,18 @@ export default function Act2View({ onCompleteAct, gameMode, onOpenHelp }) {
           )}
 
           <div className="matching-board">
-            {/* Kolom Kiri: Kondisi Penikmat */}
+            {/* Kolom Kiri: Kondisi Penikmat (Acak) */}
             <div className="match-column">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: '0.84rem', color: 'var(--color-orange)', fontWeight: 800 }}>
                   1. Pilih Kondisi Jiwa atau Raga:
                 </span>
                 <span style={{ fontSize: '0.76rem', color: 'var(--text-muted)' }}>
-                  {matchedPairs.length} / 3 Terhubung
+                  {matchedPairs.length} / {selectedPairs.length} Terhubung
                 </span>
               </div>
 
-              {ACT_2_DATA.matchingPairs.map((pair) => {
+              {shuffledConditions.map((pair) => {
                 const isMatched = matchedPairs.includes(pair.id);
                 const isSelected = selectedCondition && selectedCondition.id === pair.id;
 
@@ -610,17 +674,18 @@ export default function Act2View({ onCompleteAct, gameMode, onOpenHelp }) {
                   >
                     {!isMatched && !isSelected && (
                       <div className="interactive-cue-badge" style={{ fontSize: '0.66rem' }}>
-                        👆 Klik Keluhan
+                        <span>Pilih Keluhan</span>
                       </div>
                     )}
                     <strong>{pair.condition}</strong>
                     {isMatched ? (
-                      <span style={{ display: 'block', marginTop: '6px', fontSize: '0.78rem', color: 'var(--color-teal-dark)', fontWeight: 800 }}>
-                        ✓ Khasiat Berhasil Dicocokkan
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '6px', fontSize: '0.78rem', color: 'var(--color-teal-dark)', fontWeight: 800 }}>
+                        <Check size={13} color="var(--color-teal)" />
+                        Khasiat Berhasil Dicocokkan
                       </span>
                     ) : (
                       <span style={{ display: 'block', marginTop: '4px', fontSize: '0.74rem', color: isSelected ? 'var(--color-orange)' : 'var(--text-muted)' }}>
-                        {isSelected ? '👉 Sekarang pilih ramuan di kanan' : 'Klik untuk memilih kondisi ini'}
+                        {isSelected ? 'Pilih ramuan yang cocok di kolom kanan' : 'Klik untuk memilih keluhan ini'}
                       </span>
                     )}
                   </div>
@@ -628,12 +693,12 @@ export default function Act2View({ onCompleteAct, gameMode, onOpenHelp }) {
               })}
             </div>
 
-            {/* Kolom Kanan: Racikan Rempah */}
+            {/* Kolom Kanan: Racikan Rempah (Acak) */}
             <div className="match-column">
               <span style={{ fontSize: '0.84rem', color: 'var(--color-teal-dark)', fontWeight: 800 }}>
                 2. Pasangkan dengan Racikan Rempah:
               </span>
-              {ACT_2_DATA.matchingPairs.map((pair) => {
+              {shuffledRemedies.map((pair) => {
                 const isMatched = matchedPairs.includes(pair.id);
 
                 return (
@@ -648,13 +713,14 @@ export default function Act2View({ onCompleteAct, gameMode, onOpenHelp }) {
                   >
                     <span>{pair.remedy}</span>
                     {isMatched ? (
-                      <span style={{ display: 'block', marginTop: '6px', fontSize: '0.78rem', color: 'var(--color-teal-dark)', fontWeight: 800 }}>
-                        ✓ Khasiat Cocok Sempurna
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '6px', fontSize: '0.78rem', color: 'var(--color-teal-dark)', fontWeight: 800 }}>
+                        <Check size={13} color="var(--color-teal)" />
+                        Khasiat Cocok Sempurna
                       </span>
                     ) : (
                       selectedCondition && (
                         <span style={{ display: 'block', marginTop: '4px', fontSize: '0.74rem', color: 'var(--color-teal-dark)', fontWeight: 700 }}>
-                          👉 Klik jika ini ramuan yang tepat
+                          Pilih sebagai pasangan ramuan
                         </span>
                       )
                     )}
@@ -668,7 +734,7 @@ export default function Act2View({ onCompleteAct, gameMode, onOpenHelp }) {
           {isMatchingComplete && (
             <div className="discovery-toast-card" style={{ marginTop: '20px' }}>
               <div className="discovery-toast-text">
-                <h5>Semua Pasangan Khasiat Rempah Telah Tepat!</h5>
+                <h5>Semua Pasangan Khasiat Rempah Telah Tepat</h5>
                 <p>Kamu telah memahami keterkaitan antara keluhan raga dengan saripati tanaman herbal Nusantara.</p>
               </div>
             </div>
@@ -679,7 +745,7 @@ export default function Act2View({ onCompleteAct, gameMode, onOpenHelp }) {
       {/* Footer Aksi Navigasi Babak */}
       <div className="action-footer-bar">
         <div style={{ fontSize: '0.86rem', color: 'var(--text-muted)' }}>
-          Progres Babak 2: {completedChallengesCount} dari 3 tantangan selesai. {isAct2Ready ? 'Semua tantangan tuntas!' : 'Selesaikan seluruh tantangan untuk lanjut.'}
+          Progres Babak 2: {completedChallengesCount} dari 3 tantangan selesai. {isAct2Ready ? 'Semua tantangan tuntas.' : 'Selesaikan seluruh tantangan untuk lanjut.'}
         </div>
 
         <button

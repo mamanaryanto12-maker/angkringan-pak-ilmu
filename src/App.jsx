@@ -12,8 +12,15 @@ import Act3View from './views/Act3View.jsx';
 import EpilogueView from './views/EpilogueView.jsx';
 import SummaryView from './views/SummaryView.jsx';
 import { soundManager } from './utils/audio.js';
+import { ORDER_TICKETS } from './data/gameData.js';
 
 export default function App() {
+  // Indeks Sesi Pengunjung (Rotasi Variasi Konten 0, 1, 2)
+  const [sessionIndex, setSessionIndex] = useState(() => {
+    const saved = localStorage.getItem('angkringan_session_index');
+    return saved !== null ? parseInt(saved, 10) : 0;
+  });
+
   // State Utama Permainan
   const [currentStep, setCurrentStep] = useState(() => {
     return localStorage.getItem('angkringan_current_step') || 'intro';
@@ -53,6 +60,10 @@ export default function App() {
   const [isMuted, setIsMuted] = useState(false);
 
   // Simpan progres ke LocalStorage
+  useEffect(() => {
+    localStorage.setItem('angkringan_session_index', sessionIndex.toString());
+  }, [sessionIndex]);
+
   useEffect(() => {
     localStorage.setItem('angkringan_current_step', currentStep);
   }, [currentStep]);
@@ -125,6 +136,11 @@ export default function App() {
     localStorage.removeItem('angkringan_completed_acts');
     localStorage.removeItem('angkringan_seen_welcome');
     
+    // Perbarui rotasi sesi agar pengunjung berikutnya mendapatkan variasi tantangan yang berbeda
+    const nextSession = (sessionIndex + 1) % 3;
+    localStorage.setItem('angkringan_session_index', nextSession.toString());
+    setSessionIndex(nextSession);
+
     setCollectedNotes([]);
     setInspectedObjects([]);
     setCompletedActs([]);
@@ -132,6 +148,8 @@ export default function App() {
     setWelcomeModalAct(null);
     setCurrentStep('intro');
   };
+
+  const activeTicket = ORDER_TICKETS[sessionIndex % ORDER_TICKETS.length];
 
   return (
     <div className="game-viewport">
@@ -151,6 +169,7 @@ export default function App() {
         isMuted={isMuted}
         onToggleSound={handleToggleSound}
         hasUnreadNotes={collectedNotes.length > 0}
+        sessionIndex={sessionIndex}
       />
 
       {/* Konten Berdasarkan Langkah Permainan */}
@@ -161,6 +180,7 @@ export default function App() {
             gameMode={gameMode}
             setGameMode={setGameMode}
             onOpenWalkthrough={() => setIsWalkthroughOpen(true)}
+            sessionIndex={sessionIndex}
           />
         )}
 
@@ -173,6 +193,7 @@ export default function App() {
             setInspectedObjects={setInspectedObjects}
             onOpenTicket={() => setIsTicketOpen(true)}
             onOpenHelp={() => setIsHelpOpen(true)}
+            sessionIndex={sessionIndex}
           />
         )}
 
@@ -181,6 +202,7 @@ export default function App() {
             onCompleteAct={handleCompleteAct2}
             gameMode={gameMode}
             onOpenHelp={() => setIsHelpOpen(true)}
+            sessionIndex={sessionIndex}
           />
         )}
 
@@ -188,6 +210,7 @@ export default function App() {
           <Act3View
             onCompleteAct={handleCompleteAct3}
             onOpenHelp={() => setIsHelpOpen(true)}
+            sessionIndex={sessionIndex}
           />
         )}
 
@@ -195,6 +218,7 @@ export default function App() {
           <EpilogueView
             onCompleteEpilogue={handleCompleteEpilogue}
             onOpenHelp={() => setIsHelpOpen(true)}
+            sessionIndex={sessionIndex}
           />
         )}
 
@@ -202,6 +226,7 @@ export default function App() {
           <SummaryView
             onRestartGame={handleResetGame}
             onOpenNotebook={() => setIsNotebookOpen(true)}
+            sessionIndex={sessionIndex}
           />
         )}
       </main>
@@ -217,6 +242,7 @@ export default function App() {
       <OrderTicketModal
         isOpen={isTicketOpen}
         onClose={() => setIsTicketOpen(false)}
+        ticketData={activeTicket}
       />
 
       <NotebookModal

@@ -1566,28 +1566,54 @@ button {
   box-shadow: 0 4px 10px rgba(53, 140, 136, 0.2);
 }
 
-/* Badge Penunjuk Interaksi (Visual Cue) */
+/* Badge Penunjuk Interaksi (Visual Cue - Bersih & Elegan Tanpa Emoji) */
 .interactive-cue-badge {
   position: absolute;
   top: 8px;
   left: 8px;
-  background: var(--color-orange);
-  color: #FFF;
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 0.68rem;
-  font-weight: 800;
+  background: rgba(44, 32, 22, 0.88);
+  backdrop-filter: blur(4px);
+  color: #FFFDF9;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
   display: flex;
   align-items: center;
-  gap: 4px;
-  box-shadow: 0 2px 6px rgba(238, 114, 23, 0.35);
-  animation: pulseTap 2s infinite ease-in-out;
+  gap: 5px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
   z-index: 5;
 }
 
-@keyframes pulseTap {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
+/* Ilustrasi Rempah Asli pada Mini-Game Takaran Rempah */
+.spice-svg-icon {
+  width: 58px;
+  height: 58px;
+  object-fit: contain;
+  margin-bottom: 8px;
+  filter: drop-shadow(0 3px 6px rgba(60, 45, 30, 0.16));
+  transition: transform 0.25s ease;
+}
+
+.ingredient-tweak-box:hover .spice-svg-icon {
+  transform: scale(1.08) translateY(-2px);
+}
+
+.rain-badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: var(--color-teal-soft);
+  color: var(--color-teal-dark);
+  border: 1px solid var(--color-teal);
+  padding: 4px 12px;
+  border-radius: 14px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 /* Efek Sorotan Slot Jigsaw yang Siap Ditempati */

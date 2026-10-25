@@ -3,7 +3,7 @@ import { Sparkles, Users, User, ArrowRight, ShieldCheck, Compass } from 'lucide-
 import { soundManager } from '../utils/audio.js';
 import { GAME_INFO } from '../data/gameData.js';
 
-export default function OpeningView({ onStartGame, gameMode, setGameMode, onOpenWalkthrough }) {
+export default function OpeningView({ onStartGame, gameMode, setGameMode, onOpenWalkthrough, sessionIndex = 0 }) {
   const handleStart = () => {
     soundManager.startNightAmbience();
     soundManager.playClickSound();
@@ -203,7 +203,9 @@ export default function OpeningView({ onStartGame, gameMode, setGameMode, onOpen
             Karya Resmi Pameran Teknologi Pendidikan UNY
           </span>
           <span>•</span>
-          <span>Estimasi Sesi: {GAME_INFO.targetDuration}</span>
+          <span>Sesi #{sessionIndex + 1}</span>
+          <span>•</span>
+          <span>Estimasi: {GAME_INFO.targetDuration}</span>
         </div>
       </div>
     </div>

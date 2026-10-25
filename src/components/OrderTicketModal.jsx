@@ -2,8 +2,10 @@ import React from 'react';
 import { X, FileText } from 'lucide-react';
 import { ORDER_TICKET } from '../data/gameData.js';
 
-export default function OrderTicketModal({ isOpen, onClose }) {
+export default function OrderTicketModal({ isOpen, onClose, ticketData }) {
   if (!isOpen) return null;
+
+  const currentTicket = ticketData || ORDER_TICKET;
 
   return (
     <div className="modal-overlay" onClick={onClose} role="dialog" aria-modal="true">
@@ -22,18 +24,18 @@ export default function OrderTicketModal({ isOpen, onClose }) {
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <FileText size={20} color="var(--color-bata)" />
                 <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                  {ORDER_TICKET.title}
+                  {currentTicket.title}
                 </h2>
               </div>
               <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600, display: 'block', marginTop: '4px' }}>
-                Pengirim: {ORDER_TICKET.sender} • {ORDER_TICKET.time}
+                Pengirim: {currentTicket.sender} • {currentTicket.time}
               </span>
             </div>
             <div className="ticket-stamp">Misterius</div>
           </div>
 
           <div className="ticket-body">
-            <p>“{ORDER_TICKET.text}”</p>
+            <p>“{currentTicket.text}”</p>
 
             <div style={{
               background: 'var(--color-teal-soft)',
@@ -46,7 +48,7 @@ export default function OrderTicketModal({ isOpen, onClose }) {
                 Catatan Analisis Kebutuhan:
               </h4>
               <ul style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', paddingLeft: '18px', lineHeight: '1.5' }}>
-                {ORDER_TICKET.notes.map((n, i) => (
+                {currentTicket.notes.map((n, i) => (
                   <li key={i}>{n}</li>
                 ))}
               </ul>

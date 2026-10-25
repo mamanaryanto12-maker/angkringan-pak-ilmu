@@ -1,22 +1,37 @@
-import React, { useState } from 'react';
-import { ArrowRight, Sparkles, User, Flame, Coffee, HeartHandshake, CheckCircle2, AlertCircle, Lightbulb, Check } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { ArrowRight, Sparkles, User, HeartHandshake, CheckCircle2, AlertCircle, Check, CloudRain } from 'lucide-react';
 import { soundManager } from '../utils/audio.js';
-import { ACT_3_DATA } from '../data/gameData.js';
+import { ACT_3_PERSONAS } from '../data/gameData.js';
 import MiniGameGuideBanner from '../components/MiniGameGuideBanner.jsx';
 
-export default function Act3View({ onCompleteAct, onOpenHelp }) {
+export default function Act3View({ onCompleteAct, onOpenHelp, sessionIndex = 0 }) {
   const [currentPhase, setCurrentPhase] = useState(1); // 1: needs, 2: recipe, 3: delivery, 4: resolution
   
+  // Ambil persona pengunjung aktif berdasarkan variasi sesi (Mas Danang, Mbak Sari, atau Pak Broto)
+  const currentPersona = useMemo(() => {
+    return ACT_3_PERSONAS[sessionIndex % ACT_3_PERSONAS.length];
+  }, [sessionIndex]);
+
   // Phase 1: Analisis Kebutuhan
   const [selectedNeed, setSelectedNeed] = useState(null);
 
-  // Phase 2: Peracikan Bahan
-  const [jaheLevel, setJaheLevel] = useState(3);
-  const [serehLevel, setSerehLevel] = useState(2);
-  const [gulaLevel, setGulaLevel] = useState(2);
+  // Phase 2: Peracikan Bahan (Mulai dari kondisi netral/kosong Level 1, BUKAN langsung terisi sempurna)
+  const [jaheLevel, setJaheLevel] = useState(1);
+  const [serehLevel, setSerehLevel] = useState(1);
+  const [gulaLevel, setGulaLevel] = useState(1);
 
   // Phase 3: Sikap & Tutur Kata
   const [selectedDecision, setSelectedDecision] = useState(null);
+
+  // Reset state jika persona berganti
+  useEffect(() => {
+    setCurrentPhase(1);
+    setSelectedNeed(null);
+    setJaheLevel(1);
+    setSerehLevel(1);
+    setGulaLevel(1);
+    setSelectedDecision(null);
+  }, [currentPersona]);
 
   const handleSelectNeed = (need) => {
     soundManager.playClickSound();
@@ -38,10 +53,10 @@ export default function Act3View({ onCompleteAct, onOpenHelp }) {
     setCurrentPhase(4);
   };
 
-  // Harmoni Rasa Validator
-  const isJaheHarmonious = jaheLevel >= 3 && jaheLevel <= 4;
-  const isSerehHarmonious = serehLevel >= 2 && serehLevel <= 4;
-  const isGulaHarmonious = gulaLevel >= 2 && gulaLevel <= 3;
+  // Validasi Harmoni Rasa Berdasarkan Kebutuhan Persona Pengunjung yang Aktif
+  const isJaheHarmonious = jaheLevel >= currentPersona.idealRatios.jaheMin && jaheLevel <= currentPersona.idealRatios.jaheMax;
+  const isSerehHarmonious = serehLevel >= currentPersona.idealRatios.serehMin && serehLevel <= currentPersona.idealRatios.serehMax;
+  const isGulaHarmonious = gulaLevel >= currentPersona.idealRatios.gulaMin && gulaLevel <= currentPersona.idealRatios.gulaMax;
   const isRecipeBalanced = isJaheHarmonious && isSerehHarmonious && isGulaHarmonious;
 
   return (
@@ -51,9 +66,9 @@ export default function Act3View({ onCompleteAct, onOpenHelp }) {
         <div>
           <div className="act-subtitle">
             <Sparkles size={14} />
-            Zona {ACT_3_DATA.zone}
+            Zona Karya Kita Berkontribusi • Variasi Sesi {sessionIndex + 1}
           </div>
-          <h2 className="act-main-title">{ACT_3_DATA.title}</h2>
+          <h2 className="act-main-title">Babak 3: Untuk Siapa Racikan Ini?</h2>
         </div>
 
         {/* Step Pills Navigasi */}
@@ -69,23 +84,23 @@ export default function Act3View({ onCompleteAct, onOpenHelp }) {
               fontSize: '0.78rem',
               fontWeight: 800,
               cursor: 'pointer',
-              display: 'flex',
+              display: 'inline-flex',
               alignItems: 'center',
               gap: '4px'
             }}
           >
-            {selectedNeed && selectedNeed.id === 'na-2' ? <Check size={13} color="var(--color-teal)" /> : <span>1.</span>}
-            Kebutuhan
+            {selectedNeed && selectedNeed.isCorrect && <Check size={13} color="var(--color-teal)" />}
+            1. Analisis Kebutuhan
           </button>
 
           <button
             onClick={() => {
-              if (selectedNeed && selectedNeed.id === 'na-2') {
+              if (selectedNeed && selectedNeed.isCorrect) {
                 soundManager.playClickSound();
                 setCurrentPhase(2);
               }
             }}
-            disabled={!selectedNeed || selectedNeed.id !== 'na-2'}
+            disabled={!selectedNeed || !selectedNeed.isCorrect}
             style={{
               background: currentPhase >= 2 ? 'var(--color-teal-soft)' : '#FFF',
               border: `1.5px solid ${currentPhase === 2 ? 'var(--color-teal)' : 'var(--border-strong)'}`,
@@ -94,15 +109,15 @@ export default function Act3View({ onCompleteAct, onOpenHelp }) {
               borderRadius: '20px',
               fontSize: '0.78rem',
               fontWeight: 800,
-              cursor: (!selectedNeed || selectedNeed.id !== 'na-2') ? 'not-allowed' : 'pointer',
-              opacity: (!selectedNeed || selectedNeed.id !== 'na-2') ? 0.6 : 1,
-              display: 'flex',
+              cursor: (!selectedNeed || !selectedNeed.isCorrect) ? 'not-allowed' : 'pointer',
+              opacity: (!selectedNeed || !selectedNeed.isCorrect) ? 0.6 : 1,
+              display: 'inline-flex',
               alignItems: 'center',
               gap: '4px'
             }}
           >
-            {currentPhase >= 3 ? <Check size={13} color="var(--color-teal)" /> : <span>2.</span>}
-            Takaran Rempah
+            {currentPhase >= 3 && <Check size={13} color="var(--color-teal)" />}
+            2. Takaran Rempah
           </button>
 
           <button
@@ -123,13 +138,13 @@ export default function Act3View({ onCompleteAct, onOpenHelp }) {
               fontWeight: 800,
               cursor: currentPhase < 3 ? 'not-allowed' : 'pointer',
               opacity: currentPhase < 3 ? 0.6 : 1,
-              display: 'flex',
+              display: 'inline-flex',
               alignItems: 'center',
               gap: '4px'
             }}
           >
-            {currentPhase === 4 ? <Check size={13} color="var(--color-teal)" /> : <span>3.</span>}
-            Tutur Kata Penyajian
+            {currentPhase === 4 && <Check size={13} color="var(--color-teal)" />}
+            3. Tutur Kata Penyajian
           </button>
         </div>
       </div>
@@ -137,43 +152,43 @@ export default function Act3View({ onCompleteAct, onOpenHelp }) {
       {/* Mini Game Guide Banner sesuai Fase Aktif */}
       {currentPhase === 1 && (
         <MiniGameGuideBanner
-          tag="Tahap 1 dari 3 • Analisis Kebutuhan"
-          title="Cara Menemukan Akar Kebutuhan Pelanggan"
+          tag="Tahap 1 dari 3: Analisis Kebutuhan"
+          title={`Memahami Permasalahan: ${currentPersona.name}`}
           steps={[
-            "Simak cerita dan keluhan Mas Danang pada kartu profil di sebelah kiri.",
-            "Pilih salah satu dari 3 opsi pendekatan di panel kanan yang paling menyentuh kebutuhan fisik dan batinnya.",
-            "Baca umpan balik evaluasi. Jika sudah memilih pendekatan yang tepat, tekan tombol 'Lanjut ke Penakaran Rempah'."
+            "Simak cerita dan keluhan pengunjung pada kartu profil di sebelah kiri.",
+            "Pilih salah satu pendekatan di panel kanan yang menyentuh akar permasalahan raga dan batinnya.",
+            "Baca umpan balik evaluasi. Jika sudah memilih pendekatan yang tepat, tekan 'Lanjut ke Penakaran Rempah'."
           ]}
-          tip="Mas Danang tidak sekadar butuh pelepas dahaga; ia kedinginan hingga ke tulang dan butuh pengingat bahwa ia tidak sendirian."
+          tip={currentPersona.clue}
           onOpenHelp={onOpenHelp}
         />
       )}
 
       {currentPhase === 2 && (
         <MiniGameGuideBanner
-          tag="Tahap 2 dari 3 • Penakaran Komposisi Rasa"
-          title="Cara Menakar Bahan Wedang Uwuh Luhur"
+          tag="Tahap 2 dari 3: Penakaran Komposisi Rempah"
+          title={`Menakar Ramuan Tradisional untuk ${currentPersona.name}`}
           steps={[
-            "Gunakan tombol (-) dan (+) untuk menyesuaikan takaran Jahe Emprit, Sereh, dan Gula Aren.",
-            "Perhatikan 3 indikator harmoni seduhan di bawah: Kehangatan, Ketenangan Aroma, dan Keseimbangan Manis.",
-            "Rasio ideal: Jahe level 3–4 (hangat mendalam), Sereh level 2–3 (aroma menentramkan), dan Gula Aren level 2–3 (manis alami peneguh stamina).",
-            "Setelah komposisi seimbang, klik tombol 'Seduh & Siapkan Penyajian'."
+            "Takaran awal sengaja dimulai dari level 1. Gunakan tombol (-) dan (+) untuk mengatur intensitas bahan.",
+            "Perhatikan 3 indikator harmoni seduhan di bawah: Tingkat Kehangatan, Ketenangan Aroma, dan Keseimbangan Manis.",
+            "Sesuaikan komposisi dengan kebutuhan khusus pengunjung: " + currentPersona.idealDesc,
+            "Setelah komposisi seimbang dan selaras, klik tombol 'Seduh & Siapkan Penyajian'."
           ]}
-          tip="Terlalu banyak gula akan menenggelamkan khasiat rempah; terlalu sedikit jahe tidak akan mampu mengusir gigilan dingin."
+          tip="Rasio takaran harus seimbang antara pembakar dingin, pelega pernapasan, dan pemulih stamina."
           onOpenHelp={onOpenHelp}
         />
       )}
 
       {currentPhase === 3 && (
         <MiniGameGuideBanner
-          tag="Tahap 3 dari 3 • Sikap & Tutur Kata Penyajian"
-          title="Cara Menyajikan Wedang dengan Empati dan Budi Pekerti"
+          tag="Tahap 3 dari 3: Sikap & Tutur Kata Penyajian"
+          title={`Menyerahkan Cangkir Wedang kepada ${currentPersona.name}`}
           steps={[
-            "Pilih salah satu tutur kata dan sikap penyajian wedang hangat kepada Mas Danang.",
+            "Pilih salah satu tutur kata dan sikap penyajian wedang hangat dari opsi yang tersedia.",
             "Pilihlah sapaan yang mengandung ketulusan, doa kebaikan, dan budi pekerti khas Yogyakarta.",
-            "Tekan tombol 'Sajikan ke Mas Danang' untuk menyaksikan dampak kehangatan racikanmu."
+            "Tekan tombol 'Sajikan Wedang' untuk menyaksikan dampak kehangatan racikanmu terhadap semangat pengunjung."
           ]}
-          tip="Di Angkringan Pak Ilmu, tutur kata ramah dan doa yang tulus adalah separuh dari khasiat wedang itu sendiri."
+          tip="Di Angkringan Pak Ilmu, tutur kata ramah dan doa yang tulus adalah separuh dari khasiat obat itu sendiri."
           onOpenHelp={onOpenHelp}
         />
       )}
@@ -181,17 +196,20 @@ export default function Act3View({ onCompleteAct, onOpenHelp }) {
       <div className="customer-encounter-panel">
         {/* Panel Sisi Kiri: Profil Pelanggan & Dialog */}
         <div className="customer-profile-card">
-          <div className="rain-badge">🌧️ Hujan Deras Yogyakarta</div>
+          <div className="rain-badge">
+            <CloudRain size={14} />
+            <span>{currentPersona.contextBadge}</span>
+          </div>
 
           <div className="customer-avatar-frame">
             <User size={52} />
           </div>
 
-          <h3 className="customer-name">{ACT_3_DATA.customer.name}</h3>
-          <span className="customer-status">{ACT_3_DATA.customer.condition}</span>
+          <h3 className="customer-name">{currentPersona.name}</h3>
+          <span className="customer-status">{currentPersona.condition}</span>
 
           <div className="customer-dialogue-balloon">
-            <p>“{ACT_3_DATA.customer.story}”</p>
+            <p>“{currentPersona.story}”</p>
           </div>
 
           <div style={{
@@ -206,9 +224,9 @@ export default function Act3View({ onCompleteAct, onOpenHelp }) {
             textAlign: 'left'
           }}>
             <strong style={{ color: 'var(--color-teal-dark)', display: 'block', marginBottom: '4px' }}>
-              Isyarat Kebutuhan Pelanggan:
+              Isyarat Kebutuhan Pengunjung:
             </strong>
-            Pelanggan membutuhkan perpaduan hawa panas jahe untuk mengusir kedinginan tubuh dan aroma sereh cengkeh untuk menenangkan kegundahan batin.
+            {currentPersona.clue}
           </div>
         </div>
 
@@ -222,7 +240,7 @@ export default function Act3View({ onCompleteAct, onOpenHelp }) {
                   Langkah 1 dari 3: Analisis Kebutuhan
                 </span>
                 <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-primary)', marginTop: '2px' }}>
-                  Pendekatan Apa yang Paling Tepat untuk Mas Danang?
+                  Pendekatan Apa yang Paling Tepat untuk {currentPersona.name}?
                 </h3>
                 <p style={{ fontSize: '0.86rem', color: 'var(--text-secondary)' }}>
                   Pilihlah solusi yang menyentuh akar masalah fisik sekaligus memulihkan semangat batinnya.
@@ -230,7 +248,7 @@ export default function Act3View({ onCompleteAct, onOpenHelp }) {
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                {ACT_3_DATA.needsAnalysis.map((need) => {
+                {currentPersona.needsAnalysis.map((need) => {
                   const isSelected = selectedNeed && selectedNeed.id === need.id;
 
                   return (
@@ -250,7 +268,7 @@ export default function Act3View({ onCompleteAct, onOpenHelp }) {
                     >
                       {!isSelected && (
                         <div className="interactive-cue-badge" style={{ fontSize: '0.66rem' }}>
-                          👆 Klik Pilihan Ini
+                          <span>Pilih Pendekatan Ini</span>
                         </div>
                       )}
                       <h4 style={{ fontSize: '0.98rem', fontWeight: 800, color: isSelected ? 'var(--color-teal-dark)' : 'var(--text-primary)' }}>
@@ -265,14 +283,14 @@ export default function Act3View({ onCompleteAct, onOpenHelp }) {
                           paddingTop: '8px',
                           borderTop: '1px dashed var(--border-strong)',
                           fontSize: '0.85rem',
-                          color: need.id === 'na-2' ? 'var(--color-teal-dark)' : 'var(--color-bata-dark)',
+                          color: need.isCorrect ? 'var(--color-teal-dark)' : 'var(--color-bata-dark)',
                           lineHeight: '1.45',
                           fontWeight: 700,
                           display: 'flex',
                           alignItems: 'center',
                           gap: '6px'
                         }}>
-                          {need.id === 'na-2' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
+                          {need.isCorrect ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
                           <span>Umpan Balik: {need.feedback}</span>
                         </div>
                       )}
@@ -284,7 +302,7 @@ export default function Act3View({ onCompleteAct, onOpenHelp }) {
               <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
                 <button
                   className="btn-primary-action"
-                  disabled={!selectedNeed || selectedNeed.id !== 'na-2'}
+                  disabled={!selectedNeed || !selectedNeed.isCorrect}
                   onClick={() => {
                     soundManager.playClickSound();
                     setCurrentPhase(2);
@@ -297,19 +315,19 @@ export default function Act3View({ onCompleteAct, onOpenHelp }) {
             </div>
           )}
 
-          {/* FASE 2: PERACIKAN BAHAN DENGAN CANGKIR BLIRIK ASLI */}
+          {/* FASE 2: PERACIKAN BAHAN DENGAN ILUSTRASI REMPAH ASLI */}
           {currentPhase === 2 && (
             <div className="brewing-workshop">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
                   <span style={{ fontSize: '0.8rem', color: 'var(--color-orange)', fontWeight: 800, textTransform: 'uppercase' }}>
-                    Langkah 2 dari 3: Penakaran Komposisi Rasa
+                    Langkah 2 dari 3: Penakaran Komposisi Rempah
                   </span>
                   <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-primary)', marginTop: '2px' }}>
-                    Takaran Rempah Tradisional Wedang Uwuh Luhur
+                    Menakar Rempah Tradisional di Cangkir Blirik
                   </h3>
                   <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                    Atur perbandingan bahan rempah agar kehangatan, aroma, dan kemanisan berpadu harmonis.
+                    Mulai dari takaran awal, sesuaikan dosis rempah agar kehangatan, aroma, dan kemanisan berpadu harmonis.
                   </p>
                 </div>
 
@@ -322,11 +340,15 @@ export default function Act3View({ onCompleteAct, onOpenHelp }) {
               </div>
 
               <div className="ingredient-selectors-grid">
-                {/* Jahe Emprit */}
+                {/* Jahe Emprit Bakar (Menggunakan Ilustrasi jahe.svg Asli) */}
                 <div className="ingredient-tweak-box active">
-                  <Flame size={30} color="var(--color-orange)" style={{ marginBottom: '8px' }} />
+                  <img
+                    src="/assets/spices/jahe.svg"
+                    alt="Rimpang Jahe Emprit Bakar"
+                    className="spice-svg-icon"
+                  />
                   <span className="tweak-name">Jahe Emprit Bakar</span>
-                  <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>Pengusir Dingin Inti</span>
+                  <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>Bara Pengusir Dingin</span>
                   <div className="tweak-meter">
                     <button
                       className="meter-btn"
@@ -342,16 +364,28 @@ export default function Act3View({ onCompleteAct, onOpenHelp }) {
                       aria-label="Tambah takaran jahe"
                     >+</button>
                   </div>
-                  <span style={{ fontSize: '0.72rem', color: isJaheHarmonious ? 'var(--color-teal-dark)' : 'var(--color-orange)', fontWeight: 700, marginTop: '6px' }}>
-                    {isJaheHarmonious ? '✓ Takaran Pas' : (jaheLevel < 3 ? 'Perlu Ditambah' : 'Terlalu Pedas')}
+                  <span style={{
+                    fontSize: '0.72rem',
+                    color: isJaheHarmonious ? 'var(--color-teal-dark)' : 'var(--color-orange)',
+                    fontWeight: 700,
+                    marginTop: '6px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}>
+                    {isJaheHarmonious ? <><Check size={12} /> Takaran Pas</> : (jaheLevel < currentPersona.idealRatios.jaheMin ? 'Perlu Ditambah' : 'Terlalu Pedas')}
                   </span>
                 </div>
 
-                {/* Sereh Wangi */}
+                {/* Batang Sereh Wangi (Menggunakan Ilustrasi sereh.svg Asli) */}
                 <div className="ingredient-tweak-box active">
-                  <Coffee size={30} color="var(--color-teal)" style={{ marginBottom: '8px' }} />
+                  <img
+                    src="/assets/spices/sereh.svg"
+                    alt="Batang Sereh Wangi Memar"
+                    className="spice-svg-icon"
+                  />
                   <span className="tweak-name">Batang Sereh Memar</span>
-                  <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>Penyegar Pernapasan</span>
+                  <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>Aroma Pelega Napas</span>
                   <div className="tweak-meter">
                     <button
                       className="meter-btn"
@@ -367,16 +401,28 @@ export default function Act3View({ onCompleteAct, onOpenHelp }) {
                       aria-label="Tambah takaran sereh"
                     >+</button>
                   </div>
-                  <span style={{ fontSize: '0.72rem', color: isSerehHarmonious ? 'var(--color-teal-dark)' : 'var(--color-orange)', fontWeight: 700, marginTop: '6px' }}>
-                    {isSerehHarmonious ? '✓ Aroma Pas' : (serehLevel < 2 ? 'Aroma Lemah' : 'Terlalu Wangi')}
+                  <span style={{
+                    fontSize: '0.72rem',
+                    color: isSerehHarmonious ? 'var(--color-teal-dark)' : 'var(--color-orange)',
+                    fontWeight: 700,
+                    marginTop: '6px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}>
+                    {isSerehHarmonious ? <><Check size={12} /> Aroma Pas</> : (serehLevel < currentPersona.idealRatios.serehMin ? 'Aroma Lemah' : 'Terlalu Wangi')}
                   </span>
                 </div>
 
-                {/* Gula Aren */}
+                {/* Gula Jawa Aren (Menggunakan Ilustrasi gula_aren.svg Asli) */}
                 <div className="ingredient-tweak-box active">
-                  <Sparkles size={30} color="var(--color-gold-deep)" style={{ marginBottom: '8px' }} />
-                  <span className="tweak-name">Gula Jawa Aren Asli</span>
-                  <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>Peneguh Daya & Stamina</span>
+                  <img
+                    src="/assets/spices/gula_aren.svg"
+                    alt="Gula Jawa Aren Asli"
+                    className="spice-svg-icon"
+                  />
+                  <span className="tweak-name">Gula Jawa Aren</span>
+                  <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>Peneguh Daya Stamina</span>
                   <div className="tweak-meter">
                     <button
                       className="meter-btn"
@@ -392,13 +438,21 @@ export default function Act3View({ onCompleteAct, onOpenHelp }) {
                       aria-label="Tambah takaran gula aren"
                     >+</button>
                   </div>
-                  <span style={{ fontSize: '0.72rem', color: isGulaHarmonious ? 'var(--color-teal-dark)' : 'var(--color-orange)', fontWeight: 700, marginTop: '6px' }}>
-                    {isGulaHarmonious ? '✓ Manis Pas' : (gulaLevel < 2 ? 'Kurang Manis' : 'Terlalu Manis')}
+                  <span style={{
+                    fontSize: '0.72rem',
+                    color: isGulaHarmonious ? 'var(--color-teal-dark)' : 'var(--color-orange)',
+                    fontWeight: 700,
+                    marginTop: '6px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}>
+                    {isGulaHarmonious ? <><Check size={12} /> Manis Pas</> : (gulaLevel < currentPersona.idealRatios.gulaMin ? 'Kurang Manis' : 'Terlalu Manis')}
                   </span>
                 </div>
               </div>
 
-              {/* Indikator Harmoni Seduhan */}
+              {/* Indikator Harmoni Seduhan Sesuai Persona Aktif */}
               <div style={{
                 background: isRecipeBalanced ? 'var(--color-teal-soft)' : 'var(--bg-parchment)',
                 border: `1.5px solid ${isRecipeBalanced ? 'var(--color-teal)' : 'var(--border-natural)'}`,
@@ -410,21 +464,21 @@ export default function Act3View({ onCompleteAct, onOpenHelp }) {
                 transition: 'all 0.25s'
               }}>
                 <div>
-                  <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontWeight: 700 }}>Intensitas Hangat</span>
-                  <div style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--color-orange)', marginTop: '2px' }}>
-                    {jaheLevel >= 3 ? 'Hangat Mendalam 🔥' : 'Kurang Menggigit'}
+                  <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontWeight: 700 }}>Intensitas Hangat Jahe</span>
+                  <div style={{ fontSize: '1rem', fontWeight: 800, color: isJaheHarmonious ? 'var(--color-teal-dark)' : 'var(--color-orange)', marginTop: '2px' }}>
+                    {isJaheHarmonious ? 'Kehangatan Pas' : (jaheLevel < currentPersona.idealRatios.jaheMin ? 'Kurang Menghangatkan' : 'Terlalu Menyengat')}
                   </div>
                 </div>
                 <div style={{ borderLeft: '1.5px solid var(--border-natural)', borderRight: '1.5px solid var(--border-natural)', padding: '0 24px' }}>
-                  <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontWeight: 700 }}>Ketenangan Aroma</span>
-                  <div style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--color-teal-dark)', marginTop: '2px' }}>
-                    {serehLevel >= 2 ? 'Harum Menentramkan 🌿' : 'Aroma Tipis'}
+                  <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontWeight: 700 }}>Ketenangan Aroma Sereh</span>
+                  <div style={{ fontSize: '1rem', fontWeight: 800, color: isSerehHarmonious ? 'var(--color-teal-dark)' : 'var(--color-orange)', marginTop: '2px' }}>
+                    {isSerehHarmonious ? 'Harum Menenteramkan' : (serehLevel < currentPersona.idealRatios.serehMin ? 'Aroma Terlalu Tipis' : 'Aroma Terlalu Tajam')}
                   </div>
                 </div>
                 <div>
-                  <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontWeight: 700 }}>Keseimbangan Manis</span>
-                  <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#8C6505', marginTop: '2px' }}>
-                    {gulaLevel >= 2 ? 'Manis Gurih Pas 🍯' : 'Tawar'}
+                  <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontWeight: 700 }}>Keseimbangan Manis Aren</span>
+                  <div style={{ fontSize: '1rem', fontWeight: 800, color: isGulaHarmonious ? 'var(--color-teal-dark)' : 'var(--color-orange)', marginTop: '2px' }}>
+                    {isGulaHarmonious ? 'Manis Alami Pas' : (gulaLevel < currentPersona.idealRatios.gulaMin ? 'Kurang Asupan Tenaga' : 'Terlalu Manis')}
                   </div>
                 </div>
               </div>
@@ -438,6 +492,7 @@ export default function Act3View({ onCompleteAct, onOpenHelp }) {
                 </button>
                 <button
                   className="btn-primary-action"
+                  disabled={!isRecipeBalanced}
                   onClick={handleBrew}
                 >
                   <span>Seduh & Siapkan Penyajian</span>
@@ -455,7 +510,7 @@ export default function Act3View({ onCompleteAct, onOpenHelp }) {
                   Langkah 3 dari 3: Sikap & Tutur Kata Penyajian
                 </span>
                 <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-primary)', marginTop: '2px' }}>
-                  Bagaimana Caramu Menyerahkan Cangkir Wedang Ini?
+                  Bagaimana Caramu Menyerahkan Cangkir Wedang kepada {currentPersona.name}?
                 </h3>
                 <p style={{ fontSize: '0.86rem', color: 'var(--text-secondary)' }}>
                   Penyajian bukan sekadar serah terima fisik, melainkan penyampaian rasa kemanusiaan dan empati.
@@ -463,7 +518,7 @@ export default function Act3View({ onCompleteAct, onOpenHelp }) {
               </div>
 
               <div className="decision-options-group">
-                {ACT_3_DATA.presentationDecisions.map((dec) => {
+                {currentPersona.presentationDecisions.map((dec) => {
                   const isSelected = selectedDecision && selectedDecision.id === dec.id;
 
                   return (
@@ -475,7 +530,7 @@ export default function Act3View({ onCompleteAct, onOpenHelp }) {
                     >
                       {!isSelected && (
                         <div className="interactive-cue-badge" style={{ fontSize: '0.66rem' }}>
-                          👆 Klik Pilihan Ini
+                          <span>Pilih Tutur Kata Ini</span>
                         </div>
                       )}
                       <HeartHandshake size={32} color={isSelected ? 'var(--color-teal-dark)' : 'var(--color-teal)'} style={{ flexShrink: 0 }} />
@@ -488,7 +543,7 @@ export default function Act3View({ onCompleteAct, onOpenHelp }) {
                         </span>
                         {isSelected && (
                           <span style={{ display: 'block', marginTop: '6px', fontSize: '0.82rem', color: 'var(--color-teal-dark)', fontWeight: 600 }}>
-                            💡 {dec.impact}
+                            {dec.impact}
                           </span>
                         )}
                       </div>
@@ -509,7 +564,7 @@ export default function Act3View({ onCompleteAct, onOpenHelp }) {
                   disabled={!selectedDecision}
                   onClick={handleFinalServe}
                 >
-                  <span>Sajikan ke Mas Danang</span>
+                  <span>Sajikan Wedang</span>
                   <ArrowRight size={18} />
                 </button>
               </div>
@@ -545,8 +600,7 @@ export default function Act3View({ onCompleteAct, onOpenHelp }) {
                 maxWidth: '620px',
                 margin: '0 auto 20px auto'
               }}>
-                Mas Danang menyesap wedang hangat dari cangkir blirik dengan kedua tangannya yang gemetar. 
-                Hawa jahe membakar dingin di tulangnya, aroma sereh menjernihkan kepalanya, dan tutur katamu mengusir rasa putus asa yang sempat membelenggunya.
+                {currentPersona.resolutionDesc}
               </p>
 
               <div style={{
@@ -561,7 +615,7 @@ export default function Act3View({ onCompleteAct, onOpenHelp }) {
                 boxShadow: 'var(--shadow-paper)',
                 border: '1.5px solid var(--border-natural)'
               }}>
-                “Matur nuwun sanget... Ternyata yang kubutuhkan bukan sekadar minuman penghalau dahaga, tetapi pengingat bahwa di tanah ini, kita tidak pernah berjuang sendirian.”
+                “{currentPersona.resolutionQuote}”
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'center' }}>

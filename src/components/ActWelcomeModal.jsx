@@ -189,7 +189,7 @@ export default function ActWelcomeModal({ isOpen, onClose, currentStep }) {
             alignItems: 'center'
           }}>
             <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-              Panduan ini bisa kamu buka lagi kapan saja lewat tombol 💡 Petunjuk di atas.
+              Panduan ini bisa kamu buka lagi kapan saja lewat tombol Petunjuk di atas.
             </span>
 
             <button

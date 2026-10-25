@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <defs>
+    <radialGradient id="gingerSkin" cx="40%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#F7D382"/>
+      <stop offset="50%" stop-color="#DE9F3F"/>
+      <stop offset="85%" stop-color="#B87326"/>
+      <stop offset="100%" stop-color="#7A4513"/>
+    </radialGradient>
+    <linearGradient id="gingerCut" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF3C2"/>
+      <stop offset="100%" stop-color="#E8BE5D"/>
+    </linearGradient>
+  </defs>
+  <!-- Bayangan Dasar -->
+  <ellipse cx="50" cy="85" rx="36" ry="7" fill="#2C221E" opacity="0.18"/>
+  
+  <!-- Badan Utama Rimpang Jahe -->
+  <path d="M28,68 C20,62 16,48 24,38 C30,30 40,32 44,40 C48,32 58,26 68,32 C78,38 82,50 78,60 C74,70 66,74 54,72 C46,78 36,76 28,68 Z" 
+        fill="url(#gingerSkin)" stroke="#663A0F" stroke-width="2.5" stroke-linejoin="round"/>
+        
+  <!-- Cabang Rimpang Atas -->
+  <path d="M40,36 C38,24 48,16 56,20 C62,24 60,34 54,38 Z" 
+        fill="url(#gingerSkin)" stroke="#663A0F" stroke-width="2.2"/>
+  <path d="M24,42 C14,36 18,22 28,24 C34,26 34,34 30,40 Z" 
+        fill="url(#gingerSkin)" stroke="#663A0F" stroke-width="2.2"/>
+  <path d="M68,36 C78,28 88,36 84,46 C80,50 76,46 72,42 Z" 
+        fill="url(#gingerSkin)" stroke="#663A0F" stroke-width="2.2"/>
+
+  <!-- Garis Kerut Kulit Alami Jahe -->
+  <path d="M26,52 Q32,56 40,54" stroke="#8C4D15" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <path d="M44,46 Q52,50 60,46" stroke="#8C4D15" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <path d="M58,58 Q66,62 72,56" stroke="#8C4D15" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <path d="M34,66 Q42,70 48,66" stroke="#8C4D15" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <path d="M46,26 Q50,30 54,28" stroke="#8C4D15" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  
+  <!-- Potongan Irisan Kuning Segar di Samping -->
+  <ellipse cx="68" cy="66" rx="14" ry="11" fill="url(#gingerCut)" stroke="#7A4513" stroke-width="2" transform="rotate(-15 68 66)"/>
+  <ellipse cx="68" cy="66" rx="9" ry="7" fill="#FCEAB3" stroke="#B87326" stroke-dasharray="2,3" stroke-width="1.2" transform="rotate(-15 68 66)"/>
+</svg>

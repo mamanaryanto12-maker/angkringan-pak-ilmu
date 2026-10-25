@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <defs>
+    <radialGradient id="arenDome" cx="45%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#8A4A1C"/>
+      <stop offset="45%" stop-color="#5E2C0C"/>
+      <stop offset="85%" stop-color="#3D1A06"/>
+      <stop offset="100%" stop-color="#240D02"/>
+    </radialGradient>
+    <linearGradient id="arenChipped" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A85F24"/>
+      <stop offset="100%" stop-color="#6B330F"/>
+    </linearGradient>
+  </defs>
+  <!-- Bayangan Dasar -->
+  <ellipse cx="50" cy="86" rx="38" ry="8" fill="#2C221E" opacity="0.22"/>
+
+  <!-- Bongkahan Gula Belakang (Siluet Batok Kelapa Kedua) -->
+  <path d="M48,68 C48,46 64,36 78,36 C88,36 94,48 94,66 C94,74 74,78 54,76 Z" 
+        fill="#3D1A06" stroke="#240D02" stroke-width="2"/>
+
+  <!-- Bongkahan Gula Batok Utama (Depan) -->
+  <path d="M16,74 C16,42 32,30 52,30 C72,30 84,42 84,74 C84,82 50,86 16,74 Z" 
+        fill="url(#arenDome)" stroke="#240D02" stroke-width="2.4"/>
+
+  <!-- Tekstur Pori-Pori & Serat Nira Alami Batok -->
+  <ellipse cx="50" cy="46" rx="14" ry="7" fill="#804118" opacity="0.4"/>
+  <path d="M26,62 C34,60 44,64 56,60" stroke="#7A3912" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+  <path d="M38,50 C46,48 54,52 64,48" stroke="#7A3912" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+
+  <!-- Pecahan & Serpihan Gula Aren Kristal di Bawah -->
+  <polygon points="18,80 26,76 28,84 20,85" fill="url(#arenChipped)" stroke="#240D02" stroke-width="1.2"/>
+  <polygon points="30,83 38,81 37,87 29,86" fill="url(#arenChipped)" stroke="#240D02" stroke-width="1.2"/>
+  <polygon points="76,79 84,77 82,85 74,83" fill="url(#arenChipped)" stroke="#240D02" stroke-width="1.2"/>
+  <circle cx="23" cy="81" r="1.5" fill="#C27A36"/>
+  <circle cx="34" cy="84" r="1.2" fill="#C27A36"/>
+  <circle cx="79" cy="80" r="1.5" fill="#C27A36"/>
+</svg>

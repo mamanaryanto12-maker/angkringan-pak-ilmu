@@ -193,8 +193,9 @@ export default function WalkthroughModal({ isOpen, onClose, onStartFromWalkthrou
           {activeTab === 'controls' && (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
               <div style={{ background: '#FFF', border: '1px solid var(--border-natural)', padding: '12px 14px', borderRadius: '6px' }}>
-                <strong style={{ color: 'var(--text-primary)', display: 'block', fontSize: '0.88rem', marginBottom: '2px' }}>
-                  📄 Tiket Pesanan
+                <strong style={{ color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.88rem', marginBottom: '2px' }}>
+                  <FileText size={16} color="var(--color-bata)" />
+                  Tiket Pesanan
                 </strong>
                 <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
                   Buka kapan saja untuk membaca kembali pesan dan keluhan pelanggan.
@@ -202,8 +203,9 @@ export default function WalkthroughModal({ isOpen, onClose, onStartFromWalkthrou
               </div>
 
               <div style={{ background: '#FFF', border: '1px solid var(--border-natural)', padding: '12px 14px', borderRadius: '6px' }}>
-                <strong style={{ color: 'var(--text-primary)', display: 'block', fontSize: '0.88rem', marginBottom: '2px' }}>
-                  📖 Jurnal Kawruh
+                <strong style={{ color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.88rem', marginBottom: '2px' }}>
+                  <BookOpen size={16} color="var(--color-teal)" />
+                  Jurnal Kawruh
                 </strong>
                 <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
                   Menyimpan otomatis semua sobekan catatan dan petunjuk rempah yang kamu temukan.
@@ -211,8 +213,9 @@ export default function WalkthroughModal({ isOpen, onClose, onStartFromWalkthrou
               </div>
 
               <div style={{ background: '#FFF', border: '1px solid var(--border-natural)', padding: '12px 14px', borderRadius: '6px' }}>
-                <strong style={{ color: 'var(--text-primary)', display: 'block', fontSize: '0.88rem', marginBottom: '2px' }}>
-                  💡 Tombol Petunjuk (Bantuan)
+                <strong style={{ color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.88rem', marginBottom: '2px' }}>
+                  <Lightbulb size={16} color="var(--color-gold-deep)" />
+                  Tombol Petunjuk (Bantuan)
                 </strong>
                 <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
                   Menyediakan petunjuk bertahap level 1, 2, dan 3 jika kamu ragu langkah berikutnya.
@@ -220,8 +223,9 @@ export default function WalkthroughModal({ isOpen, onClose, onStartFromWalkthrou
               </div>
 
               <div style={{ background: '#FFF', border: '1px solid var(--border-natural)', padding: '12px 14px', borderRadius: '6px' }}>
-                <strong style={{ color: 'var(--text-primary)', display: 'block', fontSize: '0.88rem', marginBottom: '2px' }}>
-                  🔄 Tombol Mulai Ulang
+                <strong style={{ color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.88rem', marginBottom: '2px' }}>
+                  <RotateCcw size={16} color="var(--color-bata)" />
+                  Tombol Mulai Ulang
                 </strong>
                 <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
                   Mengembalikan permainan ke pembuka untuk dicoba oleh pengunjung berikutnya.
