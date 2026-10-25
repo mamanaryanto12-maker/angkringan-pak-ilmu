@@ -1,0 +1,1708 @@
+/* ==========================================================================
+   ANGKRINGAN PAK ILMU — TEMA CERAH HANGAT & GERAK VISUAL NATURAL
+   GREDUPEDIA #7 KARSA KALA (Zona Dhandanggula: Saka Rasa, Tumuju Makna)
+   ========================================================================== */
+
+/* --- 1. PEMUATAN FONT RESMI RALEWAY --- */
+@font-face {
+  font-family: 'Raleway';
+  src: url('/fonts/Raleway-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Raleway';
+  src: url('/fonts/Raleway-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Raleway';
+  src: url('/fonts/Raleway-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Raleway';
+  src: url('/fonts/Raleway-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Raleway';
+  src: url('/fonts/Raleway-ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* --- 2. SISTEM TEMA CERAH & PALET WARNA RESMI --- */
+:root {
+  /* Palet Warna Resmi Gredupedia #7 */
+  --color-teal: #358C88;          /* Hijau Toska Karsa Kala */
+  --color-teal-dark: #246360;
+  --color-teal-light: #48A8A3;
+  --color-teal-soft: rgba(53, 140, 136, 0.12);
+
+  --color-bata: #C22A18;          /* Cokelat Bata / Merah Tradisi */
+  --color-bata-dark: #911B0E;
+  --color-bata-soft: rgba(194, 42, 24, 0.1);
+
+  --color-orange: #EE7217;        /* Jingga Hangat Api Seduhan */
+  --color-orange-soft: rgba(238, 114, 23, 0.12);
+
+  --color-pink: #D8547F;          /* Merah Muda Bunga Wijayakusuma */
+  --color-pink-soft: rgba(216, 84, 127, 0.12);
+
+  --color-gold: #FDC631;          /* Kuning Emas Keilmuan */
+  --color-gold-deep: #D49D0E;
+  --color-gold-soft: rgba(253, 198, 49, 0.18);
+
+  /* Suasana Cerah Alami Angkringan */
+  --bg-parchment: #FAF6EE;
+  --bg-parchment-subtle: #F4ECE0;
+  --bg-card-white: #FFFFFF;
+  --bg-card-warm: #FFFDF9;
+  --border-natural: #E8DCC8;
+  --border-strong: #D4C4A8;
+
+  /* Tipografi Gelap Berkontras Tinggi (Keterbacaan Prima) */
+  --text-primary: #2C2016;       /* Espresso pekat untuk judul & teks penting */
+  --text-secondary: #4A3A2C;     /* Cokelat arang untuk paragraf naratif */
+  --text-muted: #7E6C58;         /* Cokelat lembut untuk label & petunjuk */
+
+  /* Tipografi */
+  --font-family: 'Raleway', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Bayangan Fisik Natural (Bukan Glow Gelap) */
+  --shadow-soft: 0 4px 14px rgba(70, 50, 30, 0.07);
+  --shadow-medium: 0 8px 24px rgba(70, 50, 30, 0.1);
+  --shadow-elevated: 0 14px 36px rgba(70, 50, 30, 0.14);
+  --shadow-paper: 0 4px 12px rgba(60, 45, 30, 0.08), 0 1px 3px rgba(60, 45, 30, 0.06);
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+}
+
+/* --- 3. RESET & DASAR TAMPILAN --- */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  font-family: var(--font-family);
+  background-color: var(--bg-parchment);
+  color: var(--text-primary);
+  overflow-x: hidden;
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+button {
+  font-family: var(--font-family);
+  cursor: pointer;
+  border: none;
+  outline: none;
+  transition: all 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* --- 4. VIEWPORT DENGAN BACKGROUND1 RESMI --- */
+.game-viewport {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-image: url('/background/background1.jpg');
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  background-attachment: fixed;
+  overflow: hidden;
+}
+
+/* Lapisan Kecerahan Tipis Natural untuk Menjamin Keterbacaan Teks */
+.game-viewport::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 252, 246, 0.88) 0%,
+    rgba(250, 244, 233, 0.82) 45%,
+    rgba(247, 239, 226, 0.88) 100%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Ornamen Tradisional Halus di Sisi Layar */
+.bg-ornament-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 38px;
+  background-image: url('/assets/Ukiran.PNG');
+  background-repeat: repeat-x;
+  background-size: auto 32px;
+  opacity: 0.25;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.bg-ornament-corner {
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  background-image: url('/assets/Ornamen_bunga.PNG');
+  background-size: contain;
+  background-repeat: no-repeat;
+  opacity: 0.16;
+  pointer-events: none;
+  z-index: 1;
+}
+.bg-ornament-corner.top-right {
+  top: 10px;
+  right: -30px;
+  transform: rotate(45deg);
+}
+.bg-ornament-corner.bottom-left {
+  bottom: -30px;
+  left: -30px;
+  transform: rotate(-135deg);
+}
+
+/* --- 5. NAVBAR ATAS (TEMA CERAH & BERSIH) --- */
+.game-navbar {
+  position: relative;
+  z-index: 100;
+  height: 72px;
+  padding: 0 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(12px);
+  border-bottom: 2px solid var(--border-natural);
+  box-shadow: 0 2px 10px rgba(50, 35, 20, 0.05);
+}
+
+.brand-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-flower-icon {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(216, 84, 127, 0.3));
+  transition: transform 0.3s ease;
+}
+.brand-flower-icon:hover {
+  transform: rotate(15deg) scale(1.08);
+}
+
+.brand-title-group h1 {
+  font-size: 1.18rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: 0.2px;
+}
+.brand-title-group p {
+  font-size: 0.74rem;
+  color: var(--color-teal);
+  letter-spacing: 0.8px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* Indikator Progres Babak */
+.act-progress-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.progress-step-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  transition: all 0.28s ease;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.step-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.78rem;
+  font-weight: 800;
+  background: #EFE6D8;
+  border: 1px solid var(--border-natural);
+  color: var(--text-muted);
+  transition: all 0.28s ease;
+}
+
+.progress-step-item.active {
+  background: var(--color-teal-soft);
+  color: var(--color-teal-dark);
+}
+.progress-step-item.active .step-circle {
+  background: var(--color-teal);
+  border-color: var(--color-teal-dark);
+  color: #FFF;
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(53, 140, 136, 0.4);
+}
+
+.progress-step-item.completed {
+  color: var(--color-teal);
+}
+.progress-step-item.completed .step-circle {
+  background: #4EA7A2;
+  border-color: var(--color-teal);
+  color: #FFF;
+}
+
+.progress-connector {
+  width: 20px;
+  height: 2px;
+  background: var(--border-natural);
+  border-radius: 2px;
+}
+.progress-connector.filled {
+  background: var(--color-teal);
+}
+
+/* Nav Actions (Tombol Kontrol) */
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-nav-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-parchment);
+  border: 1px solid var(--border-natural);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.btn-nav-icon:hover {
+  background: #FFF;
+  color: var(--color-teal);
+  border-color: var(--color-teal);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(53, 140, 136, 0.15);
+}
+.btn-nav-badge {
+  position: relative;
+}
+.btn-nav-badge .badge-dot {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-bata);
+  border: 1.5px solid #FFF;
+  box-shadow: 0 0 6px var(--color-bata);
+}
+
+/* Tombol Bantuan Menonjol */
+.btn-nav-help {
+  background: var(--color-gold-soft);
+  border-color: var(--color-gold-deep);
+  color: #8C6505;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  width: auto;
+  height: 40px;
+  border-radius: var(--radius-sm);
+}
+.btn-nav-help:hover {
+  background: var(--color-gold);
+  color: #2D2005;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(253, 198, 49, 0.3);
+}
+
+/* --- 6. AREA UTAMA KONTEN PERMAINAN --- */
+.game-content-area {
+  position: relative;
+  z-index: 10;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 32px;
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+  animation: pageFadeSlideIn 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes pageFadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Banner Judul Babak (Tanpa Tanda Hubung Dekoratif) */
+.act-header-banner {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-bottom: 2px solid var(--border-natural);
+  padding-bottom: 14px;
+}
+
+.act-subtitle {
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--color-orange);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+.act-main-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+/* Kotak Panduan Utama Babak (Interaktif & Jelas) */
+.act-guide-card {
+  background: #FFF;
+  border: 1px solid var(--border-natural);
+  border-left: 5px solid var(--color-teal);
+  border-radius: var(--radius-sm);
+  padding: 14px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-soft);
+  animation: pageFadeSlideIn 0.45s ease;
+}
+.act-guide-text h4 {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--color-teal-dark);
+  margin-bottom: 4px;
+}
+.act-guide-text p {
+  font-size: 0.86rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+.act-guide-btn {
+  background: var(--bg-parchment);
+  border: 1px solid var(--border-natural);
+  color: var(--text-primary);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.act-guide-btn:hover {
+  background: var(--color-teal);
+  color: #FFF;
+  border-color: var(--color-teal);
+}
+
+/* --- 7. TIKET PESANAN MISTERIUS (AUTENTIK & JELAS) --- */
+.ticket-paper {
+  background: #FFFDF9;
+  color: var(--text-primary);
+  border-radius: var(--radius-sm);
+  padding: 24px;
+  position: relative;
+  box-shadow: var(--shadow-paper);
+  border: 1px solid var(--border-strong);
+  font-family: var(--font-family);
+  background-image: 
+    radial-gradient(#F0E5D4 10%, transparent 11%),
+    radial-gradient(#F0E5D4 10%, transparent 11%);
+  background-size: 18px 18px;
+  background-position: 0 0, 9px 9px;
+  transition: transform 0.25s ease;
+}
+.ticket-paper:hover {
+  transform: translateY(-2px);
+}
+
+.ticket-header {
+  border-bottom: 2px dashed #C8B89E;
+  padding-bottom: 12px;
+  margin-bottom: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.ticket-stamp {
+  border: 2px solid var(--color-bata);
+  color: var(--color-bata);
+  padding: 4px 10px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transform: rotate(-3deg);
+  border-radius: 4px;
+  background: rgba(194, 42, 24, 0.04);
+}
+
+.ticket-body p {
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: var(--text-primary);
+  font-style: italic;
+  margin-bottom: 12px;
+}
+
+/* --- 8. MEJA GEROBAK DENGAN ILUSTRASI RESMI (BABAK 1) --- */
+.angkringan-board {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 24px;
+  flex: 1;
+}
+
+.countertop-view {
+  position: relative;
+  background: rgba(255, 255, 255, 0.92);
+  border: 2px solid var(--border-natural);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-medium);
+  min-height: 500px;
+}
+
+.countertop-awning {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 24px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--color-bata) 0px,
+    var(--color-bata) 32px,
+    var(--color-orange) 32px,
+    var(--color-orange) 64px
+  );
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  opacity: 0.9;
+}
+
+.counter-grid-objects {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  flex: 1;
+  align-items: stretch;
+}
+
+/* KARTU OBJEK RESMI DENGAN GAMBAR ASLI DARI FOLDER BACKGROUND */
+.interactive-item-card {
+  background: #FFFDF9;
+  border: 2px solid var(--border-natural);
+  border-radius: var(--radius-md);
+  padding: 16px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  min-height: 190px;
+  justify-content: space-between;
+  box-shadow: var(--shadow-soft);
+}
+
+.interactive-item-card:hover {
+  transform: translateY(-6px) scale(1.02);
+  border-color: var(--color-gold-deep);
+  background: #FFF;
+  box-shadow: 0 10px 24px rgba(253, 198, 49, 0.22);
+}
+
+.interactive-item-card.inspected {
+  border-color: var(--color-teal);
+  background: rgba(53, 140, 136, 0.05);
+}
+
+.interactive-item-card.inspected::after {
+  content: '✓';
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--color-teal);
+  color: #FFF;
+  font-size: 0.78rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(53, 140, 136, 0.3);
+}
+
+/* Wadah Gambar Menu Asli */
+.item-image-wrapper {
+  width: 100%;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  background: radial-gradient(circle, rgba(253, 198, 49, 0.12) 0%, transparent 70%);
+}
+
+.item-official-img {
+  max-width: 90%;
+  max-height: 90%;
+  object-fit: contain;
+  transition: transform 0.35s ease;
+  filter: drop-shadow(0 4px 8px rgba(70, 50, 20, 0.12));
+}
+
+.interactive-item-card:hover .item-official-img {
+  transform: scale(1.1) rotate(2deg);
+}
+
+.item-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+.item-tag {
+  font-size: 0.74rem;
+  color: var(--color-teal-dark);
+  font-weight: 700;
+  background: var(--color-teal-soft);
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+/* Panel Hasil Pemeriksaan */
+.object-inspection-panel {
+  background: #FFF;
+  border: 1.5px solid var(--color-teal);
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  margin-top: 18px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: var(--shadow-soft);
+  animation: pageFadeSlideIn 0.3s ease;
+}
+.inspection-badge {
+  background: var(--color-teal);
+  color: #FFF;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.inspection-text {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* Sidebar Babak 1 */
+.angkringan-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.notes-collected-box {
+  background: #FFF;
+  border: 1.5px solid var(--border-natural);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  box-shadow: var(--shadow-soft);
+}
+.notes-collected-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.notes-collected-header h3 {
+  font-size: 0.98rem;
+  font-weight: 800;
+  color: var(--color-orange);
+}
+.notes-counter-badge {
+  background: var(--color-teal-soft);
+  color: var(--color-teal-dark);
+  border: 1px solid var(--color-teal);
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+.note-scrap-item {
+  background: var(--bg-parchment);
+  color: var(--text-primary);
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  margin-bottom: 8px;
+  border-left: 4px solid var(--color-orange);
+  box-shadow: var(--shadow-paper);
+  font-style: italic;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: snapInPiece 0.35s ease;
+}
+
+/* --- 9. MINI-GAME DRAG-AND-DROP (PENGELOMPOKAN CERAH) --- */
+.sorting-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sorting-pool {
+  background: #FFF;
+  border: 2px dashed var(--border-strong);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  min-height: 90px;
+  align-items: center;
+  box-shadow: var(--shadow-soft);
+}
+
+.draggable-item {
+  background: #FFFDF9;
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: grab;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.22s;
+}
+.draggable-item:hover {
+  background: #FFF;
+  border-color: var(--color-teal);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 14px rgba(53, 140, 136, 0.18);
+}
+.draggable-item:active {
+  cursor: grabbing;
+}
+
+.dropzone-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.dropzone-box {
+  background: #FFF;
+  border: 2px dashed var(--border-strong);
+  border-radius: var(--radius-md);
+  padding: 22px;
+  min-height: 240px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-soft);
+  transition: all 0.25s;
+}
+.dropzone-box.drag-over {
+  border-color: var(--color-teal);
+  background: var(--color-teal-soft);
+}
+.dropzone-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  border-bottom: 2px solid var(--border-natural);
+  padding-bottom: 10px;
+}
+.dropzone-header h4 {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+.dropzone-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.click-transfer-btn {
+  background: var(--bg-parchment);
+  color: var(--color-teal-dark);
+  font-size: 0.74rem;
+  font-weight: 700;
+  margin-left: 8px;
+  padding: 3px 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+}
+.click-transfer-btn:hover {
+  background: var(--color-teal);
+  color: #FFF;
+  border-color: var(--color-teal);
+}
+
+/* --- 10. BABAK 2: JIGSAW PUZZLE, SEQUENCING, & MATCHING --- */
+.puzzle-assembly-arena {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.puzzle-pieces-pool {
+  background: #FFF;
+  border: 1.5px solid var(--border-natural);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  box-shadow: var(--shadow-soft);
+}
+
+.puzzle-piece-card {
+  background: #FFFDF9;
+  color: var(--text-primary);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  cursor: pointer;
+  box-shadow: var(--shadow-paper);
+  border: 1.5px solid var(--border-strong);
+  position: relative;
+  transition: all 0.24s;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.puzzle-piece-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  border-color: var(--color-orange);
+  box-shadow: 0 8px 18px rgba(238, 114, 23, 0.16);
+}
+.puzzle-piece-card.selected {
+  border-color: var(--color-teal);
+  background: var(--color-teal-soft);
+  box-shadow: 0 0 0 3px rgba(53, 140, 136, 0.25);
+}
+.piece-text {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  font-weight: 500;
+  font-style: italic;
+  color: var(--text-secondary);
+}
+.piece-slot-indicator {
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: var(--color-bata);
+  text-transform: uppercase;
+}
+
+.puzzle-target-board {
+  background: #FFF;
+  border: 2px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 14px;
+  min-height: 280px;
+  box-shadow: var(--shadow-soft);
+}
+
+.puzzle-slot {
+  background: var(--bg-parchment);
+  border: 2px dashed var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.22s;
+}
+.puzzle-slot.filled {
+  background: #FFF;
+  color: var(--text-primary);
+  border-style: solid;
+  border-color: var(--color-teal);
+  box-shadow: var(--shadow-paper);
+  animation: snapInPiece 0.3s ease;
+}
+.puzzle-slot.slot-ready {
+  border-color: var(--color-gold-deep);
+  background: var(--color-gold-soft);
+}
+
+@keyframes snapInPiece {
+  0% { transform: scale(0.92); opacity: 0.5; }
+  70% { transform: scale(1.04); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Sequencing Mini-Game */
+.sequencing-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.sequence-card {
+  background: #FFF;
+  border: 1.5px solid var(--border-natural);
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  box-shadow: var(--shadow-soft);
+  transition: all 0.22s;
+}
+.sequence-card:hover {
+  border-color: var(--color-teal);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(53, 140, 136, 0.12);
+}
+.sequence-badge {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--color-teal);
+  color: #FFF;
+  font-weight: 800;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(53, 140, 136, 0.3);
+}
+.sequence-desc {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  flex: 1;
+  line-height: 1.5;
+  font-weight: 600;
+}
+.sequence-controls {
+  display: flex;
+  gap: 8px;
+}
+.seq-btn {
+  background: var(--bg-parchment);
+  border: 1px solid var(--border-strong);
+  color: var(--text-primary);
+  width: 34px;
+  height: 34px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.seq-btn:hover {
+  background: var(--color-teal);
+  color: #FFF;
+  border-color: var(--color-teal);
+}
+
+/* Matching Pairs */
+.matching-board {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+.match-column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.match-card {
+  background: #FFF;
+  border: 1.5px solid var(--border-natural);
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  cursor: pointer;
+  transition: all 0.22s;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  box-shadow: var(--shadow-soft);
+  color: var(--text-primary);
+}
+.match-card:hover {
+  border-color: var(--color-gold-deep);
+  transform: translateY(-2px);
+  background: #FFFDF9;
+}
+.match-card.selected {
+  border-color: var(--color-orange);
+  background: var(--color-orange-soft);
+  box-shadow: 0 0 0 2px var(--color-orange);
+}
+.match-card.matched {
+  border-color: var(--color-teal);
+  background: var(--color-teal-soft);
+  color: var(--color-teal-dark);
+  cursor: default;
+  pointer-events: none;
+  font-weight: 700;
+}
+
+/* --- 11. BABAK 3: UNTUK SIAPA RACIKAN INI? --- */
+.customer-encounter-panel {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 28px;
+  align-items: start;
+}
+
+.customer-profile-card {
+  background: #FFF;
+  border: 1.5px solid var(--border-natural);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  box-shadow: var(--shadow-medium);
+}
+.rain-badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: var(--color-teal-soft);
+  color: var(--color-teal-dark);
+  border: 1px solid var(--color-teal);
+  padding: 4px 12px;
+  border-radius: 14px;
+  font-size: 0.74rem;
+  font-weight: 800;
+}
+.customer-avatar-frame {
+  width: 104px;
+  height: 104px;
+  border-radius: 50%;
+  border: 3px solid var(--color-gold-deep);
+  background: var(--bg-parchment);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 14px rgba(253, 198, 49, 0.25);
+  color: var(--color-gold-deep);
+}
+.customer-name {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+.customer-status {
+  font-size: 0.8rem;
+  color: var(--color-bata);
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+.customer-dialogue-balloon {
+  background: var(--bg-parchment);
+  color: var(--text-primary);
+  border-radius: var(--radius-sm);
+  padding: 18px;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  font-style: italic;
+  position: relative;
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow-paper);
+}
+
+.brewing-workshop {
+  background: #FFF;
+  border: 1.5px solid var(--border-natural);
+  border-radius: var(--radius-md);
+  padding: 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  box-shadow: var(--shadow-medium);
+}
+
+.ingredient-selectors-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.ingredient-tweak-box {
+  background: var(--bg-parchment);
+  border: 1.5px solid var(--border-natural);
+  border-radius: var(--radius-sm);
+  padding: 18px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: all 0.22s;
+}
+.ingredient-tweak-box.active {
+  border-color: var(--color-teal);
+  background: #FFF;
+  box-shadow: var(--shadow-soft);
+}
+.tweak-name {
+  font-weight: 800;
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+  color: var(--text-primary);
+}
+.tweak-meter {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+.meter-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #FFF;
+  border: 1.5px solid var(--border-strong);
+  color: var(--text-primary);
+  font-weight: 800;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.meter-btn:hover {
+  background: var(--color-teal);
+  color: #FFF;
+  border-color: var(--color-teal);
+}
+.meter-val {
+  font-weight: 800;
+  font-size: 1.25rem;
+  color: var(--color-teal-dark);
+  min-width: 26px;
+}
+
+.decision-options-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.decision-option-btn {
+  background: var(--bg-parchment);
+  border: 1.5px solid var(--border-natural);
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  transition: all 0.22s;
+}
+.decision-option-btn:hover {
+  border-color: var(--color-teal);
+  background: #FFF;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-soft);
+}
+.decision-option-btn.selected {
+  border-color: var(--color-teal);
+  background: var(--color-teal-soft);
+  color: var(--text-primary);
+  box-shadow: 0 0 0 2px var(--color-teal);
+}
+
+/* --- 12. EPILOG: TOPLES KAWRUH DENGAN ASET RESMI --- */
+.epilogue-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 820px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.toples-kawruh-visual {
+  position: relative;
+  width: 190px;
+  height: 250px;
+  margin: 20px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Gambar Asli Toples dari Folder Background */
+.toples-official-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 24px rgba(253, 198, 49, 0.35));
+  animation: floatSoft 4s infinite ease-in-out;
+}
+
+@keyframes floatSoft {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.word-puzzle-assembly {
+  background: #FFF;
+  border: 1.5px solid var(--border-natural);
+  border-radius: var(--radius-md);
+  padding: 28px;
+  width: 100%;
+  margin: 20px 0;
+  box-shadow: var(--shadow-medium);
+}
+
+.word-tokens-pool {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.word-token-chip {
+  background: var(--bg-parchment);
+  color: var(--text-primary);
+  font-weight: 800;
+  font-size: 1.05rem;
+  padding: 12px 22px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border-strong);
+  box-shadow: var(--shadow-paper);
+  cursor: pointer;
+  transition: all 0.22s;
+}
+.word-token-chip:hover {
+  transform: translateY(-3px);
+  border-color: var(--color-orange);
+  background: #FFF;
+}
+.word-token-chip.placed {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.word-sentence-target {
+  min-height: 80px;
+  background: var(--bg-parchment);
+  border: 2px dashed var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.word-placed-pill {
+  background: var(--color-teal);
+  color: #FFF;
+  font-weight: 800;
+  padding: 10px 18px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1rem;
+  box-shadow: 0 2px 8px rgba(53, 140, 136, 0.3);
+  animation: snapInPiece 0.3s ease;
+}
+
+/* --- 13. TOMBOL AKSI UTAMA & FOOTER --- */
+.action-footer-bar {
+  margin-top: auto;
+  padding-top: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 2px solid var(--border-natural);
+}
+
+.btn-primary-action {
+  background: var(--color-teal);
+  color: #FFF;
+  padding: 14px 30px;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 4px 14px rgba(53, 140, 136, 0.35);
+}
+.btn-primary-action:hover {
+  background: var(--color-teal-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(53, 140, 136, 0.45);
+}
+.btn-primary-action:disabled {
+  background: #D8CEBC;
+  color: #8C7E6A;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-secondary-action {
+  background: #FFF;
+  color: var(--text-primary);
+  padding: 13px 22px;
+  border-radius: var(--radius-sm);
+  font-size: 0.92rem;
+  font-weight: 700;
+  border: 1.5px solid var(--border-strong);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: var(--shadow-paper);
+}
+.btn-secondary-action:hover {
+  background: var(--bg-parchment);
+  border-color: var(--color-teal);
+  color: var(--color-teal-dark);
+}
+
+/* --- 14. MODAL POPUP DENGAN TEMA CERAH & ELEGAN --- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(44, 32, 22, 0.65);
+  backdrop-filter: blur(6px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.25s ease;
+}
+
+.modal-dialog-card {
+  background: #FFFDF9;
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  max-width: 680px;
+  width: 100%;
+  max-height: 88vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-elevated);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  animation: modalSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalSlideUp {
+  from { opacity: 0; transform: translateY(24px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: var(--bg-parchment);
+  border: 1px solid var(--border-strong);
+  color: var(--text-primary);
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+.modal-close-btn:hover {
+  background: var(--color-bata);
+  color: #FFF;
+  border-color: var(--color-bata);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* --- 15. SISTEM PANDUAN BERTINGKAT (STEP HINTS) --- */
+.hint-step-box {
+  background: #FFF;
+  border: 1px solid var(--border-natural);
+  border-left: 4px solid var(--color-gold-deep);
+  border-radius: var(--radius-sm);
+  padding: 14px 18px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow-paper);
+}
+.hint-step-level {
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--color-gold-deep);
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.hint-step-content {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+/* --- 16. RESPONSIVE DESIGN --- */
+@media (max-width: 1024px) {
+  .angkringan-board {
+    grid-template-columns: 1fr;
+  }
+  .customer-encounter-panel {
+    grid-template-columns: 1fr;
+  }
+  .puzzle-assembly-arena {
+    grid-template-columns: 1fr;
+  }
+  .game-content-area {
+    padding: 18px 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .game-navbar {
+    height: auto;
+    padding: 12px 16px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .act-progress-bar {
+    order: 3;
+    width: 100%;
+    justify-content: space-around;
+  }
+  .counter-grid-objects {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .dropzone-grid {
+    grid-template-columns: 1fr;
+  }
+  .act-header-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
+
+/* --- 17. SISTEM PANDUAN INTERAKTIF & VISUAL CUES --- */
+.mini-game-guide-banner {
+  background: #FFFFFF;
+  border: 1.5px solid var(--border-natural);
+  border-left: 5px solid var(--color-teal);
+  border-radius: var(--radius-sm);
+  padding: 14px 18px;
+  margin-bottom: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  box-shadow: var(--shadow-soft);
+  animation: pageFadeSlideIn 0.35s ease;
+}
+
+.mini-game-guide-content {
+  flex: 1;
+}
+
+.mini-game-guide-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--color-teal-dark);
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.mini-game-guide-title {
+  font-size: 0.96rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.mini-game-guide-steps {
+  font-size: 0.86rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  margin-top: 4px;
+}
+
+.mini-game-guide-steps ol, .mini-game-guide-steps ul {
+  padding-left: 18px;
+  margin-top: 4px;
+}
+
+.mini-game-guide-btn {
+  background: var(--bg-parchment);
+  border: 1px solid var(--border-strong);
+  color: var(--text-primary);
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.mini-game-guide-btn:hover {
+  background: var(--color-teal);
+  color: #FFF;
+  border-color: var(--color-teal);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(53, 140, 136, 0.2);
+}
+
+/* Badge Penunjuk Interaksi (Visual Cue) */
+.interactive-cue-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: var(--color-orange);
+  color: #FFF;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 2px 6px rgba(238, 114, 23, 0.35);
+  animation: pulseTap 2s infinite ease-in-out;
+  z-index: 5;
+}
+
+@keyframes pulseTap {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+/* Efek Sorotan Slot Jigsaw yang Siap Ditempati */
+.slot-highlight-pulse {
+  animation: borderGlowPulse 1.8s infinite ease-in-out !important;
+}
+
+@keyframes borderGlowPulse {
+  0%, 100% {
+    border-color: var(--color-gold-deep);
+    box-shadow: 0 0 0 2px rgba(253, 198, 49, 0.3);
+  }
+  50% {
+    border-color: var(--color-teal);
+    box-shadow: 0 0 0 5px rgba(53, 140, 136, 0.25);
+  }
+}
+
+/* Toast Notifikasi Penemuan Catatan & Kemajuan */
+.discovery-toast-card {
+  background: #FFFDF9;
+  border: 1.5px solid var(--color-gold-deep);
+  border-left: 5px solid var(--color-gold-deep);
+  border-radius: var(--radius-sm);
+  padding: 14px 18px;
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  box-shadow: var(--shadow-medium);
+  animation: pageFadeSlideIn 0.35s ease;
+}
+
+.discovery-toast-text h5 {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: var(--color-gold-deep);
+  margin-bottom: 2px;
+}
+
+.discovery-toast-text p {
+  font-size: 0.84rem;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+/* Modal Masuk Babak Baru (Act Welcome Modal) */
+.act-welcome-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border-bottom: 2px solid var(--border-natural);
+  padding-bottom: 16px;
+  margin-bottom: 18px;
+}
+
+.act-welcome-icon-box {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--color-teal-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-teal-dark);
+  border: 2px solid var(--color-teal);
+  flex-shrink: 0;
+}
+
+.act-welcome-steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.act-welcome-step-card {
+  background: var(--bg-parchment);
+  border: 1px solid var(--border-natural);
+  border-radius: var(--radius-sm);
+  padding: 14px 12px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.act-welcome-step-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-teal);
+  color: #FFF;
+  font-weight: 800;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+@media (max-width: 768px) {
+  .act-welcome-steps-grid {
+    grid-template-columns: 1fr;
+  }
+  .mini-game-guide-banner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
