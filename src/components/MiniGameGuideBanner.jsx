@@ -1,102 +1,75 @@
 import React, { useState } from 'react';
-import { Lightbulb, ChevronDown, ChevronUp, CheckCircle2 } from 'lucide-react';
+import { Lightbulb, HelpCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { soundManager } from '../utils/audio.js';
 
+// Panduan Ringkas & Fungsional (Sedikit teks, fokus pada tindakan)
 export default function MiniGameGuideBanner({
   title,
-  tag = "Cara Bermain Mini Game Ini",
+  tag,
   steps = [],
   onOpenHelp,
   tip
 }) {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
   return (
-    <div className="mini-game-guide-banner">
-      <div className="mini-game-guide-content">
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2px' }}>
-          <div className="mini-game-guide-tag">
-            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--color-teal)' }} />
-            {tag}
-          </div>
-
-          <button
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              color: 'var(--text-muted)',
-              fontSize: '0.74rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-              cursor: 'pointer'
-            }}
-          >
-            {isCollapsed ? (
-              <><span>Tampilkan Instruksi</span> <ChevronDown size={14} /></>
-            ) : (
-              <><span>Sembunyikan</span> <ChevronUp size={14} /></>
-            )}
-          </button>
-        </div>
-
-        <div className="mini-game-guide-title">{title}</div>
-
-        {!isCollapsed && (
-          <div className="mini-game-guide-steps">
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '6px' }}>
-              {steps.map((step, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-                  <span style={{
-                    width: '18px',
-                    height: '18px',
-                    borderRadius: '50%',
-                    background: 'var(--color-teal)',
-                    color: '#FFF',
-                    fontSize: '0.7rem',
-                    fontWeight: 800,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                    marginTop: '2px'
-                  }}>
-                    {i + 1}
-                  </span>
-                  <span>{step}</span>
-                </div>
-              ))}
-            </div>
-
-            {tip && (
-              <div style={{
-                marginTop: '8px',
-                fontSize: '0.8rem',
-                color: 'var(--color-orange)',
-                fontWeight: 700,
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px'
-              }}>
-                <Lightbulb size={14} />
-                <span>Kiat: {tip}</span>
-              </div>
-            )}
-          </div>
+    <div className="cue-bar">
+      <div className="cue-bar-main">
+        {tag && <span className="cue-tag">{tag}</span>}
+        <span className="cue-title">{title}</span>
+        {steps.length > 0 && !expanded && (
+          <span className="cue-short-hint">— {steps[0]}</span>
         )}
       </div>
 
-      <button
-        className="mini-game-guide-btn"
-        onClick={() => {
-          soundManager.playClickSound();
-          if (onOpenHelp) onOpenHelp();
-        }}
-      >
-        <Lightbulb size={15} color="var(--color-gold-deep)" />
-        <span>Petunjuk Bertahap</span>
-      </button>
+      <div className="cue-bar-actions">
+        {(steps.length > 1 || tip) && (
+          <button
+            className="cue-toggle-btn"
+            onClick={() => {
+              soundManager.playClickSound();
+              setExpanded(v => !v);
+            }}
+            aria-expanded={expanded}
+          >
+            <span>{expanded ? 'Ringkas' : 'Detail Langkah'}</span>
+            {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+          </button>
+        )}
+
+        {onOpenHelp && (
+          <button
+            className="cue-help-btn"
+            onClick={() => {
+              soundManager.playClickSound();
+              onOpenHelp();
+            }}
+            title="Buka Petunjuk Bertahap"
+          >
+            <HelpCircle size={15} />
+            <span>Bantuan</span>
+          </button>
+        )}
+      </div>
+
+      {expanded && (
+        <div className="cue-expanded-panel">
+          <div className="cue-steps-row">
+            {steps.map((step, i) => (
+              <div key={i} className="cue-step-chip">
+                <span className="cue-step-num">{i + 1}</span>
+                <span>{step}</span>
+              </div>
+            ))}
+          </div>
+          {tip && (
+            <div className="cue-tip-inline">
+              <Lightbulb size={14} />
+              <span>{tip}</span>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

@@ -104,18 +104,15 @@ export default function EpilogueView({ onCompleteEpilogue, onOpenHelp, sessionIn
           Toples Kawruh Pak Ilmu
         </h2>
 
-        {/* Panduan Kontekstual Epilog */}
-        <div style={{ maxWidth: '780px', width: '100%', margin: '0 auto 16px auto' }}>
+        {/* Panduan Singkat Epilog */}
+        <div style={{ maxWidth: '780px', width: '100%', margin: '0 auto 12px auto' }}>
           <MiniGameGuideBanner
-            tag="Epilog Simbolik: Toples Kawruh"
-            title="Cara Merumuskan & Menyimpan Pesan Hikmah"
+            tag="Epilog"
+            title="Susun kata-kata di bawah menjadi kalimat hikmah lalu masukkan ke Toples Kawruh."
             steps={[
-              "Ketuk kata-kata di pool atas (yang telah diacak posisinya) untuk merangkai pesan hikmah penutup.",
-              "Jika salah memasukkan urutan kata, ketuk kata yang terpasang pada kotak kalimat di bawah untuk membatalkannya, atau klik 'Atur Ulang'.",
-              "Setelah kalimat hikmah tersusun lengkap dan benar, tekan tombol 'Masukkan Pelajaran ke Toples Kawruh'.",
-              "Pesan hikmahmu akan tersimpan abadi di dalam toples kaca untuk diteruskan kepada pengunjung pameran berikutnya."
+              "Ketuk kata berurutan untuk menyusun kalimat hikmah.",
+              "Ketuk ulang kata di bawah bila ingin membatalkannya."
             ]}
-            tip="Kalimat ini merangkum filosofi Gredupedia #7 Karsa Kala: karya dan pengetahuan baru menemukan arti sejatinya saat dibagikan untuk meringankan beban sesama."
             onOpenHelp={onOpenHelp}
           />
         </div>

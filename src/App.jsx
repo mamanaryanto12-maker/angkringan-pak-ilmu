@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar.jsx';
+import ExhibitionBackdrop from './components/ExhibitionBackdrop.jsx';
 import OrderTicketModal from './components/OrderTicketModal.jsx';
 import NotebookModal from './components/NotebookModal.jsx';
 import HelpModal from './components/HelpModal.jsx';
@@ -15,13 +16,11 @@ import { soundManager } from './utils/audio.js';
 import { ORDER_TICKETS } from './data/gameData.js';
 
 export default function App() {
-  // Indeks Sesi Pengunjung (Rotasi Variasi Konten 0, 1, 2)
   const [sessionIndex, setSessionIndex] = useState(() => {
     const saved = localStorage.getItem('angkringan_session_index');
     return saved !== null ? parseInt(saved, 10) : 0;
   });
 
-  // State Utama Permainan
   const [currentStep, setCurrentStep] = useState(() => {
     return localStorage.getItem('angkringan_current_step') || 'intro';
   });
@@ -45,21 +44,43 @@ export default function App() {
     return saved ? JSON.parse(saved) : [];
   });
 
-  // State Modal Sambutan Babak Baru
   const [seenWelcomeActs, setSeenWelcomeActs] = useState(() => {
     const saved = localStorage.getItem('angkringan_seen_welcome');
     return saved ? JSON.parse(saved) : [];
   });
   const [welcomeModalAct, setWelcomeModalAct] = useState(null);
 
-  // State Modal Dialog
   const [isTicketOpen, setIsTicketOpen] = useState(false);
   const [isNotebookOpen, setIsNotebookOpen] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [isWalkthroughOpen, setIsWalkthroughOpen] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
+  const [isMuted, setIsMuted] = useState(soundManager.isMuted);
+  const [volumeLevel, setVolumeLevel] = useState(soundManager.volume);
 
-  // Simpan progres ke LocalStorage
+  // Mulai audio otomatis setelah interaksi pertama sesuai kebijakan autoplay browser
+  useEffect(() => {
+    const unlockAudio = () => {
+      if (soundManager.isMuted || soundManager.isBgmPlaying) return;
+      soundManager.startBgm().then((started) => {
+        if (started) {
+          window.removeEventListener('pointerdown', unlockAudio);
+          window.removeEventListener('keydown', unlockAudio);
+        }
+      });
+    };
+    window.addEventListener('pointerdown', unlockAudio);
+    window.addEventListener('keydown', unlockAudio);
+    return () => {
+      window.removeEventListener('pointerdown', unlockAudio);
+      window.removeEventListener('keydown', unlockAudio);
+    };
+  }, []);
+
+  // Sesuaikan suara suasana hujan saat memasuki Babak 3
+  useEffect(() => {
+    soundManager.setWeatherAmbience(currentStep === 'act3');
+  }, [currentStep]);
+
   useEffect(() => {
     localStorage.setItem('angkringan_session_index', sessionIndex.toString());
   }, [sessionIndex]);
@@ -88,7 +109,6 @@ export default function App() {
     localStorage.setItem('angkringan_seen_welcome', JSON.stringify(seenWelcomeActs));
   }, [seenWelcomeActs]);
 
-  // Otomatis tampilkan sambutan babak saat pemain memasuki babak baru untuk pertama kali
   useEffect(() => {
     if (['act1', 'act2', 'act3', 'epilogue'].includes(currentStep)) {
       if (!seenWelcomeActs.includes(currentStep)) {
@@ -98,13 +118,26 @@ export default function App() {
     }
   }, [currentStep]);
 
-  // Audio Toggle
   const handleToggleSound = () => {
     const nextMuted = soundManager.toggleMute();
     setIsMuted(nextMuted);
+    if (!nextMuted && !soundManager.isBgmPlaying) {
+      soundManager.startBgm();
+    }
   };
 
-  // Navigasi Antarbabak
+  const handleVolumeChange = (val) => {
+    setVolumeLevel(val);
+    soundManager.setVolume(val);
+    if (val > 0 && soundManager.isMuted) {
+      const nextMuted = soundManager.toggleMute();
+      setIsMuted(nextMuted);
+    }
+    if (val > 0 && !soundManager.isBgmPlaying) {
+      soundManager.startBgm();
+    }
+  };
+
   const handleStartGame = () => {
     setCurrentStep('act1');
   };
@@ -135,8 +168,7 @@ export default function App() {
     localStorage.removeItem('angkringan_inspected');
     localStorage.removeItem('angkringan_completed_acts');
     localStorage.removeItem('angkringan_seen_welcome');
-    
-    // Perbarui rotasi sesi agar pengunjung berikutnya mendapatkan variasi tantangan yang berbeda
+
     const nextSession = (sessionIndex + 1) % 3;
     localStorage.setItem('angkringan_session_index', nextSession.toString());
     setSessionIndex(nextSession);
@@ -152,11 +184,9 @@ export default function App() {
   const activeTicket = ORDER_TICKETS[sessionIndex % ORDER_TICKETS.length];
 
   return (
-    <div className="game-viewport">
-      {/* Ornamen Tradisional Latar Belakang */}
-      <div className="bg-ornament-top" />
-      <div className="bg-ornament-corner top-right" />
-      <div className="bg-ornament-corner bottom-left" />
+    <div className={`game-viewport ${currentStep === 'act3' ? 'rainy-night' : ''}`}>
+      {/* Latar Belakang Asli Aset Pameran */}
+      <ExhibitionBackdrop currentStep={currentStep} />
 
       {/* Navbar Atas */}
       <Navbar
@@ -168,19 +198,25 @@ export default function App() {
         onResetGame={handleResetGame}
         isMuted={isMuted}
         onToggleSound={handleToggleSound}
+        volumeLevel={volumeLevel}
+        onChangeVolume={handleVolumeChange}
         hasUnreadNotes={collectedNotes.length > 0}
-        sessionIndex={sessionIndex}
       />
 
-      {/* Konten Berdasarkan Langkah Permainan */}
-      <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+      {/* Stage Permainan dengan Transisi Halus */}
+      <main key={currentStep} className="stage-transition-frame">
         {currentStep === 'intro' && (
           <OpeningView
             onStartGame={handleStartGame}
             gameMode={gameMode}
             setGameMode={setGameMode}
             onOpenWalkthrough={() => setIsWalkthroughOpen(true)}
+            onOpenHelp={() => setIsHelpOpen(true)}
             sessionIndex={sessionIndex}
+            isMuted={isMuted}
+            onToggleSound={handleToggleSound}
+            volumeLevel={volumeLevel}
+            onChangeVolume={handleVolumeChange}
           />
         )}
 
@@ -231,14 +267,12 @@ export default function App() {
         )}
       </main>
 
-      {/* Modal Sambutan Babak Baru (Muncul Otomatis Saat Masuk Babak Baru) */}
       <ActWelcomeModal
         isOpen={Boolean(welcomeModalAct)}
         onClose={() => setWelcomeModalAct(null)}
         currentStep={welcomeModalAct || currentStep}
       />
 
-      {/* Modal Dialogs */}
       <OrderTicketModal
         isOpen={isTicketOpen}
         onClose={() => setIsTicketOpen(false)}

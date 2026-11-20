@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <defs>
+    <linearGradient id="parchmentTail" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFDF7"/>
+      <stop offset="100%" stop-color="#EEDCB8"/>
+    </linearGradient>
+  </defs>
+  <!-- Background lembaran bawah naskah -->
+  <path d="M15,16 L85,16 L85,70 C85,78 15,78 15,70 Z" fill="url(#parchmentTail)" stroke="#8A6B3D" stroke-width="2"/>
+  <!-- Gulungan bawah melingkar -->
+  <ellipse cx="50" cy="72" rx="35" ry="6" fill="#F4E6CD" stroke="#8A6B3D" stroke-width="2"/>
+  <!-- Ikon cangkir hangat bersimbol doa penutup -->
+  <rect x="42" y="28" width="16" height="12" rx="2" fill="#358C88" stroke="#1B4D4B" stroke-width="1.2"/>
+  <path d="M58,30 C62,30 62,38 58,38" stroke="#1B4D4B" stroke-width="1.5" fill="none"/>
+  <!-- Uap doa kehangatan -->
+  <path d="M46,24 Q48,20 46,16" stroke="#EE7217" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+  <path d="M54,24 Q56,20 54,16" stroke="#EE7217" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+  <!-- Cap stempel kearifan Pak Ilmu -->
+  <circle cx="68" cy="50" r="7" fill="#C22A18" opacity="0.85"/>
+  <circle cx="68" cy="50" r="5" fill="none" stroke="#FFF" stroke-width="0.8"/>
+  <rect x="24" y="46" width="36" height="4" rx="2" fill="#8A6B3D" opacity="0.6"/>
+  <rect x="24" y="54" width="32" height="4" rx="2" fill="#8A6B3D" opacity="0.4"/>
+  <!-- Penanda label Bagian Penutup -->
+  <rect x="28" y="82" width="44" height="14" rx="7" fill="#C22A18"/>
+  <text x="50" y="92" text-anchor="middle" font-family="sans-serif" font-size="8" font-weight="bold" fill="#FFFFFF">PENUTUP</text>
+</svg>

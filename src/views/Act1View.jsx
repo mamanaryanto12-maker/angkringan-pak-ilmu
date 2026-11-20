@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { ArrowRight, Sparkles, CheckCircle2, AlertCircle, Search, Layers, Lightbulb, Compass, FileText, Check, X } from 'lucide-react';
+import { ArrowRight, CheckCircle2, AlertCircle, Search, Layers, FileText, Check, X } from 'lucide-react';
 import { soundManager } from '../utils/audio.js';
-import { ACT_1_VARIANTS, SORT_ITEMS_POOL, shuffleArray } from '../data/gameData.js';
+import { ACT_1_VARIANTS, shuffleArray } from '../data/gameData.js';
 import MiniGameGuideBanner from '../components/MiniGameGuideBanner.jsx';
 
 export default function Act1View({
@@ -10,7 +10,6 @@ export default function Act1View({
   setCollectedNotes,
   inspectedObjects,
   setInspectedObjects,
-  onOpenTicket,
   onOpenHelp,
   sessionIndex = 0
 }) {
@@ -18,74 +17,66 @@ export default function Act1View({
   const [selectedObject, setSelectedObject] = useState(null);
   const [lastDiscoveredNote, setLastDiscoveredNote] = useState(null);
 
-  // Ambil varian objek dan catatan sesuai sesi aktif
   const activeVariant = useMemo(() => {
     return ACT_1_VARIANTS[sessionIndex % ACT_1_VARIANTS.length];
   }, [sessionIndex]);
 
-  // Siapkan 6 item sortir dinamis (3 bahan, 3 alat) berdasarkan sesi
-  const initialSortItems = useMemo(() => {
-    const bahanPool = SORT_ITEMS_POOL.filter(i => i.category === 'bahan');
-    const alatPool = SORT_ITEMS_POOL.filter(i => i.category === 'alat');
-    const bStart = (sessionIndex * 2) % bahanPool.length;
-    const aStart = (sessionIndex * 2) % alatPool.length;
-    const pickedBahan = [
-      bahanPool[bStart % bahanPool.length],
-      bahanPool[(bStart + 1) % bahanPool.length],
-      bahanPool[(bStart + 2) % bahanPool.length]
-    ];
-    const pickedAlat = [
-      alatPool[aStart % alatPool.length],
-      alatPool[(aStart + 1) % alatPool.length],
-      alatPool[(aStart + 2) % alatPool.length]
-    ];
-    return shuffleArray([...pickedBahan, ...pickedAlat]);
-  }, [sessionIndex]);
+  // Acak tampilan meja gerobak sambil tetap menjaga ID unik & catatan asli tiap objek
+  const randomizedTableObjects = useMemo(() => {
+    return shuffleArray(activeVariant.objects);
+  }, [activeVariant]);
 
-  // State untuk Sorting Game
+  // Sumber daftar sortir 100% sama dengan objek yang ada di Meja Gerobak (Bagian 1)
+  const initialSortItems = useMemo(() => {
+    return shuffleArray(activeVariant.objects);
+  }, [activeVariant]);
+
   const [poolItems, setPoolItems] = useState(initialSortItems);
   const [bahanBasket, setBahanBasket] = useState([]);
   const [alatBasket, setAlatBasket] = useState([]);
   const [sortFeedback, setSortFeedback] = useState(null);
   const [draggedItem, setDraggedItem] = useState(null);
 
-  // Reset item pool jika sesi berubah
+  // Sistem 2 kesempatan per item & pencatatan total kesalahan evaluasi
+  const [wrongAttempts, setWrongAttempts] = useState({});
+  const [totalMistakes, setTotalMistakes] = useState(0);
+
   useEffect(() => {
     setPoolItems(initialSortItems);
     setBahanBasket([]);
     setAlatBasket([]);
     setSortFeedback(null);
+    setWrongAttempts({});
+    setTotalMistakes(0);
+    setSelectedObject(null);
+    setLastDiscoveredNote(null);
   }, [initialSortItems]);
 
-  // Klik objek interaktif di gerobak
   const handleInspectObject = (obj) => {
     soundManager.playClickSound();
     setSelectedObject(obj);
 
-    // Tambahkan ke daftar inspeksi jika belum
     if (!inspectedObjects.some(o => o.id === obj.id)) {
       setInspectedObjects(prev => [...prev, obj]);
     }
 
-    // Cek apakah ada sobekan catatan tersembunyi di objek ini
+    // Validasi catatan tersembunyi menggunakan ID objek & ID note unik
     if (obj.hasHiddenNote && obj.noteId) {
-      checkFindNote(obj.noteId);
-    }
-  };
+      if (!collectedNotes.some(n => n.id === obj.noteId)) {
+        const matchedNote = activeVariant.hiddenNotes.find(
+          n => n.id === obj.noteId && n.objectId === obj.id
+        ) || activeVariant.hiddenNotes.find(n => n.id === obj.noteId);
 
-  const checkFindNote = (noteId) => {
-    if (!collectedNotes.some(n => n.id === noteId)) {
-      const noteToFind = activeVariant.hiddenNotes.find(n => n.id === noteId);
-      if (noteToFind) {
-        soundManager.playPaperRustle();
-        soundManager.playPlaceSuccess();
-        setCollectedNotes(prev => [...prev, noteToFind]);
-        setLastDiscoveredNote(noteToFind);
+        if (matchedNote) {
+          soundManager.playPaperRustle();
+          soundManager.playPlaceSuccess();
+          setCollectedNotes(prev => [...prev, matchedNote]);
+          setLastDiscoveredNote(matchedNote);
+        }
       }
     }
   };
 
-  // Drag and drop handlers
   const handleDragStart = (e, item) => {
     setDraggedItem(item);
     e.dataTransfer.setData('text/plain', item.id);
@@ -97,12 +88,20 @@ export default function Act1View({
     setDraggedItem(null);
   };
 
+  // Validasi jawaban berdasarkan kategori objek dari ID sumber inventaris tunggal
   const placeItem = (item, targetCategory) => {
-    if (item.category === targetCategory) {
+    const isCorrect = item.category === targetCategory;
+    const currentAttempts = wrongAttempts[item.id] || 0;
+    const targetName = targetCategory === 'bahan' ? 'Wadah Rempah' : 'Rak Peralatan';
+    const correctReceptacle = item.category === 'bahan' ? 'Wadah Rempah' : 'Rak Peralatan';
+    const correctCategoryLabel = item.category === 'bahan' ? 'Bahan Rempah' : 'Peralatan';
+    const cleanHint = (item.hint || '').replace(/\.+$/, '');
+
+    if (isCorrect) {
       soundManager.playPlaceSuccess();
       setSortFeedback({
         type: 'success',
-        message: `Tepat sekali: '${item.name}' berhasil ditempatkan di wadah ${targetCategory === 'bahan' ? 'Rempah Alami' : 'Piranti Seduh'}.`
+        message: `Tepat! ${item.name} masuk ke ${targetName}.`
       });
 
       setPoolItems(prev => prev.filter(i => i.id !== item.id));
@@ -111,197 +110,122 @@ export default function Act1View({
       } else {
         setAlatBasket(prev => [...prev, item]);
       }
+      return;
+    }
+
+    // Jawaban salah: catat kesalahan, beri 1 kesempatan mencoba kembali
+    soundManager.playGentleWrong();
+    const newAttempts = currentAttempts + 1;
+    setWrongAttempts(prev => ({ ...prev, [item.id]: newAttempts }));
+    setTotalMistakes(prev => prev + 1);
+
+    if (newAttempts === 1) {
+      setSortFeedback({
+        type: 'warning',
+        message: `Belum tepat. ${item.name} — perhatikan cirinya: ${cleanHint}. Coba sekali lagi!`
+      });
     } else {
-      soundManager.playClickSound();
+      // Percobaan ke-2 salah: jelaskan jawaban tepat lalu bantu lanjutkan permainan
       setSortFeedback({
         type: 'error',
-        message: `Kurang tepat: '${item.name}' bukan termasuk kelompok ${targetCategory === 'bahan' ? 'Rempah Alami' : 'Piranti Seduh'}. Cermati fungsinya: ${item.hint}.`
+        message: `${item.name} termasuk kategori ${correctCategoryLabel} (${cleanHint}), sehingga diletakkan di ${correctReceptacle}. Sudah dibantu ditempatkan agar bisa lanjut.`
       });
+
+      setPoolItems(prev => prev.filter(i => i.id !== item.id));
+      if (item.category === 'bahan') {
+        setBahanBasket(prev => [...prev, item]);
+      } else {
+        setAlatBasket(prev => [...prev, item]);
+      }
     }
   };
 
+  const totalItems = activeVariant.objects.length;
+  const sortedCount = totalItems - poolItems.length;
   const isSortingComplete = poolItems.length === 0;
   const isExploreComplete = inspectedObjects.length >= 4 && collectedNotes.length === 3;
-  const isAct1Ready = inspectedObjects.length >= 4 && isSortingComplete && collectedNotes.length === 3;
+  const isAct1Ready = isExploreComplete && isSortingComplete;
 
   return (
     <div className="game-content-area">
-      {/* Header Babak */}
+      {/* Header Ringkas Babak 1 */}
       <div className="act-header-banner">
         <div>
-          <div className="act-subtitle">
-            <Sparkles size={14} />
-            Zona Aku Berkarya • Variasi Sesi {sessionIndex + 1} ({activeVariant.name})
-          </div>
+          <span className="act-zone-kicker">Zona Aku Berkarya • {activeVariant.name}</span>
           <h2 className="act-main-title">Babak 1: Pesanan Pertama</h2>
         </div>
 
-        {/* Status Ringkas Checklist */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-          <span style={{
-            background: inspectedObjects.length >= 4 ? 'var(--color-teal-soft)' : 'var(--bg-parchment)',
-            border: `1.5px solid ${inspectedObjects.length >= 4 ? 'var(--color-teal)' : 'var(--border-strong)'}`,
-            color: inspectedObjects.length >= 4 ? 'var(--color-teal-dark)' : 'var(--text-muted)',
-            padding: '5px 12px',
-            borderRadius: '20px',
-            fontSize: '0.78rem',
-            fontWeight: 800,
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '4px'
-          }}>
-            {inspectedObjects.length >= 4 && <Check size={13} color="var(--color-teal)" />}
-            Benda: {inspectedObjects.length} / 6
-          </span>
+        <div className="act-subtabs">
+          <button
+            className={`subtab-btn ${activeTab === 'explore' ? 'active' : ''}`}
+            onClick={() => {
+              soundManager.playClickSound();
+              setActiveTab('explore');
+            }}
+          >
+            <Search size={16} />
+            <span>1. Meja Gerobak ({inspectedObjects.length}/{totalItems})</span>
+            {collectedNotes.length === 3 && <Check size={14} />}
+          </button>
 
-          <span style={{
-            background: collectedNotes.length === 3 ? 'var(--color-teal-soft)' : 'var(--bg-parchment)',
-            border: `1.5px solid ${collectedNotes.length === 3 ? 'var(--color-teal)' : 'var(--border-strong)'}`,
-            color: collectedNotes.length === 3 ? 'var(--color-teal-dark)' : 'var(--text-muted)',
-            padding: '5px 12px',
-            borderRadius: '20px',
-            fontSize: '0.78rem',
-            fontWeight: 800,
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '4px'
-          }}>
-            {collectedNotes.length === 3 && <Check size={13} color="var(--color-teal)" />}
-            Catatan: {collectedNotes.length} / 3
-          </span>
-
-          <span style={{
-            background: isSortingComplete ? 'var(--color-teal-soft)' : 'var(--bg-parchment)',
-            border: `1.5px solid ${isSortingComplete ? 'var(--color-teal)' : 'var(--border-strong)'}`,
-            color: isSortingComplete ? 'var(--color-teal-dark)' : 'var(--text-muted)',
-            padding: '5px 12px',
-            borderRadius: '20px',
-            fontSize: '0.78rem',
-            fontWeight: 800,
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '4px'
-          }}>
-            {isSortingComplete && <Check size={13} color="var(--color-teal)" />}
-            Penataan: {6 - poolItems.length} / 6
-          </span>
+          <button
+            className={`subtab-btn ${activeTab === 'sort' ? 'active' : ''} ${isExploreComplete && !isSortingComplete ? 'pulse-ready' : ''}`}
+            onClick={() => {
+              soundManager.playClickSound();
+              setActiveTab('sort');
+            }}
+          >
+            <Layers size={16} />
+            <span>2. Penataan ({sortedCount}/{totalItems})</span>
+            {isSortingComplete && <Check size={14} />}
+          </button>
         </div>
       </div>
 
-      {/* Navigasi Sub-Tab Babak 1 */}
-      <div style={{ display: 'flex', gap: '10px', marginBottom: '16px', flexWrap: 'wrap' }}>
-        <button
-          onClick={() => {
-            soundManager.playClickSound();
-            setActiveTab('explore');
-          }}
-          style={{
-            padding: '10px 18px',
-            borderRadius: 'var(--radius-sm)',
-            background: activeTab === 'explore' ? 'var(--color-teal)' : '#FFF',
-            border: `2px solid ${activeTab === 'explore' ? 'var(--color-teal-dark)' : 'var(--border-strong)'}`,
-            color: activeTab === 'explore' ? '#FFF' : 'var(--text-primary)',
-            fontWeight: 800,
-            fontSize: '0.88rem',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            boxShadow: activeTab === 'explore' ? '0 4px 12px rgba(53, 140, 136, 0.25)' : 'var(--shadow-soft)'
-          }}
-        >
-          <Search size={17} />
-          <span>1. Eksplorasi Meja Gerobak ({inspectedObjects.length} / {activeVariant.objects.length})</span>
-        </button>
-
-        <button
-          onClick={() => {
-            soundManager.playClickSound();
-            setActiveTab('sort');
-          }}
-          style={{
-            padding: '10px 18px',
-            borderRadius: 'var(--radius-sm)',
-            background: activeTab === 'sort' ? 'var(--color-teal)' : '#FFF',
-            border: `2px solid ${activeTab === 'sort' ? 'var(--color-teal-dark)' : (isExploreComplete ? 'var(--color-gold-deep)' : 'var(--border-strong)')}`,
-            color: activeTab === 'sort' ? '#FFF' : 'var(--text-primary)',
-            fontWeight: 800,
-            fontSize: '0.88rem',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            boxShadow: activeTab === 'sort' ? '0 4px 12px rgba(53, 140, 136, 0.25)' : 'var(--shadow-soft)'
-          }}
-        >
-          <Layers size={17} />
-          <span>2. Penataan Bahan & Piranti ({6 - poolItems.length} / 6)</span>
-          {isExploreComplete && !isSortingComplete && (
-            <span style={{ background: 'var(--color-gold)', color: '#000', fontSize: '0.72rem', padding: '2px 8px', borderRadius: '10px', fontWeight: 800 }}>
-              Lanjut ke Sini
-            </span>
-          )}
-        </button>
-      </div>
-
-      {/* TAMPILAN 1: EKSPLORASI GEROBAK */}
+      {/* BAGIAN 1: EKSPLORASI MEJA GEROBAK */}
       {activeTab === 'explore' && (
         <div>
           <MiniGameGuideBanner
-            title="Cara Bermain: Eksplorasi Benda di Meja Gerobak"
-            tag="Aktivitas 1: Pengamatan & Penemuan"
+            tag="Langkah 1"
+            title="Periksa benda di meja gerobak untuk menemukan 3 sobekan resep."
             steps={[
-              "Ketuk setiap benda di atas meja gerobak untuk mengamati fungsi dan ciri fisiknya.",
-              "Perhatikan tanda centang hijau yang muncul setelah benda berhasil diperiksa.",
-              "Temukan 3 sobekan resep kuno Pak Ilmu yang terselip di antara benda-benda gerobak.",
-              "Setelah minimal 4 benda diperiksa dan 3 catatan ditemukan, lanjutkan ke tab '2. Penataan Bahan & Piranti'."
+              "Ketuk benda di gerobak memakai mouse atau tombol Tab + Enter / Spasi.",
+              "Temukan 3 sobekan catatan resep lalu lanjut ke tab 2. Penataan."
             ]}
-            tip="Benda di atas gerobak yang belum diperiksa memiliki penanda 'Periksa Objek'. Ketuk untuk membaca keterangannya."
+            tip="Daftar benda di gerobak inilah yang akan kamu tata di langkah berikutnya."
             onOpenHelp={onOpenHelp}
           />
 
-          {/* Toast Notifikasi Penemuan Catatan Terbaru */}
           {lastDiscoveredNote && (
             <div className="discovery-toast-card">
               <div className="discovery-toast-text">
-                <h5>Sobekan Resep Baru Ditemukan ({collectedNotes.length} / 3 Terkumpul)</h5>
-                <p>“{lastDiscoveredNote.text}” — <em>Tersimpan otomatis ke Jurnal Kawruh.</em></p>
+                <h5>Sobekan Resep #{lastDiscoveredNote.num} Ditemukan ({lastDiscoveredNote.foundAt})</h5>
+                <p>“{lastDiscoveredNote.text}”</p>
               </div>
-              <button
-                onClick={() => setLastDiscoveredNote(null)}
-                style={{
-                  background: 'var(--bg-parchment)',
-                  border: '1px solid var(--border-strong)',
-                  padding: '5px 12px',
-                  borderRadius: '12px',
-                  fontSize: '0.76rem',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '4px'
-                }}
-              >
-                <span>Tutup</span>
-                <X size={13} />
+              <button className="toast-close-mini" onClick={() => setLastDiscoveredNote(null)} aria-label="Tutup pesan">
+                <X size={14} />
               </button>
             </div>
           )}
 
-          <div className="angkringan-board" style={{ marginTop: '14px' }}>
+          <div className="angkringan-board">
+            {/* Panggung Meja Gerobak Kayu */}
             <div className="countertop-view">
               <div className="countertop-awning" />
-              
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px' }}>
-                <span style={{ fontSize: '0.86rem', color: 'var(--color-teal-dark)', fontWeight: 800 }}>
-                  MEJA GEROBAK ANGKRINGAN PAK ILMU ({activeVariant.name.toUpperCase()})
-                </span>
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                  Ketuk setiap benda untuk memeriksa ciri dan menemukan petunjuk rahasia
-                </span>
+
+              <div className="countertop-bar-header">
+                <span className="countertop-label">Meja Gerobak Pak Ilmu</span>
+                <div className="kbd-hint-group" aria-label="Pintasan Keyboard">
+                  <span>Navigasi:</span>
+                  <kbd className="kbd-key">Tab</kbd>
+                  <kbd className="kbd-key">Enter</kbd>
+                  <span>/</span>
+                  <kbd className="kbd-key">Spasi</kbd>
+                </div>
               </div>
 
-              {/* Grid 6 Objek dengan Visual Cues Bersih Tanpa Emoji */}
-              <div className="counter-grid-objects">
-                {activeVariant.objects.map((obj) => {
+              <div className="counter-grid-objects grid-4x2">
+                {randomizedTableObjects.map((obj) => {
                   const isInspected = inspectedObjects.some(o => o.id === obj.id);
 
                   return (
@@ -309,28 +233,24 @@ export default function Act1View({
                       key={obj.id}
                       className={`interactive-item-card ${isInspected ? 'inspected' : ''}`}
                       onClick={() => handleInspectObject(obj)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          handleInspectObject(obj);
+                        }
+                      }}
                       role="button"
                       tabIndex={0}
-                      title={`Klik untuk memeriksa ${obj.name}`}
+                      aria-label={`${obj.name}${isInspected ? ', sudah diperiksa' : ''}`}
                     >
-                      {!isInspected && (
-                        <div className="interactive-cue-badge">
-                          <Search size={11} />
-                          <span>Periksa Objek</span>
-                        </div>
-                      )}
-
                       <div className="item-image-wrapper">
                         <img
                           src={obj.image}
                           alt={obj.name}
                           className="item-official-img"
-                          onError={(e) => {
-                            e.target.style.display = 'none';
-                          }}
                         />
                       </div>
-                      <div>
+                      <div className="item-meta-footer">
                         <div className="item-title">{obj.name}</div>
                         <span className="item-tag">{obj.tag}</span>
                       </div>
@@ -339,265 +259,202 @@ export default function Act1View({
                 })}
               </div>
 
-              {/* Panel Hasil Pemeriksaan Objek */}
-              {selectedObject ? (
-                <div className="inspect-drawer" style={{ display: 'block' }}>
+              {/* Panel Inspeksi Benda Aktif */}
+              {selectedObject && (
+                <div className="inspect-drawer">
                   <div className="inspect-header">
-                    <div>
-                      <span className="inspect-category">{selectedObject.tag}</span>
-                      <h3 className="inspect-title">{selectedObject.name}</h3>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <img src={selectedObject.image} alt="" style={{ width: '40px', height: '40px', objectFit: 'contain' }} />
+                      <div>
+                        <span className="inspect-category">{selectedObject.tag}</span>
+                        <h3 className="inspect-title">{selectedObject.name}</h3>
+                      </div>
                     </div>
                     <button
                       className="btn-secondary-action"
-                      style={{ padding: '6px 14px', fontSize: '0.8rem' }}
+                      style={{ padding: '6px 12px', fontSize: '0.78rem' }}
                       onClick={() => setSelectedObject(null)}
                     >
-                      Tutup Penjelasan
+                      Tutup
                     </button>
                   </div>
 
                   <p className="inspect-body">{selectedObject.desc}</p>
-
-                  <div className="inspect-clue-box">
-                    <span className="inspect-clue-label">Kearifan Seduhan Pak Ilmu:</span>
-                    <p style={{ fontStyle: 'italic', margin: 0 }}>“{selectedObject.clue}”</p>
-                  </div>
-
-                  {selectedObject.hasHiddenNote && (
-                    <div style={{
-                      marginTop: '12px',
-                      background: 'var(--color-teal-soft)',
-                      border: '1px solid var(--color-teal)',
-                      padding: '10px 14px',
-                      borderRadius: 'var(--radius-sm)',
-                      fontSize: '0.84rem',
-                      color: 'var(--color-teal-dark)',
-                      fontWeight: 700,
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px'
-                    }}>
-                      <CheckCircle2 size={16} />
-                      <span>Catatan Resep Rahasia telah tercatat ke dalam Jurnal Kawruh!</span>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div style={{
-                  background: 'var(--bg-parchment)',
-                  border: '1.5px dashed var(--border-strong)',
-                  borderRadius: 'var(--radius-sm)',
-                  padding: '24px',
-                  textAlign: 'center',
-                  marginTop: '16px',
-                  color: 'var(--text-muted)',
-                  fontSize: '0.9rem'
-                }}>
-                  Pilih salah satu benda di atas meja gerobak untuk membaca fungsi dan petunjuk rahasianya.
+                  <p className="inspect-clue-inline">
+                    <strong>Fungsi:</strong> {selectedObject.clue}
+                  </p>
                 </div>
               )}
             </div>
 
-            {/* Panel Sisi: Panduan Catatan Terkumpul */}
-            <div className="notes-tracker-panel">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
-                <FileText size={20} color="var(--color-orange)" />
-                <h4 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                  Sobekan Resep ({collectedNotes.length} / 3)
-                </h4>
+            {/* Panel Kanan: Sobekan Resep Terkumpul */}
+            <aside className="notes-tracker-panel">
+              <div className="notes-panel-head">
+                <FileText size={18} color="var(--color-orange)" />
+                <h4>Sobekan Resep ({collectedNotes.length}/3)</h4>
               </div>
-
-              <p style={{ fontSize: '0.84rem', color: 'var(--text-secondary)', lineHeight: '1.5', marginBottom: '14px' }}>
-                Pak Ilmu menyelipkan 3 serpihan naskah resep rahasia di antara piranti gerobak. Temukan ketiganya untuk merangkai resep di Babak 2.
-              </p>
 
               <div className="collected-notes-list">
                 {[1, 2, 3].map((num) => {
-                  const note = collectedNotes[num - 1];
+                  const note = collectedNotes.find(n => n.id === `note-${num}`);
 
                   return (
                     <div key={num} className={`note-snippet-card ${note ? 'found' : 'empty'}`}>
                       <div className="note-snippet-header">
-                        <span>Serpihan Resep #{num}</span>
-                        <span>{note ? 'Telah Ditemukan' : 'Belum Terbaca'}</span>
+                        <span className="note-num-label">Bagian #{num}</span>
+                        <span className={`note-status-pill ${note ? 'done' : 'pending'}`}>
+                          {note ? note.foundAt : 'Belum Ditemukan'}
+                        </span>
                       </div>
                       <p className="note-snippet-text">
-                        {note ? `“${note.text}”` : '(Periksa benda-benda lain di meja gerobak untuk menemukan serpihan ini...)'}
+                        {note ? `“${note.text}”` : 'Periksa benda di gerobak...'}
                       </p>
                     </div>
                   );
                 })}
               </div>
 
-              {/* Rekomendasi Lanjut */}
               {isExploreComplete && (
-                <div style={{
-                  marginTop: '16px',
-                  background: 'var(--color-teal-soft)',
-                  border: '1px solid var(--color-teal)',
-                  padding: '12px',
-                  borderRadius: 'var(--radius-sm)',
-                  fontSize: '0.84rem',
-                  color: 'var(--color-teal-dark)',
-                  lineHeight: '1.45',
-                  fontWeight: 700
-                }}>
-                  Semua 3 serpihan resep telah terkumpul! Buka tab '2. Penataan Bahan & Piranti' untuk menuntaskan babak ini.
-                </div>
+                <button
+                  className="btn-primary-action"
+                  style={{ width: '100%', marginTop: '14px', justifyContent: 'center', padding: '11px 16px', fontSize: '0.88rem' }}
+                  onClick={() => {
+                    soundManager.playClickSound();
+                    setActiveTab('sort');
+                  }}
+                >
+                  <span>Lanjut ke Penataan</span>
+                  <ArrowRight size={16} />
+                </button>
               )}
-            </div>
+            </aside>
           </div>
         </div>
       )}
 
-      {/* TAMPILAN 2: SORTING/PENATAAN BAHAN DAN ALAT */}
+      {/* BAGIAN 2: PENATAAN BAHAN REMPAH & RAK PERALATAN */}
       {activeTab === 'sort' && (
         <div>
           <MiniGameGuideBanner
-            title="Cara Bermain: Penataan Bahan Rempah & Piranti Seduh"
-            tag="Aktivitas 2: Klasifikasi Pengetahuan"
+            tag="Langkah 2"
+            title="Kelompokkan benda gerobak ke Wadah Rempah atau Rak Peralatan."
             steps={[
-              "Amati kartu bahan atau alat yang tersedia pada rak persiapan di bawah.",
-              "Tarik kartu (drag & drop) atau klik tombol '+ Rempah' / '+ Piranti' pada masing-masing kartu.",
-              "Kelompokkan ke dalam wadah yang sesuai: Rempah Alami (Jahe, Sereh, Gula Aren, Cengkeh, Kayu Manis) atau Piranti Seduh (Ceret, Cangkir, Sendok, Cobek, Saringan).",
-              "Selesaikan seluruh 6 kartu untuk membuka kunci menuju Babak 2."
+              "Tarik kartu atau tekan '+ Rempah' / '+ Peralatan' (atau tombol angka 1 / 2).",
+              "Kamu punya 2 kesempatan per benda jika keliru."
             ]}
-            tip="Pahami perbedaan antara bahan rimpang hasil bumi dan peralatan seduh tradisional."
+            tip={`Terdaftar ${totalMistakes} kesalahan saat berlatih.`}
             onOpenHelp={onOpenHelp}
           />
 
           {sortFeedback && (
-            <div style={{
-              background: sortFeedback.type === 'success' ? 'var(--color-teal-soft)' : 'var(--color-bata-soft)',
-              borderLeft: `4px solid ${sortFeedback.type === 'success' ? 'var(--color-teal)' : 'var(--color-bata)'}`,
-              padding: '12px 18px',
-              borderRadius: '0 6px 6px 0',
-              fontSize: '0.9rem',
-              color: sortFeedback.type === 'success' ? 'var(--color-teal-dark)' : 'var(--color-bata-dark)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px',
-              marginBottom: '16px',
-              fontWeight: 700
-            }}>
+            <div className={`feedback-strip ${sortFeedback.type}`}>
               {sortFeedback.type === 'success' ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
               <span>{sortFeedback.message}</span>
             </div>
           )}
 
-          {/* Rak Item yang Belum Dikelompokkan */}
+          {/* Area Kartu yang Akan Dikelompokkan */}
           <div className="sorting-pool-area">
             {poolItems.length === 0 ? (
-              <div style={{
-                width: '100%',
-                padding: '16px',
-                textAlign: 'center',
-                color: 'var(--color-teal-dark)',
-                fontWeight: 800,
-                fontSize: '0.95rem'
-              }}>
-                Seluruh 6 bahan dan piranti telah tertata rapi pada wadahnya masing-masing!
+              <div className="sorting-done-state">
+                <CheckCircle2 size={28} color="var(--color-teal)" />
+                <span>Semua {totalItems} benda sudah tertata di tempatnya!</span>
+                {totalMistakes > 0 && (
+                  <small>Catatan evaluasi: {totalMistakes} percobaan salah telah diperbaiki.</small>
+                )}
               </div>
             ) : (
-              poolItems.map((item) => (
-                <div
-                  key={item.id}
-                  className="draggable-item"
-                  draggable
-                  onDragStart={(e) => handleDragStart(e, item)}
-                >
-                  <span>{item.name}</span>
-                  <div style={{ display: 'flex', gap: '4px' }}>
-                    <button
-                      className="click-transfer-btn"
-                      onClick={() => placeItem(item, 'bahan')}
-                      title="Pindahkan ke Wadah Rempah"
+              <div className="sort-cards-grid">
+                {poolItems.map((item) => {
+                  const attempts = wrongAttempts[item.id] || 0;
+
+                  return (
+                    <div
+                      key={item.id}
+                      className={`sort-item-card ${attempts === 1 ? 'has-warning' : ''}`}
+                      draggable
+                      onDragStart={(e) => handleDragStart(e, item)}
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === '1' || e.key.toLowerCase() === 'r') placeItem(item, 'bahan');
+                        if (e.key === '2' || e.key.toLowerCase() === 'p') placeItem(item, 'alat');
+                      }}
                     >
-                      + Rempah
-                    </button>
-                    <button
-                      className="click-transfer-btn"
-                      onClick={() => placeItem(item, 'alat')}
-                      title="Pindahkan ke Rak Piranti"
-                    >
-                      + Piranti
-                    </button>
-                  </div>
-                </div>
-              ))
+                      {attempts === 1 && (
+                        <span className="retry-chance-tag">Kesempatan 2</span>
+                      )}
+
+                      <div className="sort-thumb-box">
+                        <img src={item.image} alt={item.name} />
+                      </div>
+
+                      <div className="sort-card-title">{item.name}</div>
+
+                      <div className="sort-action-btns">
+                        <button
+                          className="sort-pick-btn bahan"
+                          onClick={() => placeItem(item, 'bahan')}
+                        >
+                          + Rempah
+                        </button>
+                        <button
+                          className="sort-pick-btn alat"
+                          onClick={() => placeItem(item, 'alat')}
+                        >
+                          + Peralatan
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             )}
           </div>
 
-          {/* 2 Dropzone (Wadah Rempah vs Rak Piranti) */}
+          {/* 2 Area Penempatan: Wadah Rempah & Rak Peralatan */}
           <div className="dropzone-grid">
-            {/* Wadah Rempah Alami */}
             <div
-              className="dropzone-box"
+              className="dropzone-box zone-bahan"
               onDragOver={(e) => e.preventDefault()}
               onDrop={() => handleDropTo('bahan')}
             >
               <div className="dropzone-header">
-                <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: 'var(--color-orange)' }} />
-                <h4>Wadah Rempah Alami ({bahanBasket.length})</h4>
+                <span className="zone-dot bahan" />
+                <h4>Wadah Rempah ({bahanBasket.length})</h4>
               </div>
               <div className="dropzone-items-list">
                 {bahanBasket.length === 0 ? (
-                  <span style={{ fontSize: '0.84rem', color: 'var(--text-muted)', fontStyle: 'italic', margin: 'auto' }}>
-                    Tarik rimpang dan rempah alami ke sini
-                  </span>
+                  <span className="dropzone-placeholder">Letakkan bahan rempah di sini...</span>
                 ) : (
                   bahanBasket.map((item) => (
-                    <div key={item.id} style={{
-                      background: 'var(--bg-parchment)',
-                      border: '1px solid var(--border-natural)',
-                      padding: '10px 14px',
-                      borderRadius: '6px',
-                      fontSize: '0.88rem',
-                      color: 'var(--text-primary)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      fontWeight: 700
-                    }}>
-                      <CheckCircle2 size={16} color="var(--color-teal)" />
-                      {item.name}
+                    <div key={item.id} className="sorted-chip">
+                      <img src={item.image} alt="" />
+                      <span>{item.name}</span>
+                      <Check size={14} color="var(--color-teal)" style={{ marginLeft: 'auto' }} />
                     </div>
                   ))
                 )}
               </div>
             </div>
 
-            {/* Rak Piranti Seduh */}
             <div
-              className="dropzone-box"
+              className="dropzone-box zone-alat"
               onDragOver={(e) => e.preventDefault()}
               onDrop={() => handleDropTo('alat')}
             >
               <div className="dropzone-header">
-                <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: 'var(--color-teal)' }} />
-                <h4>Rak Piranti Seduh ({alatBasket.length})</h4>
+                <span className="zone-dot alat" />
+                <h4>Rak Peralatan ({alatBasket.length})</h4>
               </div>
               <div className="dropzone-items-list">
                 {alatBasket.length === 0 ? (
-                  <span style={{ fontSize: '0.84rem', color: 'var(--text-muted)', fontStyle: 'italic', margin: 'auto' }}>
-                    Tarik piranti seduh tradisional ke sini
-                  </span>
+                  <span className="dropzone-placeholder">Letakkan peralatan angkringan di sini...</span>
                 ) : (
                   alatBasket.map((item) => (
-                    <div key={item.id} style={{
-                      background: 'var(--bg-parchment)',
-                      border: '1px solid var(--border-natural)',
-                      padding: '10px 14px',
-                      borderRadius: '6px',
-                      fontSize: '0.88rem',
-                      color: 'var(--text-primary)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      fontWeight: 700
-                    }}>
-                      <CheckCircle2 size={16} color="var(--color-teal)" />
-                      {item.name}
+                    <div key={item.id} className="sorted-chip">
+                      <img src={item.image} alt="" />
+                      <span>{item.name}</span>
+                      <Check size={14} color="var(--color-teal)" style={{ marginLeft: 'auto' }} />
                     </div>
                   ))
                 )}
@@ -607,10 +464,11 @@ export default function Act1View({
         </div>
       )}
 
-      {/* Footer Aksi Navigasi Babak */}
+      {/* Footer Aksi */}
       <div className="action-footer-bar">
-        <div style={{ fontSize: '0.86rem', color: 'var(--text-muted)' }}>
-          Syarat lanjut: Eksplorasi 4 objek ({inspectedObjects.length}/4), tata 6 item ({6 - poolItems.length}/6), temukan 3 catatan ({collectedNotes.length}/3).
+        <div className="footer-progress-note">
+          Benda diperiksa: {inspectedObjects.length}/4 • Sobekan resep: {collectedNotes.length}/3 • Penataan: {sortedCount}/{totalItems}
+          {totalMistakes > 0 ? ` • Kesalahan tercatat: ${totalMistakes}` : ''}
         </div>
 
         <button
@@ -621,7 +479,7 @@ export default function Act1View({
             onCompleteAct();
           }}
         >
-          <span>Lanjut ke Babak 2: Resep yang Hilang</span>
+          <span>Lanjut ke Babak 2</span>
           <ArrowRight size={18} />
         </button>
       </div>

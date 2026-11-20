@@ -1,19 +1,18 @@
 // ==========================================================================
-// ANGKRINGAN PAK ILMU — DATA PERMAINAN & KONTEN NARATIF
-// Gredupedia #7: Karsa Kala • Zona Dhandanggula (Aku/Kita Berkarya & Kontribusi)
+// ANGKRINGAN PAK ILMU — SUMBER DATA TUNGGAL PERMAINAN
+// Gredupedia #7: Karsa Kala Saka Rasa Tujumu Makna
+// Prinsip Konten: Ringkas, Edukatif, Tanpa Klaim Medis Berlebihan, Konsisten
 // ==========================================================================
 
 export const GAME_INFO = {
   title: "Angkringan Pak Ilmu",
   subtitle: "Pesanan yang Tak Biasa",
-  exhibition: "Gredupedia #7: Karsa Kala",
-  tagline: "Saka Rasa, Tumuju Makna",
-  department: "Teknologi Pendidikan FIP Universitas Negeri Yogyakarta",
-  zone: "Dhandanggula (Karya & Kontribusi)",
-  targetDuration: "5 hingga 7 Menit"
+  exhibition: "Karsa Kala Saka Rasa Tujumu Makna",
+  zone: "Zona Dhandanggula",
+  targetDuration: "5–7 Menit"
 };
 
-// Fungsi Utilitas Pengacakan yang Aman & Terverifikasi
+// Utilitas Pengacakan Stabil (Fisher-Yates)
 export function shuffleArray(array) {
   const arr = [...array];
   for (let i = arr.length - 1; i > 0; i--) {
@@ -23,10 +22,11 @@ export function shuffleArray(array) {
   return arr;
 }
 
+// Acak urutan langkah sehingga tidak pernah langsung tersusun benar sejak awal
 export function derangeSequence(steps) {
   let shuffled = shuffleArray(steps);
   let attempts = 0;
-  while (shuffled.every((s, i) => s.correctOrder === i + 1) && attempts < 10) {
+  while (shuffled.every((s, i) => s.correctOrder === i + 1) && attempts < 12) {
     shuffled = shuffleArray(steps);
     attempts++;
   }
@@ -39,46 +39,43 @@ export function derangeSequence(steps) {
 }
 
 // --------------------------------------------------------------------------
-// 1. TIKET PESANAN DENGAN VARIASI SITUASI
+// 1. TIKET PESANAN PENGUNJUNG
 // --------------------------------------------------------------------------
 export const ORDER_TICKETS = [
   {
-    id: "order-mystic-01",
-    title: "Tiket Pesanan: Malam Berhawa Dingin",
-    sender: "Seorang Pengelana Basah Kuyup",
-    time: "Larut Malam di Tengah Hujan Malioboro",
+    id: "order-danang",
+    title: "Pesanan Malam Berhujan",
+    sender: "Mas Danang",
+    time: "Malam Hujan Deras, Malioboro",
     image: "/background/tiketpesanan.png",
-    text: "Tenggorokan tercekat debu jalanan, sendi-sendi ngilu didera angin malam. Jiwa lelah mencari arah, pikiran gundah butuh kehangatan yang menenangkan tanpa memperdaya rasa... Racikkan sesuatu yang bukan sekadar pengisi lambung, melainkan pengingat jati diri dan penentram batin.",
+    text: "Badan menggigil kedinginan diterpa hujan, langkah terasa berat. Tolong racikkan segelas minuman yang menghangatkan badan dan menenangkan pikiran.",
     notes: [
-      "Pelanggan kedinginan parah akibat terpaan hujan deras Malioboro.",
-      "Butuh kehangatan alami mendalam yang membakar dingin hingga ke tulang.",
-      "Butuh sapaan tulus yang menguatkan tekad untuk melanjutkan perjalanan esok."
+      "Basah kuyup diterpa hujan deras.",
+      "Butuh sensasi hangat mendalam & aroma menenangkan."
     ]
   },
   {
-    id: "order-mystic-02",
-    title: "Tiket Pesanan: Beban Lelah Perantau",
-    sender: "Perantau Muda di Ujung Lincak",
-    time: "Malam Sunyi Seusai Jam Lembur",
+    id: "order-sari",
+    title: "Pesanan Penawar Lelah Lembur",
+    sender: "Mbak Sari",
+    time: "Larut Malam Seusai Bekerja",
     image: "/background/tiketpesanan.png",
-    text: "Napas terasa sesak diimpit hiruk-pikuk kota, dada berat memikul kerinduan pada hangatnya keluarga di kampung halaman. Tubuh tidak sedang sakit, tetapi batin kehilangan ketenangan... Beri aku seteguk seduhan yang aromanya melegakan pikiran dan mengembalikan rasa damai.",
+    text: "Kepala terasa penat seusai lembur larut, rindu suasana hangat kampung halaman. Beri aku seduhan beraroma segar dan manis lembut.",
     notes: [
-      "Pelanggan mengalami kelelahan mental dan sesak napas akibat ketegangan.",
-      "Butuh aroma sereh wangi dan cengkeh yang menyegarkan pernapasan.",
-      "Butuh rasa manis alami gula kelapa yang menenteramkan rasa rindu."
+      "Kelelahan pikiran selepas bekerja larut.",
+      "Cocok dengan aroma wangi lembut & rasa manis teduh."
     ]
   },
   {
-    id: "order-mystic-03",
-    title: "Tiket Pesanan: Keringat Pengayuh Malam",
-    sender: "Pengayuh Becak Tua Malioboro",
-    time: "Dini Hari Menembus Angin Selatan",
+    id: "order-broto",
+    title: "Pesanan Pengayuh Becak Malam",
+    sender: "Pak Broto",
+    time: "Dini Hari Angin Selatan",
     image: "/background/tiketpesanan.png",
-    text: "Lutut gemetar menopang roda kehidupan, otot-otot betis tegang dan perut kembung ditiup angin malam. Bukan kemewahan yang kucari, melainkan pulihnya tenaga dan lenyapnya rasa ngilu agar esok raga ini kembali mampu berikhtiar.",
+    text: "Lutut terasa kaku setelah mengayuh jauh menembus angin malam. Buatkan wedang hangat mantap dengan manis aren agar bertenaga kembali.",
     notes: [
-      "Pelanggan mengalami masuk angin berat dan keletihan fisik setelah bekerja keras.",
-      "Butuh daya bakar bara jahe emprit untuk mengeluarkan angin di tubuh.",
-      "Butuh asupan energi stamina tinggi dari gula kelapa aren asli."
+      "Tubuh lelah & kedinginan angin malam.",
+      "Butuh hangat pedas alami & manis energi gula aren."
     ]
   }
 ];
@@ -86,506 +83,451 @@ export const ORDER_TICKETS = [
 export const ORDER_TICKET = ORDER_TICKETS[0];
 
 // --------------------------------------------------------------------------
-// 2. BABAK 1: AKU BERKARYA (DENGAN VARIASI BENDA & TANTANGAN)
+// 2. DAFTAR INVENTARIS UTAMA (SUMBER KEBENARAN TUNGGAL BABAK 1, 2, 3)
+// Seluruh nama, ID, kategori, gambar, dan fungsi merujuk ke tabel induk ini.
+// --------------------------------------------------------------------------
+export const MASTER_ANGKRINGAN_INVENTORY = {
+  // --- KELOMPOK BAHAN REMPAH (category: "bahan") ---
+  jahe: {
+    id: "jahe",
+    name: "Jahe Emprit Bakar",
+    category: "bahan",
+    tag: "Bahan Rempah",
+    image: "/assets/spices/jahe.svg",
+    desc: "Rimpang pedas yang dibakar sejenak di atas bara agar wanginya keluar.",
+    clue: "Memberi sensasi hangat kuat di badan dan tenggorokan.",
+    hint: "Berasal dari rimpang tanaman alami (Bahan Rempah).",
+    property: "Sensasi hangat kuat & pedas lembut",
+    suitableFor: ["dingin", "kaku", "hangat"]
+  },
+  serai: {
+    id: "serai",
+    name: "Batang Serai Wangi",
+    category: "bahan",
+    tag: "Bahan Rempah",
+    image: "/assets/spices/sereh.svg",
+    desc: "Batang beraroma sitrus segar yang dimemarkan sebelum diseduh.",
+    clue: "Aromanya segar dan membantu suasana hati terasa lebih tenang.",
+    hint: "Tanaman aromatik berumpun alami (Bahan Rempah).",
+    property: "Aroma segar menenangkan suasana",
+    suitableFor: ["penat", "tenang", "dingin"]
+  },
+  gula_aren: {
+    id: "gula_aren",
+    name: "Gula Jawa Aren",
+    category: "bahan",
+    tag: "Bahan Rempah",
+    image: "/assets/spices/gula_aren.svg",
+    desc: "Bongkahan pemanis alami dari nira aren dengan wangi karamel legit.",
+    clue: "Menyeimbangkan rasa pedas rempah dan memberi rasa nyaman.",
+    hint: "Olahan alami nira pohon aren (Bahan Rempah).",
+    property: "Manis lembut pembangkit tenaga",
+    suitableFor: ["lelah", "manis", "tenaga"]
+  },
+  cengkeh: {
+    id: "cengkeh",
+    name: "Bunga Cengkeh",
+    category: "bahan",
+    tag: "Bahan Rempah",
+    image: "/assets/spices/cengkeh.svg",
+    desc: "Kuncup bunga kering beraroma harum hangat khas Nusantara.",
+    clue: "Cukup beberapa butir untuk memperkaya wangi seduhan malam.",
+    hint: "Bunga rempah kering alami (Bahan Rempah).",
+    property: "Aroma harum klasik penghangat rasa",
+    suitableFor: ["penat", "dingin", "wangi"]
+  },
+  kayu_manis: {
+    id: "kayu_manis",
+    name: "Kulit Kayu Manis",
+    category: "bahan",
+    tag: "Bahan Rempah",
+    image: "/assets/spices/kayu_manis.svg",
+    desc: "Kulit batang kering dengan aroma manis lembut yang menenangkan.",
+    clue: "Membuat rasa wedang terasa lebih bulat dan ramah di tenggorokan.",
+    hint: "Kulit batang rempah alami (Bahan Rempah).",
+    property: "Aroma manis lembut & hangat",
+    suitableFor: ["manis", "tenang", "wangi"]
+  },
+  kunyit: {
+    id: "kunyit",
+    name: "Rimpang Kunyit",
+    category: "bahan",
+    tag: "Bahan Rempah",
+    image: "/assets/spices/kunyit.svg",
+    desc: "Rimpang berwarna kuning keemasan dengan aroma khas jamu tradisional.",
+    clue: "Memberi warna kuning hangat dan rasa gurih bumi yang lembut.",
+    hint: "Rimpang tanaman rempah alami (Bahan Rempah).",
+    property: "Hangat lembut ramah di perut",
+    suitableFor: ["perut", "nyaman", "lembut"]
+  },
+
+  // --- KELOMPOK PERALATAN ANGKRINGAN (category: "alat") ---
+  ceret: {
+    id: "ceret",
+    name: "Ceret Tembaga",
+    category: "alat",
+    tag: "Peralatan",
+    image: "/background/cerek.png",
+    desc: "Wadah perebus air di atas anglo arang agar panasnya merata.",
+    clue: "Air mendidih sempurna membantu sari jahe dan serai keluar maksimal.",
+    hint: "Benda perkakas perebus air (Peralatan).",
+    property: "Penjaga suhu didih air"
+  },
+  cangkir: {
+    id: "cangkir",
+    name: "Cangkir Blirik",
+    category: "alat",
+    tag: "Peralatan",
+    image: "/background/cangkir.png",
+    desc: "Gelas enamel loreng hijau-putih khas angkringan Yogyakarta.",
+    clue: "Menahan panas minuman sekaligus menjadi simbol kehangatan akrab.",
+    hint: "Wadah penyajian minuman (Peralatan).",
+    property: "Wadah saji penahan hangat"
+  },
+  cobek: {
+    id: "cobek",
+    name: "Cobek & Ulekan",
+    category: "alat",
+    tag: "Peralatan",
+    image: "/assets/tools/cobek.svg",
+    desc: "Peralatan batu untuk mememarkan jahe dan serai sebelum diseduh.",
+    clue: "Rimpang cukup dimemarkan perlahan agar saripati mudah larut.",
+    hint: "Perkakas batu pememar bahan (Peralatan).",
+    property: "Pememar batang serai & jahe"
+  },
+  sendok: {
+    id: "sendok",
+    name: "Sendok Kayu",
+    category: "alat",
+    tag: "Peralatan",
+    image: "/assets/tools/sendok.svg",
+    desc: "Pengaduk kayu jati agar gula aren larut merata tanpa merusak cangkir.",
+    clue: "Mengaduk perlahan menyatukan manis gula dan hangatnya rempah.",
+    hint: "Perkakas pengaduk minuman (Peralatan).",
+    property: "Pengaduk seduhan hangat"
+  },
+  saringan: {
+    id: "saringan",
+    name: "Saringan Kain",
+    category: "alat",
+    tag: "Peralatan",
+    image: "/assets/tools/saringan.svg",
+    desc: "Saringan tradisional pemisah ampas rempah agar seduhan bersih.",
+    clue: "Memastikan wedang nyaman diminum tanpa ampas kasar.",
+    hint: "Perkakas penyaring minuman (Peralatan).",
+    property: "Penyaring seduhan jernih"
+  }
+};
+
+// Daftar pool lengkap untuk komponen lain yang mengimpornya
+export const SORT_ITEMS_POOL = Object.values(MASTER_ANGKRINGAN_INVENTORY);
+
+// Bahan Pantry Babak 3 bersumber tunggal dari MASTER_ANGKRINGAN_INVENTORY
+export const PANTRY_INGREDIENTS = [
+  MASTER_ANGKRINGAN_INVENTORY.jahe,
+  MASTER_ANGKRINGAN_INVENTORY.serai,
+  MASTER_ANGKRINGAN_INVENTORY.gula_aren,
+  MASTER_ANGKRINGAN_INVENTORY.cengkeh,
+  MASTER_ANGKRINGAN_INVENTORY.kayu_manis,
+  MASTER_ANGKRINGAN_INVENTORY.kunyit
+];
+
+// --------------------------------------------------------------------------
+// 3. BABAK 1: AKU BERKARYA (OBJEK EKSPLORASI = OBJEK PENATAAN, 100% KONSISTEN!)
 // --------------------------------------------------------------------------
 export const ACT_1_VARIANTS = [
-  // Varian A: Meja Gerobak Klasik
+  // Sesi 0 (Utama: Mas Danang) -> 8 benda meja gerobak (4 bahan + 4 alat)
   {
     id: "act1-v0",
-    name: "Meja Gerobak Depan",
+    name: "Meja Gerobak Utama",
     objects: [
-      {
-        id: "ceret",
-        name: "Ceret Tiga Tingkat",
-        tag: "Piranti Seduh",
-        image: "/background/cerek.png",
-        desc: "Ceret tembaga khas angkringan yang bertumpuk di atas anglo arang. Bunyi desis uapnya menandakan air mendidih pada suhu yang tepat untuk melarutkan saripati rimpang.",
-        clue: "Air yang terlalu dingin takkan membangunkan aroma jahe; air yang mendidih sempurna adalah kunci keikhlasan seduhan.",
-        hasHiddenNote: true,
-        noteId: "note-1"
-      },
-      {
-        id: "toples_rempah",
-        name: "Toples Kaca Rempah Tua",
-        tag: "Bahan Alami",
-        image: "/background/toples.png",
-        desc: "Toples kaca tebal berisi rimpang jahe emprit pilihan, batang sereh wangi, cengkeh, dan kulit kayu manis. Aromanya wangi tajam dan menghangatkan.",
-        clue: "Jahe emprit kecil tapi membakar dingin. Dipadukan dengan sereh, ia melancarkan aliran rasa dan pikiran.",
-        hasHiddenNote: true,
-        noteId: "note-3"
-      },
-      {
-        id: "cangkir_blirik",
-        name: "Cangkir Kaleng Blirik",
-        tag: "Piranti Saji",
-        image: "/background/cangkir.png",
-        desc: "Cangkir loreng hijau-putih legendaris penahan panas. Menjadi saksi ratusan perbincangan egaliter tanpa memandang kasta atau gelar.",
-        clue: "Wadah sederhana mengajarkan kita bahwa bukan kemewahan bejana yang utama, melainkan kemurnian apa yang disajikan di dalamnya.",
-        hasHiddenNote: true,
-        noteId: "note-2"
-      },
-      {
-        id: "buku_catatan",
-        name: "Jurnal Lusuh Pak Ilmu",
-        tag: "Catatan Pembelajar",
-        image: "/background/jurnallusuh.png",
-        desc: "Buku catatan bersampul kulit kusam. Halamannya sebagian terlipat, berisi tulisan tangan Pak Ilmu tentang perjumpaan manusia dengan persoalan hidupnya.",
-        clue: "Karya bermula dari kepekaan meraba kebutuhan sesama. Jangan meracik sebelum kau sungguh-sungguh mendengarkan.",
-        hasHiddenNote: false
-      },
-      {
-        id: "lentera_sentir",
-        name: "Lampu Sentir Minyak",
-        tag: "Penerang Suasana",
-        image: "/background/lampusentir.png",
-        desc: "Lentera minyak tanah yang memendarkan cahaya temaram keemasan. Menghangatkan gerobak di tengah dinginnya malam kota pelajar.",
-        clue: "Cahaya kecil yang ajeg lebih bermakna daripada kilatan petir yang membutakan lalu lenyap dalam sekejap.",
-        hasHiddenNote: false
-      },
-      {
-        id: "tiket_pesanan",
-        name: "Tiket Pesanan Misterius",
-        tag: "Kebutuhan Nyata",
-        image: "/background/tiketpesanan.png",
-        desc: "Kertas pesanan dari pelanggan di ujung lincak. Berisi bahasa kiasan tentang keletihan fisik dan kegundahan jiwa.",
-        clue: "Bukan sekadar dahaga tenggorokan, melainkan kepenatan jiwa yang membutuhkan sapaan hangat dan empati.",
-        hasHiddenNote: false
-      }
+      { ...MASTER_ANGKRINGAN_INVENTORY.ceret,     hasHiddenNote: true, noteId: "note-1" },
+      { ...MASTER_ANGKRINGAN_INVENTORY.jahe,      hasHiddenNote: false },
+      { ...MASTER_ANGKRINGAN_INVENTORY.serai,     hasHiddenNote: true, noteId: "note-2" },
+      { ...MASTER_ANGKRINGAN_INVENTORY.cobek,     hasHiddenNote: false },
+      { ...MASTER_ANGKRINGAN_INVENTORY.gula_aren, hasHiddenNote: false },
+      { ...MASTER_ANGKRINGAN_INVENTORY.cangkir,   hasHiddenNote: true, noteId: "note-3" },
+      { ...MASTER_ANGKRINGAN_INVENTORY.cengkeh,   hasHiddenNote: false },
+      { ...MASTER_ANGKRINGAN_INVENTORY.sendok,    hasHiddenNote: false }
     ],
     hiddenNotes: [
       {
         id: "note-1",
-        foundAt: "Di samping Ceret Tembaga Tiga Tingkat",
-        text: "Sobekan Resep 1: Kenali dulu dingin macam apa yang merasuk. Dingin raga butuh bara jahe emprit, dingin batin butuh sapaan tulus."
+        num: 1,
+        objectId: "ceret",
+        foundAt: "Ceret Tembaga",
+        text: "Kenali dulu dingin yang dibawa tamu, lalu siapkan air mendidih matang."
       },
       {
         id: "note-2",
-        foundAt: "Di bawah tatakan Cangkir Blirik Loreng",
-        text: "Sobekan Resep 2: Jangan terburu-buru memberi manis gula sebelum kepedihan raga terurai oleh kehangatan rempah."
+        num: 2,
+        objectId: "serai",
+        foundAt: "Batang Serai Wangi",
+        text: "Memarkan jahe dan serai perlahan agar wangi segarnya larut bersama."
       },
       {
         id: "note-3",
-        foundAt: "Di balik Toples Kaca Rempah Tua",
-        text: "Sobekan Resep 3: Seduh dengan air yang matang sempurna. Aduk dengan doa kebaikan, sajikan selagi uap masih menari."
+        num: 3,
+        objectId: "cangkir",
+        foundAt: "Cangkir Blirik",
+        text: "Sajikan dalam cangkir blirik hangat dengan sapaan yang tulus."
       }
     ]
   },
 
-  // Varian B: Sudut Perapian & Penumbuk Rempah
+  // Sesi 1 (Mbak Sari)
   {
     id: "act1-v1",
-    name: "Sudut Perapian & Penumbuk",
+    name: "Meja Rempah Aromatik",
     objects: [
-      {
-        id: "ceret",
-        name: "Ceret Tiga Tingkat",
-        tag: "Piranti Seduh",
-        image: "/background/cerek.png",
-        desc: "Ceret tembaga khas angkringan yang bertumpuk di atas anglo arang. Suhu airnya terjaga ajeg untuk ekstraksi minyak atsiri rimpang.",
-        clue: "Air panas adalah perantara; tanpa air matang seimbang, saripati rempah takkan luruh menyatu.",
-        hasHiddenNote: true,
-        noteId: "note-1"
-      },
-      {
-        id: "buku_catatan",
-        name: "Jurnal Lusuh Pak Ilmu",
-        tag: "Catatan Pembelajar",
-        image: "/background/jurnallusuh.png",
-        desc: "Buku catatan bersampul kulit kusam berisi resep warisan dan renungan filosofis tentang gotong royong dan kemanusiaan.",
-        clue: "Karya sejati lahir saat keterampilan tangan dipandu oleh kelembutan nurani.",
-        hasHiddenNote: true,
-        noteId: "note-2"
-      },
-      {
-        id: "toples_rempah",
-        name: "Toples Kaca Rempah Tua",
-        tag: "Bahan Alami",
-        image: "/background/toples.png",
-        desc: "Toples kaca tebal penyimpan rimpang kering dan rempah aromatik pilihan dari perbukitan Menoreh.",
-        clue: "Rempah yang tersimpan rapat mempertahankan keharuman aslinya hingga tiba waktu diseduh.",
-        hasHiddenNote: true,
-        noteId: "note-3"
-      },
-      {
-        id: "cangkir_blirik",
-        name: "Cangkir Kaleng Blirik",
-        tag: "Piranti Saji",
-        image: "/background/cangkir.png",
-        desc: "Bejana saji kaleng enamel bermotif loreng khas tanah Jawa yang menjaga kehangatan wedang lebih lama.",
-        clue: "Kesederhanaan rupa menampung kemuliaan rasa.",
-        hasHiddenNote: false
-      },
-      {
-        id: "lentera_sentir",
-        name: "Lampu Sentir Minyak",
-        tag: "Penerang Suasana",
-        image: "/background/lampusentir.png",
-        desc: "Lentera minyak tanah yang setia menerangi gerobak dan wajah para pengunjung yang singgah.",
-        clue: "Terang yang tenang memayungi obrolan yang jujur dari hati ke hati.",
-        hasHiddenNote: false
-      },
-      {
-        id: "tiket_pesanan",
-        name: "Tiket Pesanan Misterius",
-        tag: "Kebutuhan Nyata",
-        image: "/background/tiketpesanan.png",
-        desc: "Catatan pesanan bernada puitis yang ditinggalkan pengunjung di ujung bangku kayu lincak.",
-        clue: "Bacalah getaran batin di balik setiap baris kata yang tertulis.",
-        hasHiddenNote: false
-      }
+      { ...MASTER_ANGKRINGAN_INVENTORY.serai,      hasHiddenNote: true, noteId: "note-1" },
+      { ...MASTER_ANGKRINGAN_INVENTORY.kayu_manis, hasHiddenNote: false },
+      { ...MASTER_ANGKRINGAN_INVENTORY.ceret,      hasHiddenNote: true, noteId: "note-2" },
+      { ...MASTER_ANGKRINGAN_INVENTORY.saringan,   hasHiddenNote: false },
+      { ...MASTER_ANGKRINGAN_INVENTORY.gula_aren,  hasHiddenNote: false },
+      { ...MASTER_ANGKRINGAN_INVENTORY.cengkeh,    hasHiddenNote: true, noteId: "note-3" },
+      { ...MASTER_ANGKRINGAN_INVENTORY.cangkir,    hasHiddenNote: false },
+      { ...MASTER_ANGKRINGAN_INVENTORY.sendok,     hasHiddenNote: false }
     ],
     hiddenNotes: [
       {
         id: "note-1",
-        foundAt: "Di celah alas Ceret Tembaga",
-        text: "Sobekan Resep 1: Suhu air adalah kesabaran. Seduh pada kematangan sempurna agar saripati jahe menyatu lembut dengan sereh."
+        num: 1,
+        objectId: "serai",
+        foundAt: "Batang Serai Wangi",
+        text: "Aroma serai dan kayu manis membantu pikiran terasa lebih tenang."
       },
       {
         id: "note-2",
-        foundAt: "Di balik sampul Jurnal Lusuh Pak Ilmu",
-        text: "Sobekan Resep 2: Mememarkan sereh bukan untuk menghancurkannya, melainkan membuka jalan bagi keharumannya untuk keluar."
+        num: 2,
+        objectId: "ceret",
+        foundAt: "Ceret Tembaga",
+        text: "Seduh dengan air matang agar keharuman rempah tidak menguap sia-sia."
       },
       {
         id: "note-3",
-        foundAt: "Di dasar Toples Kaca Rempah Tua",
-        text: "Sobekan Resep 3: Keseimbangan rasa tercipta saat kepedasan bara jahe dipeluk oleh kemanisan teduh gula aren."
+        num: 3,
+        objectId: "cengkeh",
+        foundAt: "Bunga Cengkeh",
+        text: "Tambahkan cengkeh secukupnya lalu beri manis gula aren seimbang."
       }
     ]
   },
 
-  // Varian C: Lincak Rempah & Ruang Saji
+  // Sesi 2 (Pak Broto)
   {
     id: "act1-v2",
-    name: "Lincak Rempah Tradisional",
+    name: "Meja Anglo Tengah Malam",
     objects: [
-      {
-        id: "cangkir_blirik",
-        name: "Cangkir Kaleng Blirik",
-        tag: "Piranti Saji",
-        image: "/background/cangkir.png",
-        desc: "Cangkir blirik hijau-putih yang telah menghangatkan ribuan tangan yang gemetar kedinginan.",
-        clue: "Cangkir ini mengajarkan bahwa kehangatan sejati harus dibagikan, bukan disimpan sendiri.",
-        hasHiddenNote: true,
-        noteId: "note-1"
-      },
-      {
-        id: "toples_rempah",
-        name: "Toples Kaca Rempah Tua",
-        tag: "Bahan Alami",
-        image: "/background/toples.png",
-        desc: "Toples kaca buram dengan aroma cengkeh, kayu manis, dan kapulaga yang khas dan menenteramkan.",
-        clue: "Rempah Nusantara adalah jalinan kekayaan tanah air yang saling melengkapi khasiatnya.",
-        hasHiddenNote: true,
-        noteId: "note-2"
-      },
-      {
-        id: "tiket_pesanan",
-        name: "Tiket Pesanan Misterius",
-        tag: "Kebutuhan Nyata",
-        image: "/background/tiketpesanan.png",
-        desc: "Kertas pesanan lusuh dengan tinta yang agak memudar terpaan tetes air hujan.",
-        clue: "Pelanggan ini sedang mencari pegangan di tengah dinginnya malam.",
-        hasHiddenNote: true,
-        noteId: "note-3"
-      },
-      {
-        id: "ceret",
-        name: "Ceret Tiga Tingkat",
-        tag: "Piranti Seduh",
-        image: "/background/cerek.png",
-        desc: "Ceret tembaga penyimpan air mendidih yang selalu mengepulkan uap hangat.",
-        clue: "Kehangatan adalah awal dari pulihnya tenaga.",
-        hasHiddenNote: false
-      },
-      {
-        id: "buku_catatan",
-        name: "Jurnal Lusuh Pak Ilmu",
-        tag: "Catatan Pembelajar",
-        image: "/background/jurnallusuh.png",
-        desc: "Jurnal catatan tentang perjalanan hidup manusia yang singgah di lincak angkringan.",
-        clue: "Dengarkan dengan saksama sebelum mengambil kesimpulan.",
-        hasHiddenNote: false
-      },
-      {
-        id: "lentera_sentir",
-        name: "Lampu Sentir Minyak",
-        tag: "Penerang Suasana",
-        image: "/background/lampusentir.png",
-        desc: "Lentera antik dengan nyala sumbu yang stabil di tengah semilir angin malam.",
-        clue: "Cahaya redup yang menghangatkan lebih menenangkan daripada silau yang membingungkan.",
-        hasHiddenNote: false
-      }
+      { ...MASTER_ANGKRINGAN_INVENTORY.jahe,      hasHiddenNote: true, noteId: "note-1" },
+      { ...MASTER_ANGKRINGAN_INVENTORY.cobek,     hasHiddenNote: false },
+      { ...MASTER_ANGKRINGAN_INVENTORY.kunyit,    hasHiddenNote: true, noteId: "note-2" },
+      { ...MASTER_ANGKRINGAN_INVENTORY.ceret,     hasHiddenNote: false },
+      { ...MASTER_ANGKRINGAN_INVENTORY.gula_aren, hasHiddenNote: true, noteId: "note-3" },
+      { ...MASTER_ANGKRINGAN_INVENTORY.cangkir,   hasHiddenNote: false },
+      { ...MASTER_ANGKRINGAN_INVENTORY.serai,     hasHiddenNote: false },
+      { ...MASTER_ANGKRINGAN_INVENTORY.saringan,  hasHiddenNote: false }
     ],
     hiddenNotes: [
       {
         id: "note-1",
-        foundAt: "Di balik tatakan Cangkir Blirik Loreng",
-        text: "Sobekan Resep 1: Bejana sederhana mengingatkan kita bahwa niat ikhlas penyaji jauh lebih berharga daripada kemewahan wadah."
+        num: 1,
+        objectId: "jahe",
+        foundAt: "Jahe Emprit Bakar",
+        text: "Bakar jahe sejenak dan memarkan di cobek sebelum diseduh."
       },
       {
         id: "note-2",
-        foundAt: "Di balik Toples Kaca Rempah Tua",
-        text: "Sobekan Resep 2: Aroma cengkeh dan sereh menenangkan saraf yang tegang, mengembalikan kejernihan pikiran yang kalut."
+        num: 2,
+        objectId: "kunyit",
+        foundAt: "Rimpang Kunyit",
+        text: "Padukan kunyit dan serai untuk rasa hangat yang nyaman di perut."
       },
       {
         id: "note-3",
-        foundAt: "Terselip di balik Tiket Pesanan Misterius",
-        text: "Sobekan Resep 3: Jangan sekadar menyuguhkan minuman, sertakan doa tulus agar langkah penikmatnya kembali diteguhkan."
+        num: 3,
+        objectId: "gula_aren",
+        foundAt: "Gula Jawa Aren",
+        text: "Larutkan gula aren asli sebagai penambah tenaga bagi pejalan malam."
       }
     ]
   }
-];
-
-// Pool Lengkap Item Sortir untuk Penataan (10 Item)
-export const SORT_ITEMS_POOL = [
-  // Kategori: Rempah Alami (Bahan)
-  { id: "s1", name: "Jahe Emprit Bakar", category: "bahan", hint: "Rimpang pedas alami pembakar hawa dingin" },
-  { id: "s2", name: "Gula Jawa Aren", category: "bahan", hint: "Pemanis alami penopang stamina tubuh" },
-  { id: "s3", name: "Batang Sereh Wangi", category: "bahan", hint: "Aroma segar pelega pernapasan dan pikiran" },
-  { id: "s4", name: "Bunga Cengkeh Kering", category: "bahan", hint: "Kuncup bunga penenang denyut saraf lelah" },
-  { id: "s5", name: "Kulit Kayu Manis", category: "bahan", hint: "Kulit batang harum pelaras ritme sirkulasi darah" },
-
-  // Kategori: Piranti Seduh (Alat)
-  { id: "s6", name: "Ceret Tembaga", category: "alat", hint: "Wadah air mendidih bersuhu ajeg" },
-  { id: "s7", name: "Cangkir Blirik Loreng", category: "alat", hint: "Wadah saji penahan kehangatan seduhan" },
-  { id: "s8", name: "Sendok Kayu Jati", category: "alat", hint: "Alat pengaduk agar saripati larut merata" },
-  { id: "s9", name: "Saringan Kain Tradisional", category: "alat", hint: "Penyaring ampas rempah agar seduhan bening" },
-  { id: "s10", name: "Cobek Tumbuk Rimpang", category: "alat", hint: "Alat pememar batang sereh dan rimpang jahe" }
 ];
 
 export const ACT_1_DATA = {
   id: "act-1",
   zone: "Aku Berkarya",
   title: "Babak 1: Pesanan Pertama",
-  objective: "Eksplorasi meja gerobak angkringan, kumpulkan bahan dan piranti seduh, lalu temukan potongan catatan rahasia yang terselip.",
+  objective: "Periksa benda di gerobak, temukan 3 sobekan resep, lalu kelompokkan Bahan Rempah dan Peralatan.",
   guide: {
-    title: "Panduan Babak 1: Eksplorasi Gerobak & Penataan Awal",
-    description: "Malam pertama menjaga angkringan dimulai dari rasa ingin tahu. Periksa setiap sudut meja gerobak, amati fungsi peralatan, dan tata bahan-bahan agar siap digunakan.",
+    title: "Panduan Babak 1",
+    description: "Amati benda-benda di gerobak Pak Ilmu lalu kelompokkan mana yang Bahan Rempah dan mana yang Peralatan.",
     steps: [
-      "1. Periksa 6 benda di meja gerobak untuk memahami fungsinya dan menemukan 3 sobekan catatan rahasia.",
-      "2. Buka tab Penataan Bahan & Piranti, lalu kelompokkan 6 item ke dalam Wadah Rempah atau Rak Piranti.",
-      "3. Setelah kedua misi selesai, tombol lanjut ke Babak 2 akan aktif secara otomatis."
+      "Periksa benda di meja gerobak untuk menemukan 3 sobekan resep.",
+      "Buka tab Penataan dan kelompokkan setiap benda ke Wadah Rempah atau Rak Peralatan.",
+      "Jika salah, kamu diberi 1 kesempatan ulang beserta petunjuk singkat."
     ],
     hints: [
-      {
-        level: "Petunjuk 1 (Tujuan Utama)",
-        text: "Klik setiap benda di atas meja gerobak. Tiga di antaranya menyimpan sobekan catatan resep kuno Pak Ilmu."
-      },
-      {
-        level: "Petunjuk 2 (Lokasi Catatan Tersembunyi)",
-        text: "Perhatikan benda-benda utama gerobak seperti Ceret, Cangkir Blirik, atau Toples Rempah. Tiga di antaranya menyimpan rahasia penting."
-      },
-      {
-        level: "Petunjuk 3 (Penataan Bahan & Piranti)",
-        text: "Pada tab Penataan, pisahkan rimpang alami (Jahe, Sereh, Gula Aren, Cengkeh) dari peralatan fisik seduh (Ceret, Cangkir, Sendok, Cobek)."
-      }
+      { level: "Petunjuk 1", text: "Ketuk setiap gambar di meja gerobak. Ada 3 catatan tersembunyi." },
+      { level: "Petunjuk 2", text: "Bahan Rempah berasal dari tumbuhan/nira (Jahe, Serai, Gula Aren, Cengkeh). Rak Peralatan berisi perkakas (Ceret, Cangkir, Cobek, Sendok)." }
     ]
-  },
-  objects: ACT_1_VARIANTS[0].objects,
-  sortItems: SORT_ITEMS_POOL.slice(0, 6),
-  hiddenNotes: ACT_1_VARIANTS[0].hiddenNotes
+  }
 };
 
 // --------------------------------------------------------------------------
-// 3. BABAK 2: KITA BERKARYA (DENGAN VARIASI & PENGACAKAN NYATA)
+// 4. BABAK 2: RESEP YANG HILANG (KITA BERKARYA)
 // --------------------------------------------------------------------------
 export const ACT_2_PUZZLE_VARIANTS = [
-  // Variasi 1: Formula Wedang Uwuh Luhur
   {
     id: "puz-v0",
-    title: "Naskah 1: Formula Wedang Uwuh Luhur",
-    description: "Kaidah racikan rempah kuno penawar dingin malam Yogyakarta.",
+    title: "Naskah Wedang Uwuh Hangat",
     pieces: [
       {
         id: "p1",
         slot: 0,
-        title: "Keping 1 (Awal)",
-        text: "Racikan Wedang Uwuh Luhur bermula dari rimpang jahe emprit yang dibakar di atas bara arang hingga aromanya pecah keluar..."
+        title: "Bagian 1",
+        structureRole: "Pembuka",
+        text: "Sapa tamu dengan ramah, lalu pilih jahe emprit bakar yang harum..."
       },
       {
         id: "p2",
         slot: 1,
-        title: "Keping 2 (Penyelarasan)",
-        text: "...ditambahkan batang sereh yang telah dimemarkan perlahan serta cengkeh wangi untuk menentramkan denyut saraf yang lelah..."
+        title: "Bagian 2",
+        structureRole: "Isi 1",
+        text: "...memarkan batang serai dan tambahkan cengkeh ke dalam cangkir..."
       },
       {
         id: "p3",
         slot: 2,
-        title: "Keping 3 (Penyeduhan)",
-        text: "...kemudian diguyur kucuran air mendidih langsung dari ceret tembaga beruap panas, melarutkan getah kayu secang hingga air merona merah..."
+        title: "Bagian 3",
+        structureRole: "Isi 2",
+        text: "...tuang air mendidih dari ceret tembaga hingga sari rempah keluar..."
       },
       {
         id: "p4",
         slot: 3,
-        title: "Keping 4 (Penutup)",
-        text: "...dan disempurnakan dengan bongkahan gula aren asli, diaduk searah jarum jam sebagai simbol keselarasan budi pekerti."
+        title: "Bagian 4",
+        structureRole: "Penutup",
+        text: "...aduk manis gula aren dan sajikan hangat dengan senyum tulus."
       }
     ]
   },
-
-  // Variasi 2: Resep Wedang Secang Kraton
   {
     id: "puz-v1",
-    title: "Naskah 2: Risalah Wedang Secang Penghangat",
-    description: "Catatan kuno tentang perpaduan warna dan kehangatan rimpang.",
+    title: "Naskah Seduhan Penenang Malam",
     pieces: [
       {
         id: "p1-b",
         slot: 0,
-        title: "Keping 1 (Awal)",
-        text: "Memilih rimpang jahe tua yang berurat padat, dibersihkan kulitnya dari tanah lalu dipanggang sejenak hingga layu berkilat..."
+        title: "Bagian 1",
+        structureRole: "Pembuka",
+        text: "Dengarkan cerita pelanggan, lalu siapkan serai wangi dan kayu manis..."
       },
       {
         id: "p2-b",
         slot: 1,
-        title: "Keping 2 (Penyelarasan)",
-        text: "...meramu serutan kayu secang merah delima bersama kelopak cengkeh kering pilihan dari lereng bukit yang sejuk..."
+        title: "Bagian 2",
+        structureRole: "Isi 1",
+        text: "...memarkan rimpang perlahan agar wangi alaminya siap diseduh..."
       },
       {
         id: "p3-b",
         slot: 2,
-        title: "Keping 3 (Penyeduhan)",
-        text: "...diseduh dengan aliran air mendidih bersuhu ajeg dari ceret tembaga, mengekstrak warna merah terang saripati alam..."
+        title: "Bagian 3",
+        structureRole: "Isi 2",
+        text: "...guyur air panas matang hingga warna hangat kekuningan merata..."
       },
       {
         id: "p4-b",
         slot: 3,
-        title: "Keping 4 (Penutup)",
-        text: "...lalu dituangkan ke dalam cangkir blirik hangat, disajikan dengan ketulusan hati bagi siapa pun yang membutuhkan jeda."
-      }
-    ]
-  },
-
-  // Variasi 3: Makna Filosofi Racikan Angkringan
-  {
-    id: "puz-v2",
-    title: "Naskah 3: Kaidah Keikhlasan Meracik",
-    description: "Pesan Pak Ilmu tentang adab melayani sesama manusia di lincak angkringan.",
-    pieces: [
-      {
-        id: "p1-c",
-        slot: 0,
-        title: "Keping 1 (Awal)",
-        text: "Menyambut setiap jiwa yang singgah dengan senyum egaliter, tanpa membedakan pangkat, harta, maupun asal muasal..."
-      },
-      {
-        id: "p2-c",
-        slot: 1,
-        title: "Keping 2 (Penyelarasan)",
-        text: "...meraba kebutuhan batin di balik setiap keluh kesah, memilihkan rempah yang menentramkan pikiran gelisah..."
-      },
-      {
-        id: "p3-c",
-        slot: 2,
-        title: "Keping 3 (Penyeduhan)",
-        text: "...meracik dengan takaran seimbang antara panasnya bara jahe dan kelembutan aroma sereh wangi..."
-      },
-      {
-        id: "p4-c",
-        slot: 3,
-        title: "Keping 4 (Penutup)",
-        text: "...menyerahkan cangkir dengan dua tangan penuh hormat, menyertakan doa kebaikan bagi keselamatan langkah mereka esok."
+        title: "Bagian 4",
+        structureRole: "Penutup",
+        text: "...serahkan dengan kedua tangan seraya mendoakan langkah mereka."
       }
     ]
   }
 ];
 
-// Variasi Urutan Seduh Tradisional
 export const ACT_2_SEQUENCE_VARIANTS = [
-  // Alur Seduh 1: Cangkir Blirik Hangat
   {
     id: "seq-v0",
-    title: "Urutan Seduh Cangkir Blirik",
+    title: "Urutan Meracik Wedang",
     steps: [
       {
         id: "seq-1",
         correctOrder: 1,
-        text: "Mendengarkan keluh kesah penikmat dengan empati tanpa menghakimi kondisi mereka."
+        label: "Dengar",
+        text: "Sapa dan dengarkan kebutuhan pengunjung terlebih dahulu.",
+        image: "/assets/steps/step1_dengar.svg"
       },
       {
         id: "seq-2",
         correctOrder: 2,
-        text: "Mememarkan rimpang jahe bakar dan batang sereh agar minyak atsiri alaminya siap mengalir."
+        label: "Memarkan",
+        text: "Memarkan jahe bakar dan batang serai di atas cobek.",
+        image: "/assets/steps/step2_memar.svg"
       },
       {
         id: "seq-3",
         correctOrder: 3,
-        text: "Mengguyur rempah dengan air mendidih bersuhu pas langsung dari ceret tembaga tiga tingkat."
+        label: "Seduh",
+        text: "Tuang air mendidih dari ceret tembaga agar sarinya larut.",
+        image: "/assets/steps/step3_seduh.svg"
       },
       {
         id: "seq-4",
         correctOrder: 4,
-        text: "Melarutkan gula aren asli, mengaduk dengan ketulusan, lalu menyajikan dalam cangkir blirik hangat."
-      }
-    ]
-  },
-
-  // Alur Seduh 2: Rebusan Kuali Tradisional
-  {
-    id: "seq-v1",
-    title: "Urutan Peracikan Kuali Tradisional",
-    steps: [
-      {
-        id: "seq-1-b",
-        correctOrder: 1,
-        text: "Menyapa pelanggan dengan santun dan menanyakan keluhan rasa dingin yang dirasakan."
-      },
-      {
-        id: "seq-2-b",
-        correctOrder: 2,
-        text: "Membakar jahe emprit di atas bara arang hingga aroma wangi atsiri pecah merebak."
-      },
-      {
-        id: "seq-3-b",
-        correctOrder: 3,
-        text: "Menyeduh ramuan rempah menggunakan air mendidih matang sempurna sampai saripati luruh."
-      },
-      {
-        id: "seq-4-b",
-        correctOrder: 4,
-        text: "Menyaring air seduhan ke bejana saji dan menyerahkannya dengan dua belah tangan penuh hormat."
+        label: "Sajikan",
+        text: "Larutkan gula aren dan sajikan hangat dalam cangkir blirik.",
+        image: "/assets/steps/step4_saji.svg"
       }
     ]
   }
 ];
 
-// Pool Lengkap Pasangan Khasiat & Raga (6 Pasangan)
+// Pasangan Khasiat & Kebutuhan (HANYA bahan dari inventaris resmi + BEBAS KLAIM MEDIS)
 export const MATCHING_PAIRS_POOL = [
   {
     id: "m1",
-    condition: "Tubuh Menggigil & Sendi Kaku Didera Angin Malam",
-    remedy: "Jahe Emprit Bakar & Sereh Wangi (Penghangat Inti Raga & Pembakar Hawa Dingin)",
-    explanation: "Jahe emprit kaya gingerol yang melancarkan peredaran darah dan mengusir dingin hingga ke tulang."
+    condition: "Badan menggigil diterpa hujan malam",
+    remedy: "Jahe Emprit Bakar",
+    explanation: "Jahe emprit memberi rasa pedas hangat yang cepat menghangatkan badan.",
+    spiceImage: "/assets/spices/jahe.svg"
   },
   {
     id: "m2",
-    condition: "Pikiran Semrawut & Jiwa Penat Seusai Perjalanan Panjang",
-    remedy: "Cengkeh & Kayu Manis Beraroma Khas (Penenang Saraf & Pelaras Ritme Jiwa)",
-    explanation: "Aroma eugenol cengkeh dan kayu manis meredakan ketegangan saraf serta menghadirkan rasa tenang."
+    condition: "Pikiran penat dan butuh rasa tenang",
+    remedy: "Batang Serai Wangi",
+    explanation: "Wangi sitrus segar dari batang serai membuat suasana terasa lebih rileks.",
+    spiceImage: "/assets/spices/sereh.svg"
   },
   {
     id: "m3",
-    condition: "Raga Kehabisan Energi & Kehilangan Daya Semangat",
-    remedy: "Gula Aren Nira Kelapa Asli (Pembangkit Daya & Peneguh Harapan)",
-    explanation: "Gula aren menyediakan energi alami bertahap yang memulihkan tenaga tanpa lonjakan gula mendadak."
+    condition: "Tenaga terasa habis seusai beraktivitas",
+    remedy: "Gula Jawa Aren",
+    explanation: "Manis alami nira aren memberi asupan energi manis yang lembut.",
+    spiceImage: "/assets/spices/gula_aren.svg"
   },
   {
     id: "m4",
-    condition: "Tenggorokan Kering Gatal Terpaan Debu Jalanan",
-    remedy: "Seduhan Kulit Kayu Manis & Daun Pandan (Pelega Saluran & Penyejuk Dahaga)",
-    explanation: "Minyak atsiri kayu manis melumasi saluran tenggorokan dan meredakan peradangan akibat debu."
+    condition: "Tenggorokan terasa kering karena angin malam",
+    remedy: "Kulit Kayu Manis",
+    explanation: "Aroma dan rasa manis hangat kayu manis terasa ramah di tenggorokan.",
+    spiceImage: "/assets/spices/kayu_manis.svg"
   },
   {
     id: "m5",
-    condition: "Perut Kembung Begah Akibat Masuk Angin Malam",
-    remedy: "Gepukan Rimpang Jahe & Seduhan Batang Sereh (Pengusir Gas & Pelega Rongga Perut)",
-    explanation: "Zat hangat jahe melancarkan fungsi pencernaan dan meredakan kejang kembung pada lambung."
+    condition: "Menginginkan aroma rempah hangat khas tradisi",
+    remedy: "Bunga Cengkeh",
+    explanation: "Cengkeh kering menghadirkan wangi klasik Nusantara yang hangat.",
+    spiceImage: "/assets/spices/cengkeh.svg"
   },
   {
     id: "m6",
-    condition: "Napas Berat & Dada Tertekan Akibat Kelelahan Mental",
-    remedy: "Kuncup Bunga Cengkeh & Uap Air Rebusan Sereh (Pelega Rongga Dada & Penenang Pikiran)",
-    explanation: "Aroma atsiri hangat membuka saluran pernapasan dan mengendurkan otot dada yang tegang."
+    condition: "Perut terasa kurang nyaman di udara dingin",
+    remedy: "Rimpang Kunyit",
+    explanation: "Seduhan kunyit hangat memberi rasa nyaman dan lembut di perut.",
+    spiceImage: "/assets/spices/kunyit.svg"
   }
 ];
 
@@ -593,217 +535,307 @@ export const ACT_2_DATA = {
   id: "act-2",
   zone: "Kita Berkarya",
   title: "Babak 2: Resep yang Hilang",
-  objective: "Satukan kepingan catatan resep kuno, urutkan tahapan peracikan yang benar, dan cocokkan khasiat rempah dengan kebutuhan raga.",
+  objective: "Rangkai naskah kuno, susun urutan meracik, dan pasangkan rempah sesuai kebutuhan.",
   guide: {
-    title: "Panduan Babak 2: Rekonstruksi Resep & Kolaborasi",
-    description: "Catatan yang kamu temukan adalah kepingan pengetahuan yang terpisah. Di zona Kita Berkarya, satukan kembali informasi tersebut menjadi struktur perancangan seduh yang logis.",
+    title: "Panduan Babak 2",
+    description: "Satukan kepingan resep kuno menjadi pedoman meracik yang utuh.",
     steps: [
-      "1. Selesaikan Jigsaw Puzzle dengan merekatkan 4 potongan kertas resep ke bingkai target.",
-      "2. Susun 4 langkah urutan seduh tradisional dari tahap mendengarkan hingga menyajikan.",
-      "3. Cocokkan 3 kondisi keluhan raga/jiwa dengan racikan rempah yang tepat khasiatnya."
+      "Jigsaw Naskah: Pilih kepingan di kiri lalu klik slot Pembuka, Isi, atau Penutup di kanan.",
+      "Urutan Seduh: Atur urutan 1–4 memakai tombol panah naik/turun.",
+      "Khasiat & Raga: Hubungkan kondisi tamu dengan rempah yang cocok."
     ],
     hints: [
-      {
-        level: "Petunjuk 1 (Jigsaw Puzzle)",
-        text: "Pilih satu kepingan di sebelah kiri, lalu klik slot nomor 1 hingga 4 di bingkai kanan sesuai sambungan alur ceritanya."
-      },
-      {
-        level: "Petunjuk 2 (Urutan Seduh)",
-        text: "Peracikan selalu dimulai dari empati mendengarkan pelanggan, dilanjutkan dengan menyiapkan rempah, menyeduh air panas, dan diakhiri dengan menyajikan dalam cangkir blirik."
-      },
-      {
-        level: "Petunjuk 3 (Pencocokan Khasiat)",
-        text: "Jahe emprit mengatasi kedinginan raga, aroma cengkeh dan kayu manis meredakan ketegangan pikiran, dan gula aren memulihkan tenaga fisik."
-      }
+      { level: "Petunjuk Jigsaw", text: "Pembuka memulai dari niat & bahan awal; Isi meramu & menyeduh; Penutup mengaduk & menyajikan." },
+      { level: "Petunjuk Urutan", text: "Selalu mulai dari mendengarkan tamu sebelum mememarkan rempah, menyeduh, lalu menyajikan." }
     ]
-  },
-  puzzlePieces: ACT_2_PUZZLE_VARIANTS[0].pieces,
-  sequenceSteps: ACT_2_SEQUENCE_VARIANTS[0].steps,
-  matchingPairs: MATCHING_PAIRS_POOL.slice(0, 3)
+  }
 };
 
 // --------------------------------------------------------------------------
-// 4. BABAK 3: KARYA KITA BERKONTRIBUSI (3 PERSONA PENGUNJUNG BERBEDA)
+// 5. BABAK 3: UNTUK SIAPA RACIKAN INI? (EVALUASI FLEKSIBEL TANPA MUTLAK)
 // --------------------------------------------------------------------------
+export function evaluateCustomRecipe(personaId, selectedIngredientIds = [], servingTemp = 'hangat_panas') {
+  const hasJahe = selectedIngredientIds.includes('jahe');
+  const hasSerai = selectedIngredientIds.includes('serai');
+  const hasGula = selectedIngredientIds.includes('gula_aren');
+  const hasCengkeh = selectedIngredientIds.includes('cengkeh');
+  const hasKayuManis = selectedIngredientIds.includes('kayu_manis');
+  const hasKunyit = selectedIngredientIds.includes('kunyit');
+  const count = selectedIngredientIds.length;
+
+  if (count === 0) {
+    return {
+      tier: 'empty',
+      badge: 'Cangkir Kosong',
+      score: 0,
+      analysis: 'Pilih minimal 1–2 rempah yang paling sesuai dengan cerita pengunjung.',
+      recommendation: 'Misalnya padukan Jahe Emprit dengan Serai atau Gula Aren.'
+    };
+  }
+
+  // Kasus 1: Mas Danang (Kehujanan Malioboro -> butuh hangat & penenang, 2+ bahan sudah sah)
+  if (personaId === 'persona-danang') {
+    if (servingTemp === 'dingin_es') {
+      return {
+        tier: 'kurang_sesuai',
+        badge: 'Kurang Sesuai',
+        score: 58,
+        analysis: 'Mas Danang baru saja kehujanan dan kedinginan. Minuman dingin berbatu es kurang cocok karena tidak memberi kehangatan yang ia butuhkan.',
+        recommendation: 'Saran: Pilih penyajian hangat panas dan utamakan Jahe Emprit atau Serai.'
+      };
+    }
+
+    if (hasJahe && (hasSerai || hasCengkeh || hasKayuManis) && (count >= 2)) {
+      return {
+        tier: 'sangat_sesuai',
+        badge: 'Sangat Sesuai',
+        score: count >= 3 && hasGula ? 98 : 92,
+        analysis: hasGula
+          ? 'Racikan pas untuk malam hujan: jahe menghangatkan raga, serai/cengkeh memberi wangi menenangkan, dan gula aren menyeimbangkan rasa.'
+          : 'Kombinasi jahe dan rempah aromatik ini pas menghangatkan tubuh Mas Danang sekaligus menenangkan suasananya.',
+        recommendation: hasGula
+          ? 'Paduan lengkap dan nyaman dinikmati selagi hangat.'
+          : 'Racikan 2 bahan ini sudah kuat; boleh tambah gula aren jika suka lebih manis.'
+      };
+    }
+
+    if (hasJahe || hasSerai || hasKunyit) {
+      return {
+        tier: 'cukup_sesuai',
+        badge: 'Cukup Sesuai',
+        score: 80,
+        analysis: 'Seduhan hangat ini cukup menenangkan Mas Danang yang kelelahan kehujanan, meski kehangatan jahe/aroma penenang masih dapat diperkaya.',
+        recommendation: hasJahe
+          ? 'Menambahkan Serai atau Cengkeh akan membuat aromanya lebih menenteramkan.'
+          : 'Menambahkan Jahe Emprit memberi sensasi hangat lebih terasa setelah kehujanan.'
+      };
+    }
+
+    return {
+      tier: 'cukup_sesuai',
+      badge: 'Cukup Sesuai',
+      score: 75,
+      analysis: 'Minuman hangat ini tetap memberi rasa nyaman bagi Mas Danang sebagai teman berteduh.',
+      recommendation: 'Untuk kondisi basah kuyup, Jahe Emprit paling membantu mengusir dingin.'
+    };
+  }
+
+  // Kasus 2: Mbak Sari (Lelah lembur -> butuh aroma penenang & manis lembut)
+  if (personaId === 'persona-sari') {
+    if (servingTemp === 'dingin_es') {
+      return {
+        tier: 'kurang_sesuai',
+        badge: 'Kurang Sesuai',
+        score: 60,
+        analysis: 'Di malam larut setelah lembur, minuman hangat lebih memberi rasa nyaman daripada es dingin.',
+        recommendation: 'Gunakan penyajian hangat dengan aroma Serai, Kayu Manis, atau Cengkeh.'
+      };
+    }
+    if ((hasSerai || hasKayuManis || hasCengkeh) && (count >= 2)) {
+      return {
+        tier: 'sangat_sesuai',
+        badge: 'Sangat Sesuai',
+        score: 95,
+        analysis: 'Wangi segar serai dan lembutnya rempah menghadirkan suasana teduh yang membantu Mbak Sari melepas penat.',
+        recommendation: 'Sajikan hangat dengan sapaan yang ramah dan tulus.'
+      };
+    }
+    return {
+      tier: 'cukup_sesuai',
+      badge: 'Cukup Sesuai',
+      score: 82,
+      analysis: 'Racikan hangat ini memberi jeda santai bagi Mbak Sari setelah bekerja keras.',
+      recommendation: 'Menambahkan Serai atau Kayu Manis akan memperkaya aroma yang menenangkan.'
+    };
+  }
+
+  // Kasus 3: Pak Broto (Angin malam -> butuh hangat kuat & manis energi gula aren)
+  if (servingTemp === 'dingin_es') {
+    return {
+      tier: 'kurang_sesuai',
+      badge: 'Kurang Sesuai',
+      score: 55,
+      analysis: 'Setelah mengayuh jauh menembus angin malam, minuman es dingin justru membuat badan terasa kurang nyaman.',
+      recommendation: 'Sajikan hangat dengan Jahe Emprit dan Gula Jawa Aren.'
+    };
+  }
+  if (hasJahe && hasGula && count >= 2) {
+    return {
+      tier: 'sangat_sesuai',
+      badge: 'Sangat Sesuai',
+      score: 96,
+      analysis: 'Paduan mantap: hangatnya jahe emprit dan manis legit gula aren cocok menemani Pak Broto beristirahat.',
+      recommendation: 'Kombinasi klasik andalan angkringan untuk pengayuh malam.'
+    };
+  }
+  return {
+    tier: 'cukup_sesuai',
+    badge: 'Cukup Sesuai',
+    score: 80,
+    analysis: 'Wedang hangat ini membantu Pak Broto merasa lebih hangat dan nyaman beristirahat.',
+    recommendation: 'Kombinasi Jahe Emprit dan Gula Aren sangat disukai setelah menempuh angin malam.'
+  };
+}
+
 export const ACT_3_PERSONAS = [
-  // Persona 0: Mas Danang (Sang Penempuh Jalan)
   {
     id: "persona-danang",
-    name: "Mas Danang (Sang Penempuh Jalan)",
-    condition: "Kedinginan Parah, Pakaian Basah Kuyup, Wajah Lelah Penuh Beban",
+    name: "Mas Danang",
+    role: "Pengelana Malam",
+    condition: "Basah kuyup, kedinginan & pikiran gundah",
     contextBadge: "Hujan Deras Malioboro",
-    story: "Malam ini hujan deras tak kunjung reda di Malioboro. Aku telah berjalan berjam-jam membawa tugas dan impian yang nyaris patah di tengah jalan. Kakiku mati rasa, dan pikiranku dipenuhi keraguan apakah langkahku ada artinya... Bolehkah aku memesan sesuatu yang bisa menghidupkan kembali nyala dalam dadaku?",
-    clue: "Pelanggan membutuhkan kehangatan bara jahe tinggi untuk mengusir dingin hingga ke tulang, dipadu aroma sereh dan gula aren seimbang.",
-    idealRatios: {
-      jaheMin: 3,
-      jaheMax: 5,
-      serehMin: 2,
-      serehMax: 3,
-      gulaMin: 2,
-      gulaMax: 3
-    },
-    idealDesc: "Jahe level 3–5 (hangat mendalam), Sereh level 2–3 (aroma menenangkan), Gula Aren level 2–3 (stamina pas).",
+    weatherType: "rain",
+    story: "Hujan deras di Malioboro bikin bajuku basah kuyup dan badan menggigil. Pikiranku juga sedang gundah. Ada minuman hangat yang bisa bikin badan lebih nyaman?",
+    clue: "Basah kuyup kedinginan cocok dengan sensasi hangat jahe dan aroma tenang serai.",
     needsAnalysis: [
       {
         id: "na-1",
-        title: "Hanya Menyajikan Teh Manis Instan",
-        desc: "Menyajikan teh manis dingin agar cepat kenyang.",
-        feedback: "Kurang tepat. Manis instan hanya menipu lambung sesaat, tetapi tidak menyembuhkan dinginnya raga dan lelahnya pikiran sang penempuh jalan.",
+        title: "Teh Manis Es Dingin",
+        desc: "Cepat menghilangkan haus dengan es batu segar.",
+        feedback: "Kurang pas. Ia sedang basah kuyup kedinginan, minuman es justru tidak membantu menghangatkan badan.",
         isCorrect: false
       },
       {
         id: "na-2",
-        title: "Kehangatan Raga & Pemulihan Semangat Batin (Rekomendasi Utama)",
-        desc: "Meracik Wedang Rempah Hangat Khas Pak Ilmu dengan Jahe Emprit Bakar pekat, Sereh, dan Gula Aren seimbang.",
-        feedback: "Sangat tepat! Racikan ini mengusir dingin fisik secara mendalam sekaligus memulihkan ketenangan jiwa melalui empati kepedulian.",
+        title: "Wedang Rempah Hangat Penuh Empati",
+        desc: "Memilihkan racikan rempah hangat yang sesuai dinginnya hujan serta sapaan ramah.",
+        feedback: "Tepat. Kepekaan pada kondisi fisik dan perasaan tamu adalah langkah awal berkontribusi.",
         isCorrect: true
       },
       {
         id: "na-3",
-        title: "Menyarankan Pindah ke Warung Lain",
-        desc: "Menolak pesanan karena bahan yang tersisa perlu dihemat.",
-        feedback: "Angkringan adalah ruang penerimaan tanpa pamrih. Menolak orang yang kedinginan bertentangan dengan filosofi Karsa Kala.",
+        title: "Menyarankan Pindah Tempat",
+        desc: "Menolak tamu karena teras gerobak mulai basah tempias.",
+        feedback: "Angkringan adalah ruang singgah yang hangat dan terbuka bagi siapa saja.",
         isCorrect: false
       }
     ],
     presentationDecisions: [
       {
         id: "pd-1",
-        quote: "Mangga Mas, dipun unjuk selagi hangat. Tiap lelah pasti ada jedanya, dan tiap dingin malam selalu punya penawar rasa. Semoga langkahmu esok kembali terang.",
-        tone: "Penuh Empati & Budi Pekerti Yogyakarta",
-        impact: "Mata Mas Danang berkaca-kaca. Kehangatan wedang meresap ke relung dadanya, dan tutur katamu mengembalikan keyakinan hidupnya.",
+        quote: "Mangga Mas, diminum selagi hangat. Tiap lelah ada jedanya, semoga langkah besok lebih ringan.",
+        tone: "Ramah & Penuh Empati",
+        impact: "Mas Danang tersenyum haru merasakan perhatian dan kehangatan.",
         score: 100
       },
       {
         id: "pd-2",
-        quote: "Ini pesanannya ya Mas. Semoga lekas hangat dan tidak kedinginan lagi.",
-        tone: "Fungsional Standar",
-        impact: "Wedang terasa nikmat dan tubuhnya menghangat, namun sentuhan batinnya terasa datar.",
-        score: 75
+        quote: "Ini pesanannya Mas, silakan langsung diminum ya.",
+        tone: "Singkat & Sopan",
+        impact: "Minuman diterima dengan baik oleh Mas Danang.",
+        score: 80
       }
     ],
-    resolutionQuote: "Matur nuwun sanget... Ternyata yang kubutuhkan bukan sekadar minuman penghalau dahaga, tetapi pengingat bahwa di tanah ini, kita tidak pernah berjuang sendirian.",
-    resolutionDesc: "Mas Danang menyesap wedang hangat dari cangkir blirik dengan kedua tangannya yang gemetar. Hawa jahe membakar dingin di tulangnya, aroma sereh menjernihkan kepalanya, dan tutur katamu mengusir rasa putus asa yang sempat membelenggunya."
+    resolutionQuote: "Matur nuwun sanget... Hangatnya wedang dan sapaanmu bikin aku kuat melangkah lagi.",
+    resolutionQuoteOk: "Terima kasih banyak, Mas. Hangatnya sudah cukup membuatku lebih tenang berteduh di sini.",
+    resolutionQuoteCold: "Wah, agak dingin di tenggorokan karena baru kehujanan... tapi terima kasih niat baikmu menyambutku berteduh.",
+    learningNote: "Racikan yang bermakna lahir saat kita menyesuaikan keahlian dengan kondisi nyata orang lain."
   },
-
-  // Persona 1: Mbak Sari (Perantau Muda yang Lelah & Rindu Rumah)
   {
     id: "persona-sari",
-    name: "Mbak Sari (Perantau Muda)",
-    condition: "Tenggorokan Kering, Dada Sesak Tertekan, Pikiran Gelisah Rindu Rumah",
-    contextBadge: "Malam Larut Seusai Lembur",
-    story: "Sudah berbulan-bulan aku merantau sendirian di kota ini. Malam ini pekerjaanku menumpuk dan rasanya kepalaku mau pecah. Aku rindu kehangatan dapur simbok di desa yang selalu menenangkanku saat gundah... Bisakah kamu meracikkan sesuatu yang aromanya membuat nafasku lega dan menghadirkan rasa tenteram?",
-    clue: "Pelanggan membutuhkan aroma sereh wangi yang dominan untuk melegakan pernapasan, dipadukan kehangatan lembut jahe dan manis gula kelapa.",
-    idealRatios: {
-      jaheMin: 2,
-      jaheMax: 3,
-      serehMin: 3,
-      serehMax: 5,
-      gulaMin: 2,
-      gulaMax: 4
-    },
-    idealDesc: "Sereh level 3–5 (aroma pelega tinggi), Jahe level 2–3 (hangat lembut), Gula Aren level 2–4 (manis penenteram).",
+    name: "Mbak Sari",
+    role: "Perantau Muda",
+    condition: "Lelah lembur & rindu kampung halaman",
+    contextBadge: "Malam Seusai Lembur",
+    weatherType: "wind",
+    story: "Kerjaan lembur baru saja selesai, kepala rasanya penuh dan rindu seduhan simbok di desa. Ada minuman beraroma tenang?",
+    clue: "Kelelahan pikiran cocok dengan aroma lembut serai, kayu manis, dan manis gula aren.",
     needsAnalysis: [
       {
         id: "na-1",
-        title: "Memberikan Kopi Hitam Pekat Tanpa Gula",
-        desc: "Agar tetap terjaga dan bisa melanjutkan kerja lembur.",
-        feedback: "Kurang tepat. Kafein pekat justru mempercepat detak jantung dan memperparah kegelisahan batin Mbak Sari.",
+        title: "Kopi Hitam Pekat Tanpa Gula",
+        desc: "Supaya tetap terjaga sampai pagi.",
+        feedback: "Kurang pas. Ia justru ingin beristirahat tenang setelah lembur panjang.",
         isCorrect: false
       },
       {
         id: "na-2",
-        title: "Seduhan Aromatik Pelega Jiwa & Rasa Tenteram (Rekomendasi Utama)",
-        desc: "Mengutamakan aroma sereh wangi dan cengkeh yang melegakan rongga dada, dipadukan kehangatan lembut jahe dan manis gula jawa.",
-        feedback: "Sangat tepat! Aroma atsiri sereh menenangkan denyut saraf yang lelah, menghadirkan kehangatan seperti berada di rumah.",
+        title: "Seduhan Aromatik Hangat & Sapaan Teduh",
+        desc: "Menonjolkan wangi lembut serai dan gula aren sebagai jeda istirahat.",
+        feedback: "Tepat sekali. Ia membutuhkan suasana damai dan minuman beraroma menenangkan.",
         isCorrect: true
       },
       {
         id: "na-3",
-        title: "Menyarankan Langsung Pulang dan Tidur",
-        desc: "Menolak meracik karena warung sudah hampir tutup.",
-        feedback: "Pelanggan datang mencari ruang jeda yang aman. Mendengarkan dan menyuguhkan kehangatan adalah esensi angkringan.",
+        title: "Tutup Lebih Awal",
+        desc: "Meminta pulang langsung karena sudah larut.",
+        feedback: "Memberi ruang jeda sebentar dapat sangat berarti bagi perantau yang penat.",
         isCorrect: false
       }
     ],
     presentationDecisions: [
       {
         id: "pd-1",
-        quote: "Mangga Mbak, dihirup dulu aromanya pelan-pelan. Kotamu boleh bising dan menuntut, tapi malam ini di lincak ini, kamu berhak beristirahat dengan damai. Kamu sudah berjuang sangat baik.",
-        tone: "Penuh Kasih & Penerimaan Tulus",
-        impact: "Mbak Sari menghela napas panjang dan tersenyum haru. Beban berat di pundaknya terasa meluruh perlahan.",
+        quote: "Mangga Mbak, nikmati wanginya pelan-pelan. Malam ini saatnya rehat dengan tenang.",
+        tone: "Lembut & Menghargai",
+        impact: "Mbak Sari menarik napas lega dan tersenyum.",
         score: 100
       },
       {
         id: "pd-2",
-        quote: "Ini wedang serehnya Mbak, silakan diminum mumpung masih panas.",
-        tone: "Biasa & Tergesa",
-        impact: "Wedang diminum dengan baik, namun tidak meninggalkan kehangatan emosional yang berkesan.",
-        score: 75
+        quote: "Ini wedangnya Mbak, diminum mumpung hangat.",
+        tone: "Standar",
+        impact: "Minuman dinikmati dengan tenang.",
+        score: 80
       }
     ],
-    resolutionQuote: "Aroma sereh ini persis seperti seduhan simbok di desa... Terima kasih sudah mengingatkanku bahwa lelah adalah tanda bahwa kita telah bersungguh-sungguh melangkah.",
-    resolutionDesc: "Mbak Sari menghirup uap sereh yang mengepul dari cangkir blirik. Otot-otot lehernya yang kaku mereda, dan rasa sepi yang menghimpitnya berganti menjadi ketenangan batin yang sejuk."
+    resolutionQuote: "Wanginya mirip seduhan simbok di desa... Terima kasih sudah menyediakan ruang jeda ini.",
+    resolutionQuoteOk: "Terima kasih ya, kehangatan ini cukup membuat lelah lemburku berkurang.",
+    resolutionQuoteCold: "Agak dingin di malam larut, tapi terima kasih sudah mau mendengarkan ceritaku.",
+    learningNote: "Empati hadir dalam bentuk sederhana: mendengarkan dan memilihkan hal yang menenangkan."
   },
-
-  // Persona 2: Pak Broto (Pengayuh Becak Lansia)
   {
     id: "persona-broto",
-    name: "Pak Broto (Pengayuh Becak Tua)",
-    condition: "Kaki Pegal Ngilu, Perut Kembung Masuk Angin, Tenaga Terkuras Habis",
+    name: "Pak Broto",
+    role: "Pengayuh Becak",
+    condition: "Capek berat & diterpa angin malam",
     contextBadge: "Dini Hari Angin Selatan",
-    story: "Seharian tadi becakku menempuh puluhan kilometer menembus angin malam dari Stasiun Tugu hingga Pojok Beteng. Lututku bergetar dan angin malam seolah mengendap di lambungku. Raga tua ini butuh bara yang kuat dan tenaga manis agar esok fajar masih bisa mengayuh rezeki untuk keluarga...",
-    clue: "Pelanggan membutuhkan jahe emprit bakar berkonsentrasi tinggi untuk mengusir masuk angin, serta gula aren tebal sebagai sumber tenaga fisik.",
-    idealRatios: {
-      jaheMin: 4,
-      jaheMax: 5,
-      serehMin: 2,
-      serehMax: 4,
-      gulaMin: 3,
-      gulaMax: 5
-    },
-    idealDesc: "Jahe level 4–5 (bara pembakar angin kuat), Gula Aren level 3–5 (tenaga stamina padat), Sereh level 2–4 (penyegar pernapasan).",
+    weatherType: "chilly",
+    story: "Sudah puluhan kilometer mengayuh becak malam ini. Kaki pegal dan badan rasanya dingin kena angin. Enaknya minum apa ya?",
+    clue: "Butuh kehangatan mantap dari jahe emprit dipadu manis energi gula aren.",
     needsAnalysis: [
       {
         id: "na-1",
-        title: "Menyajikan Air Es Dingin Pelepas Haus",
-        desc: "Untuk menyegarkan tubuh yang berkeringat.",
-        feedback: "Sangat berbahaya! Air es akan mengunci hawa dingin di lambung dan memperparah kram sendi Pak Broto.",
+        title: "Air Es Dingin Biasa",
+        desc: "Penghilang haus instan.",
+        feedback: "Kurang cocok untuk orang yang baru menembus dinginnya angin dini hari.",
         isCorrect: false
       },
       {
         id: "na-2",
-        title: "Wedang Bara Jahe Emprit & Gula Aren Pekat (Rekomendasi Utama)",
-        desc: "Menakar jahe emprit bakar level tinggi untuk mengusir angin, ditambah gula aren pekat penopang tenaga otot.",
-        feedback: "Sangat tepat! Kombinasi panas jahe dan kalori alami nira aren mengendurkan kram otot dan memulihkan stamina fisiknya.",
+        title: "Wedang Jahe Hangat & Gula Aren",
+        desc: "Menghadirkan rasa hangat kuat serta manis alami untuk memulihkan semangat.",
+        feedback: "Tepat. Sesuai untuk kondisi kelelahan fisik dan udara dingin.",
         isCorrect: true
       },
       {
         id: "na-3",
-        title: "Hanya Memberikan Nasi Kucing Kering",
-        desc: "Tanpa menyediakan minuman hangat penawar angin.",
-        feedback: "Kurang bijak. Perut yang kembung masuk angin membutuhkan cairan rempah hangat terlebih dahulu sebelum makanan padat.",
+        title: "Sajian Tanpa Minuman Hangat",
+        desc: "Menyajikan camilan kering saja.",
+        feedback: "Setelah menembus angin malam, minuman hangat jauh lebih membantu memberi rasa nyaman.",
         isCorrect: false
       }
     ],
     presentationDecisions: [
       {
         id: "pd-1",
-        quote: "Nyuwun sewu Pak Broto, mangga diunjuk anget-anget. Keringat dan ikhtiar panjenengan sungguh berkah luar biasa. Mugi-mugi raga tansah pinaringan berkah sehat lan kekiyatan.",
-        tone: "Hormat Luhur & Doa Ketulusan",
-        impact: "Pak Broto menerima cangkir dengan kedua tangannya yang kapalan seraya mengangguk takzim penuh rasa syukur.",
+        quote: "Nyuwun sewu Pak, mangga diunjuk anget-anget. Semoga selalu diparingi kekuatan lan berkah.",
+        tone: "Hormat & Penuh Doa",
+        impact: "Pak Broto menerima cangkir dengan dua tangan penuh syukur.",
         score: 100
       },
       {
         id: "pd-2",
-        quote: "Ini wedangnya Pak, habiskan biar badannya tidak masuk angin lagi.",
-        tone: "Singkat & Biasa",
-        impact: "Wedang diminum habis, namun percakapan berakhir tanpa kehangatan persaudaraan.",
-        score: 75
+        quote: "Ini wedangnya Pak, silakan dinikmati.",
+        tone: "Sopan Standar",
+        impact: "Pak Broto mengangguk ramah dan menikmati minumannya.",
+        score: 80
       }
     ],
-    resolutionQuote: "Alhamdulillah... Hangatnya jahe langsung meresap ke sendi-sendi lututku yang kaku. Rasanya seperti mendapat tenaga baru untuk mengayuh esok pagi.",
-    resolutionDesc: "Pak Broto menyesap wedang dengan mata berbinar. Keringat dingin di dahinya mengering, rasa begah di perutnya mereda, dan wajahnya kembali memancarkan keteguhan seorang pejuang nafkah keluarga."
+    resolutionQuote: "Wah mantap, hangatnya langsung terasa di badan. Seperti punya tenaga baru untuk besok pagi.",
+    resolutionQuoteOk: "Matur nuwun, minuman hangatnya enak menemani istirahat sebentar.",
+    resolutionQuoteCold: "Aduh, agak dingin untuk malam begini... tapi matur nuwun niat baiknya.",
+    learningNote: "Pengetahuan menjadi kontribusi sejati ketika menyentuh kebutuhan nyata di sekitar kita."
   }
 ];
 
@@ -811,40 +843,25 @@ export const ACT_3_DATA = {
   id: "act-3",
   zone: "Karya Kita Berkontribusi",
   title: "Babak 3: Untuk Siapa Racikan Ini?",
-  missionTitle: "Misi: Pelayanan Penuh Empati",
-  customer: ACT_3_PERSONAS[0],
+  objective: "Pahami kondisi pengunjung, racik kombinasi rempah secara fleksibel, dan sajikan dengan tutur kata ramah.",
   guide: {
-    title: "Panduan Babak 3: Misi Pelayanan Penuh Empati",
-    description: "Karya sejati bukan sekadar membuat produk, melainkan meringankan beban nyata sesama manusia. Pahami kebutuhan pengunjung dan racik wedang yang tepat.",
+    title: "Panduan Babak 3",
+    description: "Pilih kombinasi rempah sesuai kebutuhan pengunjung. Tidak harus terpaku pada satu rumus kaku.",
     steps: [
-      "1. Analisis Kebutuhan: Pilih pendekatan pemulihan yang menyentuh akar permasalahan pengunjung.",
-      "2. Penakaran Rempah: Atur perbandingan Jahe Emprit, Sereh, dan Gula Aren sesuai kebutuhan fisik dan batinnya.",
-      "3. Tutur Kata Penyajian: Pilih sapaan dan sikap menyerahkan cangkir dengan budi pekerti khas Yogyakarta."
+      "Tentukan pendekatan yang sesuai dengan cerita pengunjung.",
+      "Pilih 2 atau lebih bahan rempah + suhu seduhan, lalu lihat kesesuaian kontekstualnya.",
+      "Pilih tutur kata penyajian dan saksikan reaksi pengunjung."
     ],
     hints: [
-      {
-        level: "Petunjuk 1 (Analisis Kebutuhan)",
-        text: "Perhatikan isyarat kebutuhan pelanggan di kartu profil. Pilih solusi yang menyentuh akar persoalan, bukan solusi instan."
-      },
-      {
-        level: "Petunjuk 2 (Takaran Seimbang)",
-        text: "Kondisi awal takaran sengaja dikosongkan. Naikkan level rempah sesuai kebutuhan khusus pelanggan yang sedang dilayani."
-      },
-      {
-        level: "Petunjuk 3 (Sikap Penyajian)",
-        text: "Sikap ramah dan tutur kata tulus adalah separuh dari khasiat wedang angkringan. Pilih ungkapan doa kebaikan yang menyemangati langkahnya."
-      }
+      { level: "Petunjuk Konteks", text: "Untuk tamu kehujanan/dingin, minuman hangat berbahan Jahe & Serai/Gula Aren paling nyaman." }
     ]
-  },
-  needsAnalysis: ACT_3_PERSONAS[0].needsAnalysis,
-  presentationDecisions: ACT_3_PERSONAS[0].presentationDecisions
+  }
 };
 
 // --------------------------------------------------------------------------
-// 5. EPILOG: TOPLES KAWRUH (3 VARIASI REFLEKSI & KATA HIKMAH)
+// 6. EPILOG: TOPLES KAWRUH
 // --------------------------------------------------------------------------
 export const EPILOGUE_VARIANTS = [
-  // Variasi 1
   {
     id: "epi-v0",
     theme: "Berbagi Pengetahuan",
@@ -856,10 +873,8 @@ export const EPILOGUE_VARIANTS = [
       { id: "t5", text: "Dibagikan" }
     ],
     correctSentence: "Pengetahuan Menjadi Berarti Ketika Dibagikan",
-    reflectionMessage: "Di Angkringan Pak Ilmu ini, secangkir wedang rempah bukanlah sekadar komoditas pelepas dahaga, melainkan jembatan rasa antara manusia yang saling peduli. Apa yang kita pelajari dalam kesendirian (Aku Berkarya) dan kita padukan dalam kebersamaan (Kita Berkarya), baru menemukan kesempurnaannya saat dipersembahkan untuk meringankan beban sesama (Karya Kita Berkontribusi)."
+    reflectionMessage: "Apa yang kita amati sendiri dan rangkai bersama menemukan makna sejatinya ketika dipersembahkan bagi sesama."
   },
-
-  // Variasi 2
   {
     id: "epi-v1",
     theme: "Ketulusan Empati",
@@ -868,27 +883,10 @@ export const EPILOGUE_VARIANTS = [
       { id: "t2-b", text: "Bermakna" },
       { id: "t3-b", text: "Lahir" },
       { id: "t4-b", text: "Dari" },
-      { id: "t5-b", text: "Empati" },
-      { id: "t6-b", text: "Tulus" }
+      { id: "t5-b", text: "Empati" }
     ],
-    correctSentence: "Karya Bermakna Lahir Dari Empati Tulus",
-    reflectionMessage: "Kemahiran meracik bahan takkan pernah cukup jika tidak dilandasi kepekaan menyimak derita sesama. Setiap tetes kehangatan yang kita bagikan adalah bukti bahwa ilmu pengetahuan mencapai puncak tertingginya saat ia menjadi penyejuk bagi jiwa yang letih."
-  },
-
-  // Variasi 3
-  {
-    id: "epi-v2",
-    theme: "Kekuatan Kehangatan",
-    tokens: [
-      { id: "t1-c", text: "Kehangatan" },
-      { id: "t2-c", text: "Sejati" },
-      { id: "t3-c", text: "Meneguhkan" },
-      { id: "t4-c", text: "Jiwa" },
-      { id: "t5-c", text: "Yang" },
-      { id: "t6-c", text: "Lelah" }
-    ],
-    correctSentence: "Kehangatan Sejati Meneguhkan Jiwa Yang Lelah",
-    reflectionMessage: "Dunia mungkin terasa dingin dan menuntut, namun kehadiran ruang sederhana seperti Angkringan Pak Ilmu mengingatkan kita pada kodrat gotong royong. Satu sapaan hangat dan satu cangkir ketulusan sudah cukup untuk menyalakan kembali lentera harapan di dalam dada manusia."
+    correctSentence: "Karya Bermakna Lahir Dari Empati",
+    reflectionMessage: "Ilmu meracik mencapai puncak keindahannya ketika peka menjawab kebutuhan manusia."
   }
 ];
 
@@ -896,28 +894,19 @@ export const EPILOGUE_DATA = {
   id: "epilogue",
   title: "Epilog: Toples Kawruh",
   image: "/background/toples.png",
-  objective: "Susun hikmah pengetahuan yang telah kamu petik, lalu masukkan ke dalam Toples Kawruh untuk menerangi langkah pengunjung berikutnya.",
+  objective: "Susun kalimat hikmah lalu simpan ke Toples Kawruh.",
   guide: {
-    title: "Panduan Epilog: Merumuskan Hikmah di Toples Kawruh",
-    description: "Perjalanan di Angkringan Pak Ilmu ditutup dengan mewariskan pengalaman. Pengetahuan tidak berhenti pada satu misi, melainkan berlanjut saat diteruskan.",
-    steps: [
-      "1. Ketuk kata-kata di pool untuk menyusun kalimat hikmah yang utuh.",
-      "2. Tekan tombol 'Masukkan Pelajaran ke Toples Kawruh'.",
-      "3. Catatan hikmah akan terabadikan di dalam toples kaca untuk pengunjung pameran berikutnya."
-    ],
-    hints: [
-      {
-        level: "Petunjuk Kalimat Hikmah",
-        text: "Amati kata-kata yang tersedia dan susun menjadi kalimat bermakna utuh tentang intisari pembelajaran yang kamu peroleh."
-      }
-    ]
+    title: "Panduan Epilog",
+    description: "Rangkai kata menjadi pesan hikmah penutup.",
+    steps: ["Ketuk kata berurutan lalu simpan ke dalam toples."],
+    hints: [{ level: "Petunjuk", text: "Susun menjadi kalimat utuh bermakna tentang berbagi pengetahuan." }]
   },
   tokens: EPILOGUE_VARIANTS[0].tokens,
   correctSentence: EPILOGUE_VARIANTS[0].correctSentence,
   reflectionMessage: EPILOGUE_VARIANTS[0].reflectionMessage,
   exhibitionBadge: {
     name: "Peracik Kawruh Dhandanggula",
-    motto: "Saka Rasa, Tumuju Makna",
-    authority: "Pameran Karya Teknologi Pendidikan Gredupedia #7"
+    motto: "Karsa Kala: Saka Rasa, Tumuju Makna",
+    authority: "Pameran Karya Teknologi Pendidikan #7"
   }
 };

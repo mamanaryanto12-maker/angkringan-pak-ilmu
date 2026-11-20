@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Sparkles, CheckCircle2, ArrowRight, Lightbulb, Compass, HeartHandshake, Puzzle, Search } from 'lucide-react';
+import { X, ArrowRight, Sparkles, HeartHandshake, Puzzle, Search } from 'lucide-react';
 import { soundManager } from '../utils/audio.js';
 
 export default function ActWelcomeModal({ isOpen, onClose, currentStep }) {
@@ -8,199 +8,95 @@ export default function ActWelcomeModal({ isOpen, onClose, currentStep }) {
   const actData = {
     act1: {
       badge: "Zona Aku Berkarya",
-      title: "Selamat Datang di Babak 1: Pesanan Pertama",
+      title: "Babak 1: Pesanan Pertama",
       icon: Search,
-      color: "var(--color-orange)",
-      narrative: "Kamu baru saja membuka gerobak Angkringan Pak Ilmu. Di atas meja terdapat tiket pesanan misterius serta bahan dan piranti yang belum tertata. Mulailah dengan mengamati lingkungan sekitarmu!",
+      narrative: "Kamu menjaga gerobak Pak Ilmu malam ini. Amati benda di meja gerobak lalu tata bahan dan peralatan dengan rapi.",
       steps: [
-        {
-          num: 1,
-          title: "Eksplorasi Gerobak",
-          desc: "Klik 6 benda di meja gerobak untuk mengamati fungsi dan mencari rahasianya."
-        },
-        {
-          num: 2,
-          title: "Temukan 3 Catatan",
-          desc: "Tiga benda menyembunyikan sobekan resep kuno Pak Ilmu. Temukan semuanya!"
-        },
-        {
-          num: 3,
-          title: "Tata Bahan & Alat",
-          desc: "Buka tab Penataan dan kelompokkan rempah alami vs piranti seduh tradisional."
-        }
-      ],
-      tip: "Tanda centang hijau akan muncul di setiap benda yang telah kamu periksa. Sobekan catatan otomatis tersimpan di Jurnal Kawruh."
+        { num: 1, title: "Amati Gerobak", desc: "Klik benda meja & cari 3 sobekan resep." },
+        { num: 2, title: "Tata Wadah", desc: "Pisahkan Bahan Rempah & Rak Peralatan." }
+      ]
     },
     act2: {
       badge: "Zona Kita Berkarya",
-      title: "Selamat Datang di Babak 2: Resep yang Hilang",
+      title: "Babak 2: Resep yang Hilang",
       icon: Puzzle,
-      color: "var(--color-teal-dark)",
-      narrative: "Tiga sobekan catatan yang kamu temukan di Babak 1 ternyata adalah formula Wedang Uwuh Luhur yang terpecah. Saatnya menyatukan informasi dan membangun urutan seduh yang logis!",
+      narrative: "Sobekan catatan tadi adalah bagian dari resep kuno Pak Ilmu. Satukan naskah, urutan seduh, dan pasangan rempahnya.",
       steps: [
-        {
-          num: 1,
-          title: "Jigsaw Puzzle",
-          desc: "Klik kepingan resep di kiri, lalu klik slot bingkai 1–4 di kanan hingga naskah utuh."
-        },
-        {
-          num: 2,
-          title: "Urutan Seduh",
-          desc: "Gunakan tombol panah ▲ dan ▼ untuk menyusun 4 langkah peracikan secara kronologis."
-        },
-        {
-          num: 3,
-          title: "Khasiat & Raga",
-          desc: "Hubungkan kondisi fisik/jiwa pelanggan dengan ramuan rempah yang menyembuhkan."
-        }
-      ],
-      tip: "Setiap mini-game memiliki tab sendiri di bagian atas. Selesaikan ketiganya untuk membuka Babak 3."
+        { num: 1, title: "Puzzle Naskah", desc: "Susun bagian Pembuka, Isi, dan Penutup." },
+        { num: 2, title: "Urutan & Rempah", desc: "Atur tahap menyeduh & cocokkan bahan." }
+      ]
     },
     act3: {
-      badge: "Zona Karya Kita Berkontribusi",
-      title: "Selamat Datang di Babak 3: Untuk Siapa Racikan Ini?",
+      badge: "Zona Berkontribusi",
+      title: "Babak 3: Untuk Siapa Racikan Ini?",
       icon: HeartHandshake,
-      color: "var(--color-gold-deep)",
-      narrative: "Hujan deras mengguyur malam di Yogyakarta. Mas Danang datang dengan pakaian basah kuyup dan napas terengah. Saatnya menerapkan pengetahuanmu untuk menolong sesama!",
+      narrative: "Seorang tamu datang di tengah malam dingin Yogyakarta. Pahami kebutuhannya dan racik minuman yang paling sesuai.",
       steps: [
-        {
-          num: 1,
-          title: "Analisis Kebutuhan",
-          desc: "Pahami kondisi Mas Danang dan pilih pendekatan pemulihan yang menyentuh akar masalah."
-        },
-        {
-          num: 2,
-          title: "Penakaran Rempah",
-          desc: "Atur meteran Jahe (panas), Sereh (aroma), dan Gula Aren (stamina) secara harmonis."
-        },
-        {
-          num: 3,
-          title: "Tutur Kata Empati",
-          desc: "Pilih cara penyajian cangkir dengan budi pekerti Yogyakarta yang menentramkan jiwa."
-        }
-      ],
-      tip: "Karya sejati bukan sekadar menghasilkan barang, melainkan empati yang meringankan beban hidup orang lain."
+        { num: 1, title: "Pahami Tamu", desc: "Simak cerita pengunjung yang singgah." },
+        { num: 2, title: "Racik & Sajikan", desc: "Pilih 2+ rempah bebas & ucapkan salam hangat." }
+      ]
     },
     epilogue: {
-      badge: "Epilog Simbolik",
-      title: "Selamat Datang di Epilog: Toples Kawruh",
+      badge: "Epilog",
+      title: "Toples Kawruh",
       icon: Sparkles,
-      color: "var(--color-pink)",
-      narrative: "Mas Danang telah merasakan kehangatan wedangmu dan menemukan kembali harapannya. Sebelum pameran berakhir, abadikan pelajaran yang kamu petik ke dalam Toples Kawruh!",
+      narrative: "Tutup perjalananmu dengan merangkai pesan hikmah dan menyimpannya untuk pengunjung berikutnya.",
       steps: [
-        {
-          num: 1,
-          title: "Susun Kata Hikmah",
-          desc: "Ketuk kata-kata untuk membentuk kalimat: 'Pengetahuan Menjadi Berarti Ketika Dibagikan'."
-        },
-        {
-          num: 2,
-          title: "Masukkan ke Toples",
-          desc: "Tekan tombol serahkan agar catatan hikmah tersimpan abadi di dalam toples kaca."
-        },
-        {
-          num: 3,
-          title: "Terima Piagam",
-          desc: "Dapatkan Piagam Peracik Kawruh resmi pameran Gredupedia #7 Karsa Kala."
-        }
-      ],
-      tip: "Jika salah memilih urutan kata, ketuk kata yang terpasang di kotak target untuk menghapusnya."
+        { num: 1, title: "Susun Hikmah", desc: "Rangkai kata menjadi kalimat pesan utuh." },
+        { num: 2, title: "Simpan Toples", desc: "Masukkan pesan ke dalam Toples Kawruh." }
+      ]
     }
   };
 
   const current = actData[currentStep];
   if (!current) return null;
-
-  const IconComponent = current.icon;
+  const IconComp = current.icon;
 
   return (
     <div className="modal-overlay" onClick={onClose} role="dialog" aria-modal="true">
-      <div className="modal-dialog-card" style={{ maxWidth: '720px' }} onClick={e => e.stopPropagation()}>
-        <button className="modal-close-btn" onClick={onClose} aria-label="Tutup Panduan Babak">
+      <div className="modal-dialog-card" style={{ maxWidth: '580px' }} onClick={e => e.stopPropagation()}>
+        <button className="modal-close-btn" onClick={onClose} aria-label="Tutup">
           <X size={18} />
         </button>
 
-        <div style={{ padding: '28px 32px' }}>
-          {/* Header Sambutan Babak */}
+        <div style={{ padding: '26px 28px' }}>
           <div className="act-welcome-header">
             <div className="act-welcome-icon-box">
-              <IconComponent size={28} />
+              <IconComp size={24} />
             </div>
             <div>
-              <span style={{ fontSize: '0.78rem', fontWeight: 800, textTransform: 'uppercase', color: current.color, letterSpacing: '0.8px' }}>
-                {current.badge}
-              </span>
-              <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-primary)', marginTop: '2px' }}>
+              <span className="act-zone-kicker">{current.badge}</span>
+              <h2 style={{ fontSize: '1.28rem', fontWeight: 700, color: 'var(--text-primary)' }}>
                 {current.title}
               </h2>
             </div>
           </div>
 
-          {/* Narasi Kontekstual */}
-          <p style={{ fontSize: '0.94rem', color: 'var(--text-secondary)', lineHeight: '1.6', marginBottom: '16px' }}>
+          <p style={{ fontSize: '0.92rem', color: 'var(--text-secondary)', lineHeight: '1.55', marginBottom: '16px' }}>
             {current.narrative}
           </p>
 
-          {/* 3 Langkah Utama Babak Ini */}
-          <div>
-            <h4 style={{ fontSize: '0.86rem', fontWeight: 800, color: 'var(--text-primary)', textTransform: 'uppercase', marginBottom: '8px' }}>
-              3 Hal yang Perlu Kamu Lakukan di Babak Ini:
-            </h4>
-            <div className="act-welcome-steps-grid">
-              {current.steps.map((st) => (
-                <div key={st.num} className="act-welcome-step-card">
-                  <div className="act-welcome-step-num">{st.num}</div>
-                  <strong style={{ fontSize: '0.88rem', color: 'var(--text-primary)', marginBottom: '4px' }}>
-                    {st.title}
-                  </strong>
-                  <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.4' }}>
-                    {st.desc}
-                  </span>
-                </div>
-              ))}
-            </div>
+          <div className="act-welcome-steps-2col">
+            {current.steps.map((st) => (
+              <div key={st.num} className="act-welcome-step-card">
+                <div className="act-welcome-step-num">{st.num}</div>
+                <strong>{st.title}</strong>
+                <span>{st.desc}</span>
+              </div>
+            ))}
           </div>
 
-          {/* Tips Tambahan */}
-          <div style={{
-            background: 'var(--color-teal-soft)',
-            borderLeft: '4px solid var(--color-teal)',
-            padding: '12px 16px',
-            borderRadius: '0 8px 8px 0',
-            fontSize: '0.85rem',
-            color: 'var(--color-teal-dark)',
-            lineHeight: '1.5',
-            marginTop: '12px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px'
-          }}>
-            <Lightbulb size={20} style={{ flexShrink: 0 }} />
-            <span><strong>Kiat:</strong> {current.tip}</span>
-          </div>
-
-          {/* Tombol Mulai Babak */}
-          <div style={{
-            marginTop: '24px',
-            paddingTop: '16px',
-            borderTop: '1px solid var(--border-natural)',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center'
-          }}>
-            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-              Panduan ini bisa kamu buka lagi kapan saja lewat tombol Petunjuk di atas.
-            </span>
-
+          <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end' }}>
             <button
               className="btn-primary-action"
+              style={{ padding: '10px 24px', fontSize: '0.9rem' }}
               onClick={() => {
                 soundManager.playClickSound();
                 onClose();
               }}
             >
-              <span>Saya Siap, Mulai Tantangan!</span>
-              <ArrowRight size={18} />
+              <span>Mulai Babak Ini</span>
+              <ArrowRight size={17} />
             </button>
           </div>
         </div>

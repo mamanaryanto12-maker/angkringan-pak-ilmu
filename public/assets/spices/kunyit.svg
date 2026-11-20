@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <defs>
+    <radialGradient id="turmericSkin" cx="45%" cy="40%" r="65%">
+      <stop offset="0%" stop-color="#EAA638"/>
+      <stop offset="55%" stop-color="#C7781C"/>
+      <stop offset="100%" stop-color="#783F0D"/>
+    </radialGradient>
+    <radialGradient id="turmericFlesh" cx="45%" cy="45%" r="55%">
+      <stop offset="0%" stop-color="#FFA812"/>
+      <stop offset="70%" stop-color="#E86C00"/>
+      <stop offset="100%" stop-color="#A34400"/>
+    </radialGradient>
+  </defs>
+  <!-- Bayangan -->
+  <ellipse cx="50" cy="85" rx="36" ry="7" fill="#2C221E" opacity="0.18"/>
+  
+  <!-- Badan Utama Rimpang Kunyit Melengkung -->
+  <path d="M22,62 C16,48 24,32 38,36 C48,30 62,34 72,44 C82,52 84,66 76,74 C66,82 52,78 40,76 C32,80 26,72 22,62 Z" 
+        fill="url(#turmericSkin)" stroke="#5E3006" stroke-width="2.4" stroke-linejoin="round"/>
+        
+  <!-- Ruas Rimpang Tambahan -->
+  <path d="M36,36 C32,24 44,18 52,24 C56,28 54,36 48,38 Z" 
+        fill="url(#turmericSkin)" stroke="#5E3006" stroke-width="2"/>
+  <path d="M68,42 C78,34 86,40 82,50 Z" 
+        fill="url(#turmericSkin)" stroke="#5E3006" stroke-width="2"/>
+        
+  <!-- Garis-garis Cincin Melingkar Khas Kunyit -->
+  <path d="M26,56 Q34,60 42,56" stroke="#99500A" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <path d="M38,46 Q46,50 54,46" stroke="#99500A" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <path d="M52,58 Q60,62 68,58" stroke="#99500A" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <path d="M40,28 Q44,32 48,30" stroke="#99500A" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+  
+  <!-- Irisan Melintang Kuning Oranye Menyala -->
+  <ellipse cx="68" cy="65" rx="14" ry="11" fill="url(#turmericFlesh)" stroke="#7A3500" stroke-width="2" transform="rotate(-18 68 65)"/>
+  <circle cx="68" cy="65" r="5" fill="#FFC947" opacity="0.8"/>
+</svg>

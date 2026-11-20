@@ -39,7 +39,7 @@ export default function NotebookModal({ isOpen, onClose, collectedNotes, inspect
           <div style={{ marginBottom: '24px' }}>
             <h3 style={{ fontSize: '0.94rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Feather size={16} color="var(--color-orange)" />
-              Potongan Catatan Resep ({collectedNotes.length} / 3 Terkumpul)
+              Sobekan Catatan Resep ({collectedNotes.length} / 3 Terkumpul)
             </h3>
 
             {collectedNotes.length === 0 ? (
@@ -52,20 +52,24 @@ export default function NotebookModal({ isOpen, onClose, collectedNotes, inspect
                 color: 'var(--text-muted)',
                 fontSize: '0.88rem'
               }}>
-                Belum ada sobekan catatan yang kamu temukan. Periksa sudut-sudut gerobak angkringan pada Babak 1.
+                Belum ada sobekan catatan yang kamu temukan. Periksa benda-benda di meja gerobak angkringan pada Babak 1.
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {collectedNotes.map((note) => (
-                  <div key={note.id} className="note-scrap-item">
-                    <div>
-                      <span style={{ fontSize: '0.74rem', fontWeight: 800, color: 'var(--color-bata)', display: 'block', marginBottom: '2px' }}>
-                        Ditemukan di: {note.foundAt}
-                      </span>
-                      “{note.text}”
+                {[1, 2, 3].map((num) => {
+                  const note = collectedNotes.find(n => n.id === `note-${num}`);
+                  if (!note) return null;
+                  return (
+                    <div key={note.id} className="note-scrap-item">
+                      <div>
+                        <span style={{ fontSize: '0.74rem', fontWeight: 800, color: 'var(--color-bata)', display: 'block', marginBottom: '2px' }}>
+                          Catatan Bagian {num} (Ditemukan di: {note.foundAt})
+                        </span>
+                        “{note.text}”
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
@@ -73,7 +77,7 @@ export default function NotebookModal({ isOpen, onClose, collectedNotes, inspect
           {/* Bagian 2: Catatan Objek yang Pernah Diperiksa */}
           <div>
             <h3 style={{ fontSize: '0.94rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '12px' }}>
-              Pengamatan Piranti & Rempah ({inspectedObjects.length} Teramati)
+              Pengamatan Peralatan & Rempah ({inspectedObjects.length} Teramati)
             </h3>
             {inspectedObjects.length === 0 ? (
               <div style={{

@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 100" width="120" height="100">
+  <defs>
+    <linearGradient id="kettleCopper" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#D97A3A"/>
+      <stop offset="60%" stop-color="#A84E1A"/>
+      <stop offset="100%" stop-color="#6E2B08"/>
+    </linearGradient>
+    <linearGradient id="waterPour" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#64B5F6"/>
+    </linearGradient>
+  </defs>
+  <!-- Background bulat -->
+  <circle cx="60" cy="50" r="44" fill="#FBF5EA" stroke="#D9C7AC" stroke-width="2"/>
+  <!-- Meja -->
+  <path d="M22,78 L98,78" stroke="#8D5524" stroke-width="5" stroke-linecap="round"/>
+  
+  <!-- Ceret tembaga miring menuang air -->
+  <g transform="rotate(-25 50 40)">
+    <!-- Badan ceret -->
+    <ellipse cx="50" cy="44" rx="20" ry="16" fill="url(#kettleCopper)" stroke="#4A1E05" stroke-width="2"/>
+    <!-- Tutup ceret -->
+    <ellipse cx="50" cy="30" rx="10" ry="4" fill="#8C3F14" stroke="#4A1E05" stroke-width="1.5"/>
+    <circle cx="50" cy="26" r="2.5" fill="#DE8C4C"/>
+    <!-- Gagang melengkung -->
+    <path d="M34,42 C34,22 66,22 66,42" stroke="#3D1804" stroke-width="3" fill="none"/>
+    <!-- Corong ceret menuang -->
+    <path d="M34,46 L18,36 C16,34 16,30 20,30 L26,34 Z" fill="url(#kettleCopper)" stroke="#4A1E05" stroke-width="1.5"/>
+  </g>
+  
+  <!-- Kucuran air panas mendidih -->
+  <path d="M48,38 Q56,52 64,68" stroke="url(#waterPour)" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+  
+  <!-- Cangkir di bawah menampung seduhan -->
+  <rect x="56" y="66" width="22" height="16" rx="3" fill="#358C88" stroke="#1F4D4A" stroke-width="1.8"/>
+  <path d="M78,69 C82,69 82,77 78,77" stroke="#1F4D4A" stroke-width="2" fill="none"/>
+  
+  <!-- Kepulan uap panas -->
+  <path d="M62,60 Q66,54 60,48 Q64,42 62,36" stroke="#90CAF9" stroke-width="1.5" fill="none" opacity="0.75" stroke-linecap="round"/>
+  <path d="M70,62 Q74,56 68,50 Q72,44 70,38" stroke="#90CAF9" stroke-width="1.5" fill="none" opacity="0.75" stroke-linecap="round"/>
+</svg>

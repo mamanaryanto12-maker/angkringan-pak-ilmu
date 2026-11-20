@@ -1,211 +1,165 @@
 import React from 'react';
-import { Sparkles, Users, User, ArrowRight, ShieldCheck, Compass } from 'lucide-react';
+import { Users, User, ArrowRight, Compass, HelpCircle, Volume2, VolumeX } from 'lucide-react';
 import { soundManager } from '../utils/audio.js';
-import { GAME_INFO } from '../data/gameData.js';
+import Angkringan3DViewer from '../components/Angkringan3DViewer.jsx';
 
-export default function OpeningView({ onStartGame, gameMode, setGameMode, onOpenWalkthrough, sessionIndex = 0 }) {
+export default function OpeningView({
+  onStartGame,
+  gameMode,
+  setGameMode,
+  onOpenWalkthrough,
+  onOpenHelp,
+  sessionIndex = 0,
+  isMuted = false,
+  onToggleSound,
+  volumeLevel = soundManager.volume,
+  onChangeVolume
+}) {
   const handleStart = () => {
-    soundManager.startNightAmbience();
+    soundManager.startBgm();
     soundManager.playClickSound();
     onStartGame();
   };
 
+  const handleToggleSound = () => {
+    if (onToggleSound) {
+      onToggleSound();
+    } else {
+      soundManager.toggleMute();
+    }
+    soundManager.playClickSound();
+  };
+
+  const handleVolumeChange = (e) => {
+    const val = parseFloat(e.target.value);
+    if (onChangeVolume) {
+      onChangeVolume(val);
+    } else {
+      soundManager.setVolume(val);
+    }
+  };
+
   return (
-    <div className="game-content-area" style={{ justifyContent: 'center', alignItems: 'center' }}>
-      <div style={{
-        maxWidth: '840px',
-        width: '100%',
-        textAlign: 'center',
-        padding: '40px 36px',
-        background: 'rgba(255, 255, 255, 0.94)',
-        borderRadius: 'var(--radius-lg)',
-        border: '2px solid var(--border-natural)',
-        boxShadow: 'var(--shadow-elevated)',
-        position: 'relative'
-      }}>
-        {/* Ornamen Bunga Wijayakusuma Resmi */}
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
-          <img
-            src="/assets/Bunga_Wijayakusuma.PNG"
-            alt="Bunga Wijayakusuma Gredupedia"
-            style={{
-              width: '88px',
-              height: '88px',
-              objectFit: 'contain',
-              filter: 'drop-shadow(0 4px 12px rgba(216, 84, 127, 0.35))'
-            }}
-            onError={(e) => { e.target.style.display = 'none'; }}
-          />
-        </div>
+    <div className="opening-stage">
+      {/* Bagian Atas: Identitas Resmi Gredupedia & Judul Tanpa Kotak Kaku */}
+      <div className="opening-hero-header">
+        {/* Logo Asli Pameran (Transparan, Tanpa Kotak Merah & Tanpa Teks Duplikat) */}
+        <img
+          src="/assets/exhibition/gredupedia_logo.png"
+          alt="Logo Pameran"
+          className="opening-brand-logo"
+        />
 
-        {/* Tagline Pameran */}
-        <div style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '8px',
-          background: 'var(--color-orange-soft)',
-          border: '1.5px solid var(--color-orange)',
-          padding: '6px 16px',
-          borderRadius: '24px',
-          fontSize: '0.82rem',
-          fontWeight: 800,
-          color: 'var(--color-orange)',
-          letterSpacing: '0.8px',
-          marginBottom: '16px',
-          textTransform: 'uppercase'
-        }}>
-          <Sparkles size={15} />
-          {GAME_INFO.exhibition} • {GAME_INFO.tagline}
-        </div>
-
-        {/* Judul Karya */}
-        <h1 style={{
-          fontSize: '2.5rem',
-          fontWeight: 800,
-          color: 'var(--text-primary)',
-          letterSpacing: '0.2px',
-          lineHeight: '1.2',
-          marginBottom: '6px'
-        }}>
-          {GAME_INFO.title}
-        </h1>
-        <h2 style={{
-          fontSize: '1.25rem',
-          fontWeight: 700,
-          color: 'var(--color-teal)',
-          letterSpacing: '0.6px',
-          marginBottom: '20px'
-        }}>
-          “{GAME_INFO.subtitle}”
-        </h2>
-
-        {/* Narasi Pengantar */}
-        <p style={{
-          fontSize: '1rem',
-          lineHeight: '1.65',
-          color: 'var(--text-secondary)',
-          maxWidth: '680px',
-          margin: '0 auto 26px auto',
-          textAlign: 'center'
-        }}>
-          Malam ini kamu dipercaya menjaga <strong>Angkringan Pak Ilmu</strong> di sudut Yogyakarta. 
-          Gemercik hujan mulai turun saat seorang pelanggan misterius datang membawa tiket pesanan yang tak biasa. 
-          Eksplorasi gerobak, pecahkan teka-teki resep kuno, dan temukan bagaimana pengetahuan menjadi bermakna saat dipersembahkan untuk sesama.
+        {/* Identitas Tema Pameran */}
+        <p className="opening-theme-identity">
+          Karsa Kala Saka Rasa Tujumu Makna
         </p>
 
-        {/* Pilihan Mode Permainan (Solo / Duo) */}
-        <div style={{
-          display: 'flex',
-          justifyContent: 'center',
-          gap: '16px',
-          marginBottom: '28px'
-        }}>
+        {/* Ornamen Divider Resmi dari Aset Pameran */}
+        <img
+          src="/assets/exhibition/ornamen_divider.png"
+          alt=""
+          className="opening-ornament-divider"
+          aria-hidden="true"
+        />
+
+        {/* Hierarki Tipografi: "Malam Ini..." Regular (400) -> "Angkringan Pak Ilmu" Bold (700/800) */}
+        <div className="opening-title-stack">
+          <p className="opening-eyebrow-regular">Malam Ini...</p>
+          <h1 className="opening-main-bold">Angkringan Pak Ilmu</h1>
+          <h2 className="opening-subtitle">Pesanan yang Tak Biasa</h2>
+        </div>
+
+        <p className="opening-brief-hook">
+          Jaga gerobak angkringan, pahami kisah setiap pengunjung, dan racik kehangatan yang tepat makna.
+        </p>
+      </div>
+
+      {/* Panggung Visual 3D Model Gerobak Angkringan Tradisional */}
+      <Angkringan3DViewer modelPath="/assets/models/angkringan.glb" />
+
+      {/* Panel Kontrol Ringkas di Atas Lapisan Tanah Hangat */}
+      <div className="opening-controls-dock">
+        {/* Pemilihan Mode Ringkas */}
+        <div className="opening-mode-switch" role="group" aria-label="Pilih Mode Bermain">
           <button
+            className={`mode-pill-btn ${gameMode === 'solo' ? 'active' : ''}`}
             onClick={() => {
               soundManager.playClickSound();
               setGameMode('solo');
             }}
-            style={{
-              flex: '1',
-              maxWidth: '280px',
-              padding: '16px 20px',
-              borderRadius: 'var(--radius-md)',
-              background: gameMode === 'solo' ? 'var(--color-teal)' : '#FFF',
-              border: `2px solid ${gameMode === 'solo' ? 'var(--color-teal-dark)' : 'var(--border-strong)'}`,
-              color: gameMode === 'solo' ? '#FFF' : 'var(--text-primary)',
-              textAlign: 'left',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '14px',
-              boxShadow: gameMode === 'solo' ? '0 6px 18px rgba(53, 140, 136, 0.3)' : 'var(--shadow-soft)'
-            }}
           >
-            <User size={26} color={gameMode === 'solo' ? '#FFF' : 'var(--color-teal)'} />
-            <div>
-              <div style={{ fontWeight: 800, fontSize: '0.96rem' }}>Mode Solo</div>
-              <div style={{ fontSize: '0.78rem', color: gameMode === 'solo' ? '#E0F4F2' : 'var(--text-muted)' }}>
-                Petualangan Mandiri (Disarankan)
-              </div>
-            </div>
+            <User size={16} />
+            <span>Solo</span>
           </button>
-
           <button
+            className={`mode-pill-btn ${gameMode === 'duo' ? 'active' : ''}`}
             onClick={() => {
               soundManager.playClickSound();
               setGameMode('duo');
             }}
-            style={{
-              flex: '1',
-              maxWidth: '280px',
-              padding: '16px 20px',
-              borderRadius: 'var(--radius-md)',
-              background: gameMode === 'duo' ? 'var(--color-teal)' : '#FFF',
-              border: `2px solid ${gameMode === 'duo' ? 'var(--color-teal-dark)' : 'var(--border-strong)'}`,
-              color: gameMode === 'duo' ? '#FFF' : 'var(--text-primary)',
-              textAlign: 'left',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '14px',
-              boxShadow: gameMode === 'duo' ? '0 6px 18px rgba(53, 140, 136, 0.3)' : 'var(--shadow-soft)'
-            }}
           >
-            <Users size={26} color={gameMode === 'duo' ? '#FFF' : 'var(--color-teal)'} />
-            <div>
-              <div style={{ fontWeight: 800, fontSize: '0.96rem' }}>Mode Duo</div>
-              <div style={{ fontSize: '0.78rem', color: gameMode === 'duo' ? '#E0F4F2' : 'var(--text-muted)' }}>
-                Diskusi Bersama Teman Pameran
-              </div>
-            </div>
+            <Users size={16} />
+            <span>Duo</span>
           </button>
         </div>
 
-        {/* Tombol Aksi Utama & Panduan */}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '14px', flexWrap: 'wrap' }}>
+        {/* Tombol Mulai Bermain */}
+        <button className="btn-primary-action opening-start-btn" onClick={handleStart}>
+          <span>Buka Angkringan</span>
+          <ArrowRight size={19} />
+        </button>
+
+        {/* Bantuan, Peta, dan Pengatur Suara */}
+        <div className="opening-secondary-row">
           <button
             className="btn-secondary-action"
-            style={{ padding: '14px 24px', fontSize: '0.96rem' }}
+            onClick={() => {
+              soundManager.playClickSound();
+              if (onOpenHelp) onOpenHelp();
+            }}
+          >
+            <HelpCircle size={16} color="var(--color-orange)" />
+            <span>Bantuan</span>
+          </button>
+
+          <button
+            className="btn-secondary-action"
             onClick={() => {
               soundManager.playClickSound();
               onOpenWalkthrough();
             }}
           >
-            <Compass size={18} color="var(--color-teal)" />
-            <span>Cara Bermain & Peta Babak</span>
+            <Compass size={16} color="var(--color-teal)" />
+            <span>Alur 3 Babak</span>
           </button>
 
-          <button
-            className="btn-primary-action"
-            style={{
-              fontSize: '1.05rem',
-              padding: '14px 34px'
-            }}
-            onClick={handleStart}
-          >
-            <span>Buka Angkringan Sekarang</span>
-            <ArrowRight size={20} />
-          </button>
+          <div className="opening-audio-pill">
+            <button
+              className="audio-pill-toggle"
+              onClick={handleToggleSound}
+              title={isMuted ? 'Aktifkan Musik' : 'Bisukan Musik'}
+            >
+              {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} color="var(--color-teal-dark)" />}
+              <span>{isMuted ? 'Bisu' : 'Audio'}</span>
+            </button>
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.05"
+              value={isMuted ? 0 : volumeLevel}
+              onChange={handleVolumeChange}
+              aria-label="Volume musik latar"
+              className="opening-volume-slider"
+            />
+          </div>
         </div>
 
-        {/* Informasi Pameran */}
-        <div style={{
-          marginTop: '28px',
-          paddingTop: '16px',
-          borderTop: '1px solid var(--border-natural)',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          gap: '16px',
-          fontSize: '0.8rem',
-          color: 'var(--text-muted)'
-        }}>
-          <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <ShieldCheck size={15} color="var(--color-teal)" />
-            Karya Resmi Pameran Teknologi Pendidikan UNY
-          </span>
+        <div className="opening-session-foot">
+          <span>Sesi Pengunjung #{sessionIndex + 1}</span>
           <span>•</span>
-          <span>Sesi #{sessionIndex + 1}</span>
-          <span>•</span>
-          <span>Estimasi: {GAME_INFO.targetDuration}</span>
+          <span>Durasi 5–7 Menit</span>
         </div>
       </div>
     </div>

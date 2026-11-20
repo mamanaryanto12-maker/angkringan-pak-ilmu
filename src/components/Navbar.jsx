@@ -1,5 +1,5 @@
-import React from 'react';
-import { Volume2, VolumeX, BookOpen, FileText, HelpCircle, RotateCcw, Compass } from 'lucide-react';
+import React, { useState } from 'react';
+import { Volume2, VolumeX, BookOpen, FileText, HelpCircle, RotateCcw, Compass, SlidersHorizontal } from 'lucide-react';
 import { soundManager } from '../utils/audio.js';
 
 export default function Navbar({
@@ -11,37 +11,50 @@ export default function Navbar({
   onResetGame,
   isMuted,
   onToggleSound,
+  volumeLevel = soundManager.volume,
+  onChangeVolume,
   hasUnreadNotes
 }) {
+  const [showVolumeSlider, setShowVolumeSlider] = useState(false);
+
   const steps = [
     { key: 'intro', label: 'Pembuka' },
     { key: 'act1', label: 'Babak 1' },
     { key: 'act2', label: 'Babak 2' },
     { key: 'act3', label: 'Babak 3' },
     { key: 'epilogue', label: 'Epilog' },
-    { key: 'summary', label: 'Refleksi' }
+    { key: 'summary', label: 'Selesai' }
   ];
 
   const currentIdx = steps.findIndex(s => s.key === currentStep);
 
+  const handleVolumeChange = (e) => {
+    const val = parseFloat(e.target.value);
+    if (onChangeVolume) {
+      onChangeVolume(val);
+    } else {
+      soundManager.setVolume(val);
+      if (isMuted && val > 0) onToggleSound();
+    }
+  };
+
   return (
     <header className="game-navbar">
-      {/* Brand & Logo Wijayakusuma Resmi */}
+      {/* Identitas Kiri: Monogram Resmi Gredupedia (Transparan Tanpa Kotak) */}
       <div className="brand-section">
         <img
-          src="/assets/Bunga_Wijayakusuma.PNG"
-          alt="Bunga Wijayakusuma"
-          className="brand-flower-icon"
-          onError={(e) => { e.target.style.display = 'none'; }}
+          src="/assets/exhibition/logo_g_emblem.png"
+          alt="Logo Resmi"
+          className="brand-emblem-img"
         />
         <div className="brand-title-group">
           <h1>Angkringan Pak Ilmu</h1>
-          <p>Karsa Kala #7 • Zona Dhandanggula</p>
+          <p>Karsa Kala #7</p>
         </div>
       </div>
 
-      {/* Indikator Progres Babak */}
-      <nav className="act-progress-bar" aria-label="Alur Cerita">
+      {/* Indikator Alur Permainan 1 Baris Rapi */}
+      <nav className="act-progress-bar" aria-label="Alur Permainan">
         {steps.map((st, i) => {
           const isActive = st.key === currentStep;
           const isCompleted = i < currentIdx;
@@ -50,9 +63,9 @@ export default function Navbar({
             <React.Fragment key={st.key}>
               <div
                 className={`progress-step-item ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}`}
-                title={`Langkah ${i + 1}: ${st.label}`}
+                title={`${i + 1}. ${st.label}`}
               >
-                <div className="step-circle">{i + 1}</div>
+                <span className="step-circle">{i + 1}</span>
                 <span className="step-text-label">{st.label}</span>
               </div>
               {i < steps.length - 1 && (
@@ -63,85 +76,128 @@ export default function Navbar({
         })}
       </nav>
 
-      {/* Tombol Kontrol Pameran */}
+      {/* Kontrol Navigasi & Audio */}
       <div className="nav-actions">
-        {/* Tombol Panduan Cara Bermain */}
         <button
           className="btn-nav-help"
           onClick={() => {
             soundManager.playClickSound();
             onOpenWalkthrough();
           }}
-          title="Panduan Cara Bermain & Peta Babak"
-          aria-label="Panduan Bermain"
+          title="Peta & Cara Bermain"
         >
-          <Compass size={17} />
-          <span>Panduan</span>
+          <Compass size={16} />
+          <span>Peta</span>
         </button>
 
-        {/* Tiket Pesanan */}
         <button
           className="btn-nav-icon"
           onClick={() => {
             soundManager.playPaperRustle();
             onOpenTicket();
           }}
-          title="Buka Tiket Pesanan Misterius"
+          title="Tiket Pesanan"
           aria-label="Tiket Pesanan"
         >
-          <FileText size={18} />
+          <FileText size={17} />
         </button>
 
-        {/* Jurnal / Catatan Kawruh */}
         <button
           className="btn-nav-icon btn-nav-badge"
           onClick={() => {
             soundManager.playPaperRustle();
             onOpenNotebook();
           }}
-          title="Buka Jurnal Kawruh"
-          aria-label="Jurnal Kawruh"
+          title="Jurnal Catatan"
+          aria-label="Jurnal Catatan"
         >
-          <BookOpen size={18} />
+          <BookOpen size={17} />
           {hasUnreadNotes && <span className="badge-dot" />}
         </button>
 
-        {/* Petunjuk Kontekstual Babak */}
         <button
           className="btn-nav-icon"
           onClick={() => {
             soundManager.playClickSound();
             onOpenHelp();
           }}
-          title="Petunjuk Misi Babak Ini"
-          aria-label="Petunjuk Babak"
+          title="Bantuan & Petunjuk"
+          aria-label="Bantuan"
         >
-          <HelpCircle size={18} />
+          <HelpCircle size={17} />
         </button>
 
-        {/* Audio Mute/Unmute */}
-        <button
-          className="btn-nav-icon"
-          onClick={onToggleSound}
-          title={isMuted ? 'Nyalakan Suara Organik' : 'Bisukan Suara'}
-          aria-label="Kontrol Audio"
-        >
-          {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
-        </button>
+        {/* Audio Controls (Mute + Pengatur Volume) */}
+        <div className="audio-control-wrap" style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <button
+            className="btn-nav-icon"
+            onClick={onToggleSound}
+            title={isMuted ? 'Aktifkan Musik' : 'Bisukan Musik'}
+            aria-label={isMuted ? 'Aktifkan Musik' : 'Bisukan Musik'}
+          >
+            {isMuted ? <VolumeX size={17} /> : <Volume2 size={17} />}
+          </button>
 
-        {/* Mulai Ulang Sesi */}
+          <button
+            className="btn-nav-icon"
+            style={{ width: '32px', background: showVolumeSlider ? 'var(--color-teal-soft)' : undefined }}
+            onClick={() => {
+              soundManager.playClickSound();
+              setShowVolumeSlider(v => !v);
+            }}
+            title="Atur Volume Suara"
+            aria-label="Atur Volume"
+          >
+            <SlidersHorizontal size={14} />
+          </button>
+
+          {showVolumeSlider && (
+            <div className="volume-popover">
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', fontWeight: 700, marginBottom: '8px' }}>
+                <span>Volume Audio</span>
+                <span>{isMuted ? 'Bisu' : `${Math.round(volumeLevel * 100)}%`}</span>
+              </div>
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.05"
+                value={isMuted ? 0 : volumeLevel}
+                onChange={handleVolumeChange}
+                style={{ width: '100%', accentColor: 'var(--color-teal)', cursor: 'pointer' }}
+                aria-label="Pengatur tingkat volume"
+              />
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8px' }}>
+                <button
+                  onClick={() => setShowVolumeSlider(false)}
+                  style={{
+                    fontSize: '0.74rem',
+                    fontWeight: 700,
+                    background: 'var(--color-teal)',
+                    color: '#FFF',
+                    padding: '4px 10px',
+                    borderRadius: '6px'
+                  }}
+                >
+                  Tutup
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
         <button
           className="btn-nav-icon"
           onClick={() => {
-            if (window.confirm("Mulai ulang petualangan dari awal? Progres saat ini akan dikembalikan ke pembuka untuk pengunjung berikutnya.")) {
+            if (window.confirm("Ulangi permainan dari pembuka?")) {
               soundManager.playClickSound();
               onResetGame();
             }
           }}
-          title="Mulai Ulang Permainan"
-          aria-label="Reset Game"
+          title="Mulai Ulang"
+          aria-label="Mulai Ulang"
         >
-          <RotateCcw size={18} />
+          <RotateCcw size={17} />
         </button>
       </div>
     </header>

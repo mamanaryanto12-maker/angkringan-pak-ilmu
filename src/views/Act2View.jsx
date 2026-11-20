@@ -1,27 +1,30 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { ArrowRight, Sparkles, CheckCircle2, AlertCircle, Puzzle, ListOrdered, GitCompare, ArrowUp, ArrowDown, Check } from 'lucide-react';
+import { ArrowRight, CheckCircle2, AlertCircle, Puzzle, ListOrdered, GitCompare, ArrowUp, ArrowDown, Check, BookOpen } from 'lucide-react';
 import { soundManager } from '../utils/audio.js';
 import { ACT_2_PUZZLE_VARIANTS, ACT_2_SEQUENCE_VARIANTS, MATCHING_PAIRS_POOL, shuffleArray, derangeSequence } from '../data/gameData.js';
 import MiniGameGuideBanner from '../components/MiniGameGuideBanner.jsx';
+import RecipeManuscriptModal from '../components/RecipeManuscriptModal.jsx';
 
-export default function Act2View({ onCompleteAct, gameMode, onOpenHelp, sessionIndex = 0 }) {
+const SLOT_METADATA = [
+  { title: 'Bagian 1 • Pembuka', hint: 'Niat & bahan awal', icon: '/assets/tools/naskah_pembuka.svg', color: 'var(--color-orange)' },
+  { title: 'Bagian 2 • Isi 1', hint: 'Memarkan rempah', icon: '/assets/tools/naskah_isi.svg', color: 'var(--color-teal-dark)' },
+  { title: 'Bagian 3 • Isi 2', hint: 'Seduh air mendidih', icon: '/assets/tools/naskah_isi.svg', color: 'var(--color-teal-dark)' },
+  { title: 'Bagian 4 • Penutup', hint: 'Aduk & sajikan hangat', icon: '/assets/tools/naskah_penutup.svg', color: 'var(--color-bata)' }
+];
+
+export default function Act2View({ onCompleteAct, onOpenHelp, sessionIndex = 0 }) {
   const [subTab, setSubTab] = useState('puzzle'); // 'puzzle' | 'sequence' | 'matching'
-  
-  // ------------------------------------------------------------------------
-  // VARIATION 1: JIGSAW PUZZLE (DENGAN VARIASI NASKAH & PENGACAKAN AWAL)
-  // ------------------------------------------------------------------------
+  const [isManuscriptModalOpen, setIsManuscriptModalOpen] = useState(false);
+
+  // 1. PUZZLE NASKAH
   const activePuzzle = useMemo(() => {
     return ACT_2_PUZZLE_VARIANTS[sessionIndex % ACT_2_PUZZLE_VARIANTS.length];
   }, [sessionIndex]);
 
-  // Acak kepingan puzzle di awal agar posisi kepingan tidak tersusun 1-4
   const initialShuffledPieces = useMemo(() => {
-    let pieces = shuffleArray(activePuzzle.pieces);
-    // Pastikan kepingan pertama bukan kepingan slot 0
+    const pieces = shuffleArray(activePuzzle.pieces);
     if (pieces[0].slot === 0 && pieces.length > 1) {
-      const temp = pieces[0];
-      pieces[0] = pieces[1];
-      pieces[1] = temp;
+      [pieces[0], pieces[1]] = [pieces[1], pieces[0]];
     }
     return pieces;
   }, [activePuzzle]);
@@ -34,44 +37,31 @@ export default function Act2View({ onCompleteAct, gameMode, onOpenHelp, sessionI
     setPlacedPieces([null, null, null, null]);
     setSelectedPiece(null);
     setPuzzleFeedback(null);
+    setIsManuscriptModalOpen(false);
   }, [activePuzzle]);
 
-  // ------------------------------------------------------------------------
-  // VARIATION 2: SEQUENCING URUTAN SEDUH (DENGAN PENGACAKAN NYATA)
-  // ------------------------------------------------------------------------
-  const activeSequence = useMemo(() => {
-    return ACT_2_SEQUENCE_VARIANTS[sessionIndex % ACT_2_SEQUENCE_VARIANTS.length];
-  }, [sessionIndex]);
-
-  const [sequenceOrder, setSequenceOrder] = useState(() => {
-    return derangeSequence(activeSequence.steps);
-  });
+  // 2. URUTAN SEDUH
+  const activeSequence = ACT_2_SEQUENCE_VARIANTS[0];
+  const [sequenceOrder, setSequenceOrder] = useState(() => derangeSequence(activeSequence.steps));
   const [seqFeedback, setSeqFeedback] = useState(null);
 
   useEffect(() => {
     setSequenceOrder(derangeSequence(activeSequence.steps));
     setSeqFeedback(null);
-  }, [activeSequence]);
-
-  // ------------------------------------------------------------------------
-  // VARIATION 3: KHASIAT DAN RAGA (POOL 6 PASANGAN & PENGACAKAN MANDIRI)
-  // ------------------------------------------------------------------------
-  const selectedPairs = useMemo(() => {
-    const startIdx = (sessionIndex * 2) % MATCHING_PAIRS_POOL.length;
-    const p1 = MATCHING_PAIRS_POOL[startIdx % MATCHING_PAIRS_POOL.length];
-    const p2 = MATCHING_PAIRS_POOL[(startIdx + 1) % MATCHING_PAIRS_POOL.length];
-    const p3 = MATCHING_PAIRS_POOL[(startIdx + 2) % MATCHING_PAIRS_POOL.length];
-    return [p1, p2, p3];
   }, [sessionIndex]);
 
-  // Acak posisi kartu kondisi di kolom kiri dan racikan di kolom kanan secara independen
-  const shuffledConditions = useMemo(() => {
-    return shuffleArray(selectedPairs);
-  }, [selectedPairs]);
+  // 3. KHASIAT & RAGA
+  const selectedPairs = useMemo(() => {
+    const startIdx = (sessionIndex * 2) % MATCHING_PAIRS_POOL.length;
+    return [
+      MATCHING_PAIRS_POOL[startIdx % MATCHING_PAIRS_POOL.length],
+      MATCHING_PAIRS_POOL[(startIdx + 1) % MATCHING_PAIRS_POOL.length],
+      MATCHING_PAIRS_POOL[(startIdx + 2) % MATCHING_PAIRS_POOL.length]
+    ];
+  }, [sessionIndex]);
 
-  const shuffledRemedies = useMemo(() => {
-    return shuffleArray(selectedPairs);
-  }, [selectedPairs]);
+  const shuffledConditions = useMemo(() => shuffleArray(selectedPairs), [selectedPairs]);
+  const shuffledRemedies = useMemo(() => shuffleArray(selectedPairs), [selectedPairs]);
 
   const [selectedCondition, setSelectedCondition] = useState(null);
   const [matchedPairs, setMatchedPairs] = useState([]);
@@ -83,7 +73,7 @@ export default function Act2View({ onCompleteAct, gameMode, onOpenHelp, sessionI
     setMatchFeedback(null);
   }, [selectedPairs]);
 
-  // Jigsaw Handlers
+  // Handlers Puzzle
   const handleSelectPiece = (piece) => {
     soundManager.playClickSound();
     setSelectedPiece(piece);
@@ -91,10 +81,11 @@ export default function Act2View({ onCompleteAct, gameMode, onOpenHelp, sessionI
   };
 
   const handlePlacePieceInSlot = (slotIdx) => {
+    if (placedPieces[slotIdx]) return;
     if (!selectedPiece) {
       setPuzzleFeedback({
         type: 'info',
-        message: 'Pilih salah satu kepingan resep di kolom kiri terlebih dahulu sebelum mengeklik slot.'
+        message: 'Pilih kepingan naskah di panel kiri terlebih dahulu.'
       });
       return;
     }
@@ -105,39 +96,45 @@ export default function Act2View({ onCompleteAct, gameMode, onOpenHelp, sessionI
       updated[slotIdx] = selectedPiece;
       setPlacedPieces(updated);
       setSelectedPiece(null);
-      setPuzzleFeedback({
-        type: 'success',
-        message: `Kepingan Bagian ${slotIdx + 1} pas terpasang pada bingkai naskah.`
-      });
+
+      if (updated.every(Boolean)) {
+        setPuzzleFeedback({
+          type: 'success',
+          message: 'Naskah resep kuno berhasil disusun lengkap.'
+        });
+        setTimeout(() => setIsManuscriptModalOpen(true), 420);
+      } else {
+        setPuzzleFeedback({
+          type: 'success',
+          message: `Bagian ${slotIdx + 1} (${SLOT_METADATA[slotIdx].title.split('•')[1].trim()}) tepat terpasang.`
+        });
+      }
     } else {
-      soundManager.playClickSound();
+      soundManager.playGentleWrong();
       setPuzzleFeedback({
         type: 'error',
-        message: `Kepingan ini belum pas pada Slot Bagian ${slotIdx + 1}. Cermati kesinambungan teks narasi dari awal penyambutan, penyiapan rempah, penyeduhan, hingga penutup.`
+        message: `Belum pas pada Bagian ${slotIdx + 1} (${SLOT_METADATA[slotIdx].hint}). Perhatikan tanda elipsis (...) penyambung kalimat.`
       });
     }
   };
 
-  const isPuzzleComplete = placedPieces.every(p => p !== null);
+  const isPuzzleComplete = placedPieces.every(Boolean);
 
-  // Sequencing Handlers
+  // Handlers Sequence
   const moveSequenceItem = (idx, direction) => {
     soundManager.playClickSound();
     const newIdx = idx + direction;
     if (newIdx < 0 || newIdx >= sequenceOrder.length) return;
 
     const updated = [...sequenceOrder];
-    const temp = updated[idx];
-    updated[idx] = updated[newIdx];
-    updated[newIdx] = temp;
+    [updated[idx], updated[newIdx]] = [updated[newIdx], updated[idx]];
     setSequenceOrder(updated);
 
-    const isCorrect = updated.every((step, i) => step.correctOrder === i + 1);
-    if (isCorrect) {
+    if (updated.every((step, i) => step.correctOrder === i + 1)) {
       soundManager.playPlaceSuccess();
       setSeqFeedback({
         type: 'success',
-        message: 'Luar biasa! Seluruh 4 tahapan peracikan wedang telah tersusun runtut dari awal mendengarkan hingga penyajian.'
+        message: 'Urutan seduh dari mendengar tamu hingga menyajikan hangat telah runtut.'
       });
     } else {
       setSeqFeedback(null);
@@ -146,7 +143,7 @@ export default function Act2View({ onCompleteAct, gameMode, onOpenHelp, sessionI
 
   const isSequenceComplete = sequenceOrder.every((step, i) => step.correctOrder === i + 1);
 
-  // Matching Handlers
+  // Handlers Matching
   const handleSelectCondition = (item) => {
     soundManager.playClickSound();
     setSelectedCondition(item);
@@ -158,7 +155,7 @@ export default function Act2View({ onCompleteAct, gameMode, onOpenHelp, sessionI
       soundManager.playClickSound();
       setMatchFeedback({
         type: 'info',
-        message: 'Pilih keluhan di kolom kiri (Kondisi Jiwa atau Raga) terlebih dahulu sebelum memilih racikan rempah.'
+        message: 'Pilih salah satu kondisi di kolom kiri dahulu.'
       });
       return;
     }
@@ -169,334 +166,230 @@ export default function Act2View({ onCompleteAct, gameMode, onOpenHelp, sessionI
       setSelectedCondition(null);
       setMatchFeedback({
         type: 'success',
-        message: `Tepat sekali: ${item.explanation}`
+        message: `Cocok! ${item.explanation}`
       });
     } else {
-      soundManager.playClickSound();
+      soundManager.playGentleWrong();
       setMatchFeedback({
         type: 'error',
-        message: 'Kombinasi rempah tersebut belum tepat untuk meredakan keluhan ini. Telaah kembali khasiat zat alaminya.'
+        message: 'Belum sesuai dengan kondisi yang dipilih. Coba perhatikan sifat hangat atau aroma rempah lainnya.'
       });
     }
   };
 
   const isMatchingComplete = matchedPairs.length === selectedPairs.length;
-  const completedChallengesCount = (isPuzzleComplete ? 1 : 0) + (isSequenceComplete ? 1 : 0) + (isMatchingComplete ? 1 : 0);
+  const completedCount = (isPuzzleComplete ? 1 : 0) + (isSequenceComplete ? 1 : 0) + (isMatchingComplete ? 1 : 0);
   const isAct2Ready = isPuzzleComplete && isSequenceComplete && isMatchingComplete;
 
   return (
     <div className="game-content-area">
-      {/* Header Babak */}
+      {/* Header Babak 2 */}
       <div className="act-header-banner">
         <div>
-          <div className="act-subtitle">
-            <Sparkles size={14} />
-            Zona Kita Berkarya • Variasi Sesi {sessionIndex + 1} ({activePuzzle.title})
-          </div>
+          <span className="act-zone-kicker">Zona Kita Berkarya • {activePuzzle.title}</span>
           <h2 className="act-main-title">Babak 2: Resep yang Hilang</h2>
         </div>
 
-        {/* Status Ringkas Sub-Misi */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+        <div className="act-subtabs">
           <button
+            className={`subtab-btn ${subTab === 'puzzle' ? 'active' : ''}`}
             onClick={() => { soundManager.playClickSound(); setSubTab('puzzle'); }}
-            style={{
-              background: isPuzzleComplete ? 'var(--color-teal-soft)' : (subTab === 'puzzle' ? 'var(--color-gold-soft)' : '#FFF'),
-              border: `1.5px solid ${isPuzzleComplete ? 'var(--color-teal)' : (subTab === 'puzzle' ? 'var(--color-gold-deep)' : 'var(--border-strong)')}`,
-              color: isPuzzleComplete ? 'var(--color-teal-dark)' : 'var(--text-primary)',
-              padding: '5px 12px',
-              borderRadius: '20px',
-              fontSize: '0.78rem',
-              fontWeight: 800,
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '4px'
-            }}
           >
-            {isPuzzleComplete && <Check size={13} color="var(--color-teal)" />}
-            1. Puzzle: {isPuzzleComplete ? 'Selesai' : 'Belum'}
+            <Puzzle size={16} />
+            <span>1. Puzzle Naskah</span>
+            {isPuzzleComplete && <Check size={14} />}
           </button>
 
           <button
+            className={`subtab-btn ${subTab === 'sequence' ? 'active' : ''}`}
             onClick={() => { soundManager.playClickSound(); setSubTab('sequence'); }}
-            style={{
-              background: isSequenceComplete ? 'var(--color-teal-soft)' : (subTab === 'sequence' ? 'var(--color-gold-soft)' : '#FFF'),
-              border: `1.5px solid ${isSequenceComplete ? 'var(--color-teal)' : (subTab === 'sequence' ? 'var(--color-gold-deep)' : 'var(--border-strong)')}`,
-              color: isSequenceComplete ? 'var(--color-teal-dark)' : 'var(--text-primary)',
-              padding: '5px 12px',
-              borderRadius: '20px',
-              fontSize: '0.78rem',
-              fontWeight: 800,
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '4px'
-            }}
           >
-            {isSequenceComplete && <Check size={13} color="var(--color-teal)" />}
-            2. Urutan Seduh: {isSequenceComplete ? 'Selesai' : 'Belum'}
+            <ListOrdered size={16} />
+            <span>2. Urutan Seduh</span>
+            {isSequenceComplete && <Check size={14} />}
           </button>
 
           <button
+            className={`subtab-btn ${subTab === 'matching' ? 'active' : ''}`}
             onClick={() => { soundManager.playClickSound(); setSubTab('matching'); }}
-            style={{
-              background: isMatchingComplete ? 'var(--color-teal-soft)' : (subTab === 'matching' ? 'var(--color-gold-soft)' : '#FFF'),
-              border: `1.5px solid ${isMatchingComplete ? 'var(--color-teal)' : (subTab === 'matching' ? 'var(--color-gold-deep)' : 'var(--border-strong)')}`,
-              color: isMatchingComplete ? 'var(--color-teal-dark)' : 'var(--text-primary)',
-              padding: '5px 12px',
-              borderRadius: '20px',
-              fontSize: '0.78rem',
-              fontWeight: 800,
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '4px'
-            }}
           >
-            {isMatchingComplete && <Check size={13} color="var(--color-teal)" />}
-            3. Khasiat: {matchedPairs.length} / {selectedPairs.length}
+            <GitCompare size={16} />
+            <span>3. Khasiat Rempah ({matchedPairs.length}/{selectedPairs.length})</span>
+            {isMatchingComplete && <Check size={14} />}
           </button>
         </div>
       </div>
 
-      {/* Navigasi 3 Sub-Tantangan */}
-      <div style={{ display: 'flex', gap: '10px', marginBottom: '16px', flexWrap: 'wrap' }}>
-        <button
-          onClick={() => {
-            soundManager.playClickSound();
-            setSubTab('puzzle');
-          }}
-          style={{
-            padding: '10px 18px',
-            borderRadius: 'var(--radius-sm)',
-            background: subTab === 'puzzle' ? 'var(--color-teal)' : '#FFF',
-            border: `2px solid ${subTab === 'puzzle' ? 'var(--color-teal-dark)' : 'var(--border-strong)'}`,
-            color: subTab === 'puzzle' ? '#FFF' : 'var(--text-primary)',
-            fontWeight: 800,
-            fontSize: '0.88rem',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            boxShadow: subTab === 'puzzle' ? '0 4px 12px rgba(53, 140, 136, 0.25)' : 'var(--shadow-soft)'
-          }}
-        >
-          <Puzzle size={17} />
-          <span>1. Jigsaw Resep Kuno</span>
-          {isPuzzleComplete && <Check size={14} color="#FFF" />}
-        </button>
-
-        <button
-          onClick={() => {
-            soundManager.playClickSound();
-            setSubTab('sequence');
-          }}
-          style={{
-            padding: '10px 18px',
-            borderRadius: 'var(--radius-sm)',
-            background: subTab === 'sequence' ? 'var(--color-teal)' : '#FFF',
-            border: `2px solid ${subTab === 'sequence' ? 'var(--color-teal-dark)' : 'var(--border-strong)'}`,
-            color: subTab === 'sequence' ? '#FFF' : 'var(--text-primary)',
-            fontWeight: 800,
-            fontSize: '0.88rem',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            boxShadow: subTab === 'sequence' ? '0 4px 12px rgba(53, 140, 136, 0.25)' : 'var(--shadow-soft)'
-          }}
-        >
-          <ListOrdered size={17} />
-          <span>2. Urutan Seduh</span>
-          {isSequenceComplete && <Check size={14} color="#FFF" />}
-        </button>
-
-        <button
-          onClick={() => {
-            soundManager.playClickSound();
-            setSubTab('matching');
-          }}
-          style={{
-            padding: '10px 18px',
-            borderRadius: 'var(--radius-sm)',
-            background: subTab === 'matching' ? 'var(--color-teal)' : '#FFF',
-            border: `2px solid ${subTab === 'matching' ? 'var(--color-teal-dark)' : 'var(--border-strong)'}`,
-            color: subTab === 'matching' ? '#FFF' : 'var(--text-primary)',
-            fontWeight: 800,
-            fontSize: '0.88rem',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            boxShadow: subTab === 'matching' ? '0 4px 12px rgba(53, 140, 136, 0.25)' : 'var(--shadow-soft)'
-          }}
-        >
-          <GitCompare size={17} />
-          <span>3. Khasiat & Raga ({matchedPairs.length} / {selectedPairs.length})</span>
-          {isMatchingComplete && <Check size={14} color="#FFF" />}
-        </button>
-      </div>
-
-      {/* TANTANGAN 1: JIGSAW PUZZLE RESEP KUNO */}
+      {/* SUBBABAK 1: PUZZLE NASKAH RESEP */}
       {subTab === 'puzzle' && (
         <div>
           <MiniGameGuideBanner
-            tag="Tantangan 1: Rekonstruksi Naskah Resep"
-            title={`Cara Menyusun: ${activePuzzle.title}`}
+            tag="Tantangan 1"
+            title="Susun 4 potongan resep menjadi struktur Pembuka, Isi, dan Penutup."
             steps={[
-              "Pilih salah satu kepingan resep di panel kiri (posisi kepingan telah diacak).",
-              "Klik slot kosong pada bingkai kanan (Slot Bagian 1 sampai 4) sesuai kesinambungan alur naskah.",
-              "Susun keempat kepingan hingga seluruh formula resep kuno terbaca utuh dan bermakna."
+              "Pilih kepingan teks di panel kiri.",
+              "Klik slot tujuan di bingkai kanan sesuai kelanjutan alur kalimat."
             ]}
-            tip="Baca teks pada setiap kepingan untuk mengenali alur dari tahap pembuka, penyelarasan rempah, penyeduhan, hingga penutup."
+            tip="Perhatikan letak tanda titik-titik (...) untuk melihat sambungan kalimat."
             onOpenHelp={onOpenHelp}
           />
 
+          {/* Ilustrasi Visual Struktur 3 Bagian Naskah (Contoh Ringkas) */}
+          <div className="structure-visual-strip">
+            <div className="structure-step-badge">
+              <img src="/assets/tools/naskah_pembuka.svg" alt="" />
+              <div>
+                <strong>Pembuka</strong>
+                <span>Sapa tamu & pilih rimpang awal</span>
+              </div>
+            </div>
+            <div className="structure-arrow">→</div>
+            <div className="structure-step-badge">
+              <img src="/assets/tools/naskah_isi.svg" alt="" />
+              <div>
+                <strong>Isi</strong>
+                <span>Memar rempah & tuang air didih</span>
+              </div>
+            </div>
+            <div className="structure-arrow">→</div>
+            <div className="structure-step-badge">
+              <img src="/assets/tools/naskah_penutup.svg" alt="" />
+              <div>
+                <strong>Penutup</strong>
+                <span>Aduk gula aren & sajikan hangat</span>
+              </div>
+            </div>
+          </div>
+
           {puzzleFeedback && (
-            <div style={{
-              background: puzzleFeedback.type === 'success' ? 'var(--color-teal-soft)' : (puzzleFeedback.type === 'info' ? 'var(--color-gold-soft)' : 'var(--color-bata-soft)'),
-              borderLeft: `4px solid ${puzzleFeedback.type === 'success' ? 'var(--color-teal)' : (puzzleFeedback.type === 'info' ? 'var(--color-gold-deep)' : 'var(--color-bata)')}`,
-              padding: '12px 18px',
-              borderRadius: '0 6px 6px 0',
-              fontSize: '0.88rem',
-              color: puzzleFeedback.type === 'success' ? 'var(--color-teal-dark)' : (puzzleFeedback.type === 'info' ? '#8C6505' : 'var(--color-bata-dark)'),
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px',
-              marginBottom: '16px',
-              fontWeight: 700
-            }}>
+            <div className={`feedback-strip ${puzzleFeedback.type}`}>
               {puzzleFeedback.type === 'success' ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
               <span>{puzzleFeedback.message}</span>
             </div>
           )}
 
           <div className="puzzle-assembly-arena">
-            {/* Pool Kepingan Resep Acak */}
-            <div className="puzzle-pieces-pool">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                <span style={{ fontSize: '0.82rem', fontWeight: 800, color: 'var(--color-orange)', textTransform: 'uppercase' }}>
-                  Kepingan Sobekan Resep (Acak):
-                </span>
-                <span style={{ fontSize: '0.76rem', color: 'var(--text-muted)' }}>
-                  {placedPieces.filter(Boolean).length} / 4 Terpasang
-                </span>
+            {/* Panel Kiri: Kepingan Acak */}
+            <div className="puzzle-panel">
+              <div className="puzzle-panel-header">
+                <span className="panel-title-kicker orange">Kepingan Sobekan ({placedPieces.filter(Boolean).length}/4)</span>
+                <span className="panel-hint-mini">Klik kepingan untuk memilih</span>
               </div>
 
-              {initialShuffledPieces.map((piece) => {
-                const isPlaced = placedPieces.some(p => p && p.id === piece.id);
-                const isSelected = selectedPiece && selectedPiece.id === piece.id;
+              <div className="puzzle-pieces-grid">
+                {initialShuffledPieces.map((piece) => {
+                  const isPlaced = placedPieces.some(p => p && p.id === piece.id);
+                  const isSelected = selectedPiece && selectedPiece.id === piece.id;
 
-                if (isPlaced) {
+                  if (isPlaced) {
+                    return (
+                      <div key={piece.id} className="puzzle-piece-placed-placeholder">
+                        <Check size={15} color="var(--color-teal)" />
+                        <span>{piece.structureRole} Terpasang</span>
+                      </div>
+                    );
+                  }
+
                   return (
                     <div
                       key={piece.id}
-                      style={{
-                        background: 'var(--bg-parchment)',
-                        border: '1.5px dashed var(--border-strong)',
-                        borderRadius: 'var(--radius-sm)',
-                        padding: '14px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: 'var(--color-teal-dark)',
-                        fontSize: '0.82rem',
-                        fontWeight: 700,
-                        gap: '6px'
+                      className={`puzzle-piece-card ${isSelected ? 'selected' : ''}`}
+                      onClick={() => handleSelectPiece(piece)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          handleSelectPiece(piece);
+                        }
                       }}
                     >
-                      <Check size={14} color="var(--color-teal)" />
-                      <span>{piece.title} Telah Terpasang di Bingkai</span>
+                      <div className="piece-top-row">
+                        <span className="piece-role-chip">{piece.structureRole}</span>
+                        {isSelected && <span className="piece-selected-tag">Dipilih</span>}
+                      </div>
+                      <p className="piece-text">“{piece.text}”</p>
                     </div>
                   );
-                }
-
-                return (
-                  <div
-                    key={piece.id}
-                    className={`puzzle-piece-card ${isSelected ? 'selected' : ''}`}
-                    onClick={() => handleSelectPiece(piece)}
-                    style={{ position: 'relative' }}
-                  >
-                    {!isSelected && (
-                      <div className="interactive-cue-badge" style={{ fontSize: '0.66rem' }}>
-                        <span>Pilih Kepingan</span>
-                      </div>
-                    )}
-                    <span className="piece-slot-indicator">{piece.title}</span>
-                    <p className="piece-text">“{piece.text}”</p>
-                    <span style={{ fontSize: '0.74rem', color: isSelected ? 'var(--color-orange)' : 'var(--color-teal-dark)', fontWeight: 800 }}>
-                      {isSelected ? 'Pilih Slot Tujuan di Bingkai Kanan' : 'Klik untuk Memilih'}
-                    </span>
-                  </div>
-                );
-              })}
+                })}
+              </div>
             </div>
 
-            {/* Target Papan Bingkai 4 Slot */}
-            <div className="puzzle-target-board">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                <span style={{ fontSize: '0.82rem', fontWeight: 800, color: 'var(--color-teal-dark)', textTransform: 'uppercase' }}>
-                  Bingkai Naskah Resep Kuno (4 Bagian):
-                </span>
+            {/* Panel Kanan: Bingkai Target 4 Slot */}
+            <div className="puzzle-panel">
+              <div className="puzzle-panel-header">
+                <span className="panel-title-kicker teal">Bingkai Naskah Utuh (4 Bagian)</span>
                 {isPuzzleComplete && (
-                  <span style={{ fontSize: '0.78rem', color: 'var(--color-teal)', fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                    <Check size={13} />
-                    Naskah Utuh Terbaca
-                  </span>
+                  <button
+                    className="btn-read-manuscript"
+                    onClick={() => {
+                      soundManager.playPaperRustle();
+                      setIsManuscriptModalOpen(true);
+                    }}
+                  >
+                    <BookOpen size={14} />
+                    <span>Buka Naskah Utuh</span>
+                  </button>
                 )}
               </div>
 
-              {[0, 1, 2, 3].map((slotIdx) => {
-                const placed = placedPieces[slotIdx];
-                const isReadyToPlace = !placed && selectedPiece !== null;
+              <div className="puzzle-slots-grid">
+                {[0, 1, 2, 3].map((slotIdx) => {
+                  const placed = placedPieces[slotIdx];
+                  const isReady = !placed && selectedPiece !== null;
+                  const meta = SLOT_METADATA[slotIdx];
 
-                return (
-                  <div
-                    key={slotIdx}
-                    className={`puzzle-slot ${placed ? 'filled' : 'slot-ready'} ${isReadyToPlace ? 'slot-highlight-pulse' : ''}`}
-                    onClick={() => handlePlacePieceInSlot(slotIdx)}
-                    style={{ position: 'relative' }}
-                  >
-                    {placed ? (
-                      <div>
-                        <span style={{ fontSize: '0.74rem', color: 'var(--color-teal)', fontWeight: 800, textTransform: 'uppercase' }}>
-                          Bagian {slotIdx + 1}
-                        </span>
-                        <p style={{ fontSize: '0.88rem', color: 'var(--text-primary)', lineHeight: '1.5', marginTop: '4px', fontStyle: 'italic' }}>
-                          “{placed.text}”
-                        </p>
+                  return (
+                    <div
+                      key={slotIdx}
+                      className={`puzzle-slot ${placed ? 'filled' : ''} ${isReady ? 'slot-ready' : ''}`}
+                      onClick={() => handlePlacePieceInSlot(slotIdx)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          handlePlacePieceInSlot(slotIdx);
+                        }
+                      }}
+                    >
+                      <div className="slot-header-meta">
+                        <img src={meta.icon} alt="" className="slot-icon-img" />
+                        <div>
+                          <div className="slot-title" style={{ color: meta.color }}>{meta.title}</div>
+                          <div className="slot-subtitle">{meta.hint}</div>
+                        </div>
                       </div>
-                    ) : (
-                      <div>
-                        <span style={{ fontSize: '0.8rem', color: isReadyToPlace ? 'var(--color-gold-deep)' : 'var(--text-muted)', fontWeight: 800 }}>
-                          Slot Bagian #{slotIdx + 1}
-                        </span>
-                        <p style={{ fontSize: '0.78rem', color: isReadyToPlace ? 'var(--color-orange)' : 'var(--text-muted)', marginTop: '4px', fontWeight: isReadyToPlace ? 700 : 500 }}>
-                          {selectedPiece ? 'Klik untuk merekatkan kepingan ke sini' : 'Pilih kepingan di kiri terlebih dahulu'}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+
+                      {placed ? (
+                        <p className="slot-filled-text">“{placed.text}”</p>
+                      ) : (
+                        <div className="slot-empty-prompt">
+                          {isReady ? 'Klik untuk meletakkan kepingan di sini' : 'Slot kosong'}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
 
-          {/* Navigasi Sukses Jigsaw */}
           {isPuzzleComplete && (
-            <div className="discovery-toast-card" style={{ marginTop: '20px' }}>
+            <div className="discovery-toast-card" style={{ marginTop: '18px' }}>
               <div className="discovery-toast-text">
-                <h5>Naskah Resep Berhasil Direkonstruksi</h5>
-                <p>Formula wedang tradisional telah tersusun utuh. Lanjutkan ke tantangan berikutnya untuk menyusun urutan peracikan.</p>
+                <h5>Naskah Lengkap Terangkai</h5>
+                <p>Kamu siap melanjutkan ke tantangan urutan penyeduhan.</p>
               </div>
               <button
                 className="btn-primary-action"
-                style={{ padding: '8px 18px', fontSize: '0.86rem' }}
+                style={{ padding: '9px 18px', fontSize: '0.86rem' }}
                 onClick={() => {
                   soundManager.playClickSound();
                   setSubTab('sequence');
                 }}
               >
-                <span>Lanjut ke Tantangan 2: Urutan Seduh</span>
+                <span>Lanjut: 2. Urutan Seduh</span>
                 <ArrowRight size={16} />
               </button>
             </div>
@@ -504,35 +397,21 @@ export default function Act2View({ onCompleteAct, gameMode, onOpenHelp, sessionI
         </div>
       )}
 
-      {/* TANTANGAN 2: SEQUENCING URUTAN PROSES SEDUH */}
+      {/* SUBBABAK 2: URUTAN SEDUH (DENGAN ILUSTRASI TAHAPAN JELAS) */}
       {subTab === 'sequence' && (
         <div style={{ maxWidth: '860px', margin: '0 auto', width: '100%' }}>
           <MiniGameGuideBanner
-            tag="Tantangan 2: Urutan Peracikan"
-            title={`Cara Menyusun: ${activeSequence.title}`}
+            tag="Tantangan 2"
+            title="Urutkan 4 tahapan meracik wedang dari awal menyapa hingga menyajikan."
             steps={[
-              "Perhatikan 4 kartu tahapan peracikan di bawah yang posisinya telah diacak secara acak.",
-              "Klik tombol panah ke atas (▲) atau ke bawah (▼) untuk menaikkan atau menurunkan posisi kartu.",
-              "Susun secara logis dari tahap penyambutan pelanggan, penyiapan rimpang, perebusan/penyeduhan, hingga penyajian hangat."
+              "Gunakan tombol panah atas atau bawah untuk menukar posisi kartu."
             ]}
-            tip="Pak Ilmu selalu mengajarkan: empati mendengarkan harus mendahului tindakan menyentuh rempah."
+            tip="Selalu dengarkan tamu dahulu sebelum menyiapkan bahan."
             onOpenHelp={onOpenHelp}
           />
 
           {seqFeedback && (
-            <div style={{
-              background: 'var(--color-teal-soft)',
-              borderLeft: '4px solid var(--color-teal)',
-              padding: '12px 18px',
-              borderRadius: '0 6px 6px 0',
-              fontSize: '0.9rem',
-              color: 'var(--color-teal-dark)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px',
-              marginBottom: '16px',
-              fontWeight: 700
-            }}>
+            <div className="feedback-strip success">
               <CheckCircle2 size={18} />
               <span>{seqFeedback.message}</span>
             </div>
@@ -543,71 +422,61 @@ export default function Act2View({ onCompleteAct, gameMode, onOpenHelp, sessionI
               const isStepCorrect = step.correctOrder === idx + 1;
 
               return (
-                <div key={step.id} className="sequence-card" style={{
-                  border: isStepCorrect ? '2px solid var(--color-teal)' : '1.5px solid var(--border-natural)',
-                  background: isStepCorrect ? '#FAFCFB' : '#FFF'
-                }}>
-                  <div
-                    className="sequence-badge"
-                    style={{
-                      background: isStepCorrect ? 'var(--color-teal)' : '#D0C4B0',
-                      color: isStepCorrect ? '#FFF' : 'var(--text-primary)'
-                    }}
-                  >
-                    {idx + 1}
+                <div key={step.id} className={`sequence-card ${isStepCorrect ? 'is-aligned' : ''}`}>
+                  <div className="sequence-badge">{idx + 1}</div>
+
+                  <div className="sequence-visual-thumb">
+                    <img src={step.image} alt={step.label} />
                   </div>
-                  <div className="sequence-desc">
-                    {step.text}
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    {isStepCorrect && (
-                      <span style={{ fontSize: '0.74rem', color: 'var(--color-teal-dark)', fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                        <Check size={12} />
-                        Posisi Tepat
-                      </span>
-                    )}
-                    <div className="sequence-controls">
-                      <button
-                        className="seq-btn"
-                        disabled={idx === 0}
-                        onClick={() => moveSequenceItem(idx, -1)}
-                        title="Pindahkan Ke Atas"
-                        aria-label="Pindahkan langkah ini ke atas"
-                      >
-                        <ArrowUp size={16} />
-                      </button>
-                      <button
-                        className="seq-btn"
-                        disabled={idx === sequenceOrder.length - 1}
-                        onClick={() => moveSequenceItem(idx, 1)}
-                        title="Pindahkan Ke Bawah"
-                        aria-label="Pindahkan langkah ini ke bawah"
-                      >
-                        <ArrowDown size={16} />
-                      </button>
+
+                  <div className="sequence-body">
+                    <div className="sequence-step-label">
+                      Tahap {idx + 1} • {step.label}
+                      {isStepCorrect && <Check size={14} color="var(--color-teal)" />}
                     </div>
+                    <p className="sequence-step-text">{step.text}</p>
+                  </div>
+
+                  <div className="sequence-controls">
+                    <button
+                      className="seq-btn"
+                      disabled={idx === 0}
+                      onClick={() => moveSequenceItem(idx, -1)}
+                      title="Naikkan urutan"
+                      aria-label={`Naikkan ${step.label}`}
+                    >
+                      <ArrowUp size={16} />
+                    </button>
+                    <button
+                      className="seq-btn"
+                      disabled={idx === sequenceOrder.length - 1}
+                      onClick={() => moveSequenceItem(idx, 1)}
+                      title="Turunkan urutan"
+                      aria-label={`Turunkan ${step.label}`}
+                    >
+                      <ArrowDown size={16} />
+                    </button>
                   </div>
                 </div>
               );
             })}
           </div>
 
-          {/* Navigasi Sukses Urutan Seduh */}
           {isSequenceComplete && (
-            <div className="discovery-toast-card" style={{ marginTop: '20px' }}>
+            <div className="discovery-toast-card" style={{ marginTop: '18px' }}>
               <div className="discovery-toast-text">
-                <h5>Urutan Peracikan Telah Selaras</h5>
-                <p>Tahapan seduh wedang tradisional telah tersusun kronologis. Saatnya mencocokkan ramuan rempah dengan kondisi raga.</p>
+                <h5>Urutan Seduh Runtut</h5>
+                <p>Lanjutkan ke tahap mengenali sifat dan kehangatan setiap rempah.</p>
               </div>
               <button
                 className="btn-primary-action"
-                style={{ padding: '8px 18px', fontSize: '0.86rem' }}
+                style={{ padding: '9px 18px', fontSize: '0.86rem' }}
                 onClick={() => {
                   soundManager.playClickSound();
                   setSubTab('matching');
                 }}
               >
-                <span>Lanjut ke Tantangan 3: Khasiat & Raga</span>
+                <span>Lanjut: 3. Khasiat Rempah</span>
                 <ArrowRight size={16} />
               </button>
             </div>
@@ -615,51 +484,29 @@ export default function Act2View({ onCompleteAct, gameMode, onOpenHelp, sessionI
         </div>
       )}
 
-      {/* TANTANGAN 3: MATCHING PAIRS */}
+      {/* SUBBABAK 3: KHASIAT & RAGA (HANYA REMPAH ASLI DI INVENTORY) */}
       {subTab === 'matching' && (
         <div>
           <MiniGameGuideBanner
-            tag="Tantangan 3: Pemetaan Khasiat Rempah"
-            title="Cara Mencocokkan Kondisi Jiwa & Raga dengan Rempah"
+            tag="Tantangan 3"
+            title="Pasangkan kondisi pengunjung di kiri dengan bahan rempah yang cocok di kanan."
             steps={[
-              "Pilih salah satu kartu kondisi pada kolom kiri (posisi telah diacak secara mandiri).",
-              "Pilih racikan rempah penyembuh yang tepat pada kolom kanan.",
-              "Hubungkan seluruh pasangan keluhan dan khasiat rempah dengan benar."
+              "Pilih kartu kondisi di kiri, lalu pilih rempah pasangannya di kanan."
             ]}
-            tip="Jahe emprit mengatasi hawa dingin di tulang, cengkeh & sereh menenangkan pikiran lelah, dan gula aren memulihkan tenaga fisik."
+            tip="Jahe memberi hangat pedas, Serai wangi menenangkan, Gula Aren memulihkan manis tenaga."
             onOpenHelp={onOpenHelp}
           />
 
           {matchFeedback && (
-            <div style={{
-              background: matchFeedback.type === 'success' ? 'var(--color-teal-soft)' : (matchFeedback.type === 'info' ? 'var(--color-gold-soft)' : 'var(--color-bata-soft)'),
-              borderLeft: `4px solid ${matchFeedback.type === 'success' ? 'var(--color-teal)' : (matchFeedback.type === 'info' ? 'var(--color-gold-deep)' : 'var(--color-bata)')}`,
-              padding: '12px 18px',
-              borderRadius: '0 6px 6px 0',
-              fontSize: '0.9rem',
-              color: matchFeedback.type === 'success' ? 'var(--color-teal-dark)' : (matchFeedback.type === 'info' ? '#8C6505' : 'var(--color-bata-dark)'),
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px',
-              marginBottom: '16px',
-              fontWeight: 700
-            }}>
+            <div className={`feedback-strip ${matchFeedback.type}`}>
               {matchFeedback.type === 'success' ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
               <span>{matchFeedback.message}</span>
             </div>
           )}
 
           <div className="matching-board">
-            {/* Kolom Kiri: Kondisi Penikmat (Acak) */}
             <div className="match-column">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.84rem', color: 'var(--color-orange)', fontWeight: 800 }}>
-                  1. Pilih Kondisi Jiwa atau Raga:
-                </span>
-                <span style={{ fontSize: '0.76rem', color: 'var(--text-muted)' }}>
-                  {matchedPairs.length} / {selectedPairs.length} Terhubung
-                </span>
-              </div>
+              <div className="match-col-title orange">1. Kondisi Pengunjung ({matchedPairs.length}/{selectedPairs.length})</div>
 
               {shuffledConditions.map((pair) => {
                 const isMatched = matchedPairs.includes(pair.id);
@@ -670,82 +517,69 @@ export default function Act2View({ onCompleteAct, gameMode, onOpenHelp, sessionI
                     key={pair.id}
                     className={`match-card ${isMatched ? 'matched' : ''} ${isSelected ? 'selected' : ''}`}
                     onClick={() => !isMatched && handleSelectCondition(pair)}
-                    style={{ position: 'relative' }}
+                    role="button"
+                    tabIndex={isMatched ? -1 : 0}
+                    onKeyDown={(e) => {
+                      if (!isMatched && (e.key === 'Enter' || e.key === ' ')) {
+                        e.preventDefault();
+                        handleSelectCondition(pair);
+                      }
+                    }}
                   >
-                    {!isMatched && !isSelected && (
-                      <div className="interactive-cue-badge" style={{ fontSize: '0.66rem' }}>
-                        <span>Pilih Keluhan</span>
-                      </div>
-                    )}
-                    <strong>{pair.condition}</strong>
-                    {isMatched ? (
-                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '6px', fontSize: '0.78rem', color: 'var(--color-teal-dark)', fontWeight: 800 }}>
-                        <Check size={13} color="var(--color-teal)" />
-                        Khasiat Berhasil Dicocokkan
+                    <div className="match-card-content">
+                      <strong>{pair.condition}</strong>
+                      <span className="match-card-sub">
+                        {isMatched ? 'Pasangan cocok' : (isSelected ? 'Pilih rempah cocok di kanan →' : 'Klik untuk memilih')}
                       </span>
-                    ) : (
-                      <span style={{ display: 'block', marginTop: '4px', fontSize: '0.74rem', color: isSelected ? 'var(--color-orange)' : 'var(--text-muted)' }}>
-                        {isSelected ? 'Pilih ramuan yang cocok di kolom kanan' : 'Klik untuk memilih keluhan ini'}
-                      </span>
-                    )}
+                    </div>
+                    {isMatched && <CheckCircle2 size={18} color="var(--color-teal)" />}
                   </div>
                 );
               })}
             </div>
 
-            {/* Kolom Kanan: Racikan Rempah (Acak) */}
             <div className="match-column">
-              <span style={{ fontSize: '0.84rem', color: 'var(--color-teal-dark)', fontWeight: 800 }}>
-                2. Pasangkan dengan Racikan Rempah:
-              </span>
+              <div className="match-col-title teal">2. Bahan Rempah Nusantara</div>
+
               {shuffledRemedies.map((pair) => {
                 const isMatched = matchedPairs.includes(pair.id);
 
                 return (
                   <div
                     key={pair.id}
-                    className={`match-card ${isMatched ? 'matched' : ''}`}
+                    className={`match-card remedy-card ${isMatched ? 'matched' : ''} ${selectedCondition && !isMatched ? 'target-ready' : ''}`}
                     onClick={() => !isMatched && handleSelectRemedy(pair)}
-                    style={{
-                      border: selectedCondition && !isMatched ? '1.5px dashed var(--color-teal)' : undefined,
-                      cursor: isMatched ? 'default' : 'pointer'
+                    role="button"
+                    tabIndex={isMatched ? -1 : 0}
+                    onKeyDown={(e) => {
+                      if (!isMatched && (e.key === 'Enter' || e.key === ' ')) {
+                        e.preventDefault();
+                        handleSelectRemedy(pair);
+                      }
                     }}
                   >
-                    <span>{pair.remedy}</span>
-                    {isMatched ? (
-                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '6px', fontSize: '0.78rem', color: 'var(--color-teal-dark)', fontWeight: 800 }}>
-                        <Check size={13} color="var(--color-teal)" />
-                        Khasiat Cocok Sempurna
+                    <div className="remedy-thumb">
+                      <img src={pair.spiceImage} alt={pair.remedy} />
+                    </div>
+                    <div className="match-card-content">
+                      <strong>{pair.remedy}</strong>
+                      <span className="match-card-sub">
+                        {isMatched ? pair.explanation : (selectedCondition ? 'Klik untuk memasangkan' : 'Tentukan kondisi dahulu')}
                       </span>
-                    ) : (
-                      selectedCondition && (
-                        <span style={{ display: 'block', marginTop: '4px', fontSize: '0.74rem', color: 'var(--color-teal-dark)', fontWeight: 700 }}>
-                          Pilih sebagai pasangan ramuan
-                        </span>
-                      )
-                    )}
+                    </div>
+                    {isMatched && <CheckCircle2 size={18} color="var(--color-teal)" />}
                   </div>
                 );
               })}
             </div>
           </div>
-
-          {/* Notifikasi Selesai Khasiat */}
-          {isMatchingComplete && (
-            <div className="discovery-toast-card" style={{ marginTop: '20px' }}>
-              <div className="discovery-toast-text">
-                <h5>Semua Pasangan Khasiat Rempah Telah Tepat</h5>
-                <p>Kamu telah memahami keterkaitan antara keluhan raga dengan saripati tanaman herbal Nusantara.</p>
-              </div>
-            </div>
-          )}
         </div>
       )}
 
-      {/* Footer Aksi Navigasi Babak */}
+      {/* Footer Babak 2 */}
       <div className="action-footer-bar">
-        <div style={{ fontSize: '0.86rem', color: 'var(--text-muted)' }}>
-          Progres Babak 2: {completedChallengesCount} dari 3 tantangan selesai. {isAct2Ready ? 'Semua tantangan tuntas.' : 'Selesaikan seluruh tantangan untuk lanjut.'}
+        <div className="footer-progress-note">
+          Progres Babak 2: {completedCount}/3 tantangan selesai.
         </div>
 
         <button
@@ -756,10 +590,20 @@ export default function Act2View({ onCompleteAct, gameMode, onOpenHelp, sessionI
             onCompleteAct();
           }}
         >
-          <span>Lanjut ke Babak 3: Untuk Siapa Racikan Ini?</span>
+          <span>Lanjut ke Babak 3</span>
           <ArrowRight size={18} />
         </button>
       </div>
+
+      <RecipeManuscriptModal
+        isOpen={isManuscriptModalOpen}
+        onClose={() => setIsManuscriptModalOpen(false)}
+        puzzleData={activePuzzle}
+        onContinueToSequence={() => {
+          setIsManuscriptModalOpen(false);
+          setSubTab('sequence');
+        }}
+      />
     </div>
   );
 }

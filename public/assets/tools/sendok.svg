@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <defs>
+    <linearGradient id="teakHandle" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#C48847"/>
+      <stop offset="50%" stop-color="#9C5E28"/>
+      <stop offset="100%" stop-color="#6E3D15"/>
+    </linearGradient>
+    <radialGradient id="teakBowl" cx="45%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#DEB073"/>
+      <stop offset="65%" stop-color="#A86A30"/>
+      <stop offset="100%" stop-color="#663A12"/>
+    </radialGradient>
+  </defs>
+  <!-- Bayangan sendok -->
+  <ellipse cx="50" cy="88" rx="36" ry="6" fill="#2C221E" opacity="0.16"/>
+  <!-- Tangkai sendok kayu jati diagonal -->
+  <path d="M22,78 L54,46 C56,44 58,44 60,46 L64,50 C66,52 66,54 64,56 L32,88 C30,90 28,90 26,88 L22,84 C20,82 20,80 22,78 Z" 
+        fill="url(#teakHandle)" stroke="#4A2608" stroke-width="2"/>
+  <!-- Serat kayu jati -->
+  <path d="M26,82 L58,50" stroke="#784218" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+  <path d="M28,85 L48,65" stroke="#B87D3E" stroke-width="1" stroke-linecap="round" fill="none"/>
+  <!-- Cekungan sendok lonjong -->
+  <ellipse cx="68" cy="34" rx="20" ry="24" fill="url(#teakBowl)" stroke="#4A2608" stroke-width="2.2" transform="rotate(-35 68 34)"/>
+  <!-- Kedalaman cekungan sendok -->
+  <ellipse cx="67" cy="35" rx="14" ry="17" fill="#8A5120" opacity="0.75" transform="rotate(-35 67 35)"/>
+  <!-- Kilau cekungan atas -->
+  <path d="M56,22 C62,16 74,18 78,26" stroke="#F5D7A4" stroke-width="2" fill="none" stroke-linecap="round"/>
+</svg>
