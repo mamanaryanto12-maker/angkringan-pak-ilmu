@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Volume2, VolumeX, BookOpen, FileText, HelpCircle, RotateCcw, Compass, SlidersHorizontal } from 'lucide-react';
+import { Volume2, VolumeX, BookOpen, FileText, HelpCircle, RotateCcw, Compass, SlidersHorizontal, Box } from 'lucide-react';
 import { soundManager } from '../utils/audio.js';
 
 export default function Navbar({
@@ -8,6 +8,7 @@ export default function Navbar({
   onOpenNotebook,
   onOpenHelp,
   onOpenWalkthrough,
+  onOpen3DGallery,
   onResetGame,
   isMuted,
   onToggleSound,
@@ -100,6 +101,18 @@ export default function Navbar({
           aria-label="Tiket Pesanan"
         >
           <FileText size={17} />
+        </button>
+
+        <button
+          className="btn-nav-icon"
+          onClick={() => {
+            soundManager.playClickSound();
+            if (onOpen3DGallery) onOpen3DGallery();
+          }}
+          title="Koleksi Model 3D Perkakas & Rempah"
+          aria-label="Koleksi 3D"
+        >
+          <Box size={17} color="var(--color-orange)" />
         </button>
 
         <button

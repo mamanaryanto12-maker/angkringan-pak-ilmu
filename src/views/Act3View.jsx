@@ -4,6 +4,7 @@ import { soundManager } from '../utils/audio.js';
 import { ACT_3_PERSONAS, PANTRY_INGREDIENTS, evaluateCustomRecipe } from '../data/gameData.js';
 import MiniGameGuideBanner from '../components/MiniGameGuideBanner.jsx';
 import VisitorSceneIllustration from '../components/VisitorSceneIllustration.jsx';
+import Item3DViewer from '../components/Item3DViewer.jsx';
 
 export default function Act3View({ onCompleteAct, onOpenHelp, sessionIndex = 0 }) {
   const [currentPhase, setCurrentPhase] = useState(1); // 1: needs, 2: recipe, 3: delivery, 4: serving cutscene
@@ -238,7 +239,30 @@ export default function Act3View({ onCompleteAct, onOpenHelp, sessionIndex = 0 }
                       className={`pantry-card ${isChecked ? 'selected' : ''}`}
                       onClick={() => handleToggleIngredient(item.id)}
                       aria-pressed={isChecked}
+                      style={{ position: 'relative' }}
                     >
+                      {item.model3d && (
+                        <span
+                          style={{
+                            position: 'absolute',
+                            top: '6px',
+                            right: '6px',
+                            background: 'rgba(20, 20, 28, 0.75)',
+                            backdropFilter: 'blur(3px)',
+                            color: 'var(--color-orange)',
+                            border: '1px solid rgba(255, 170, 68, 0.4)',
+                            borderRadius: '4px',
+                            padding: '1px 5px',
+                            fontSize: '0.62rem',
+                            fontWeight: 800,
+                            letterSpacing: '0.5px',
+                            zIndex: 2,
+                            pointerEvents: 'none'
+                          }}
+                        >
+                          3D
+                        </span>
+                      )}
                       <span className="pantry-check-dot">
                         {isChecked && <Check size={12} color="#FFF" />}
                       </span>
@@ -379,11 +403,16 @@ export default function Act3View({ onCompleteAct, onOpenHelp, sessionIndex = 0 }
                         <div className="steam-smoke" />
                       </div>
                     )}
-                    <img
-                      src="/background/cangkir.png"
-                      alt="Menyerahkan cangkir wedang"
-                      className="serving-cup-anim"
-                    />
+                    <div style={{ width: '160px', height: '140px', margin: '0 auto 8px', position: 'relative' }}>
+                      <Item3DViewer
+                        modelPath="/assets/models/items/cangkir.glb"
+                        itemName="Cangkir Blirik Wedang"
+                        fallbackImage="/background/cangkir.png"
+                        height={140}
+                        showBadge={false}
+                        autoRotateSpeed={2.8}
+                      />
+                    </div>
                     <p className="serving-beat-caption">Menyerahkan cangkir dengan dua tangan...</p>
                   </div>
                 ) : (

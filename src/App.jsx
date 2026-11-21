@@ -6,6 +6,7 @@ import NotebookModal from './components/NotebookModal.jsx';
 import HelpModal from './components/HelpModal.jsx';
 import WalkthroughModal from './components/WalkthroughModal.jsx';
 import ActWelcomeModal from './components/ActWelcomeModal.jsx';
+import Items3DGalleryModal from './components/Items3DGalleryModal.jsx';
 import OpeningView from './views/OpeningView.jsx';
 import Act1View from './views/Act1View.jsx';
 import Act2View from './views/Act2View.jsx';
@@ -54,6 +55,8 @@ export default function App() {
   const [isNotebookOpen, setIsNotebookOpen] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [isWalkthroughOpen, setIsWalkthroughOpen] = useState(false);
+  const [isItems3DOpen, setIsItems3DOpen] = useState(false);
+  const [selected3DItemId, setSelected3DItemId] = useState('serai');
   const [isMuted, setIsMuted] = useState(soundManager.isMuted);
   const [volumeLevel, setVolumeLevel] = useState(soundManager.volume);
 
@@ -181,6 +184,11 @@ export default function App() {
     setCurrentStep('intro');
   };
 
+  const handleOpen3DGallery = (itemId = 'serai') => {
+    setSelected3DItemId(itemId);
+    setIsItems3DOpen(true);
+  };
+
   const activeTicket = ORDER_TICKETS[sessionIndex % ORDER_TICKETS.length];
 
   return (
@@ -195,6 +203,7 @@ export default function App() {
         onOpenNotebook={() => setIsNotebookOpen(true)}
         onOpenHelp={() => setIsHelpOpen(true)}
         onOpenWalkthrough={() => setIsWalkthroughOpen(true)}
+        onOpen3DGallery={handleOpen3DGallery}
         onResetGame={handleResetGame}
         isMuted={isMuted}
         onToggleSound={handleToggleSound}
@@ -223,6 +232,7 @@ export default function App() {
             setInspectedObjects={setInspectedObjects}
             onOpenTicket={() => setIsTicketOpen(true)}
             onOpenHelp={() => setIsHelpOpen(true)}
+            onOpen3DGallery={handleOpen3DGallery}
             sessionIndex={sessionIndex}
           />
         )}
@@ -294,6 +304,12 @@ export default function App() {
             handleStartGame();
           }
         }}
+      />
+
+      <Items3DGalleryModal
+        isOpen={isItems3DOpen}
+        onClose={() => setIsItems3DOpen(false)}
+        initialItemId={selected3DItemId}
       />
     </div>
   );

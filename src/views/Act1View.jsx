@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { ArrowRight, CheckCircle2, AlertCircle, Search, Layers, FileText, Check, X } from 'lucide-react';
+import { ArrowRight, CheckCircle2, AlertCircle, Search, Layers, FileText, Check, X, Box } from 'lucide-react';
 import { soundManager } from '../utils/audio.js';
 import { ACT_1_VARIANTS, shuffleArray } from '../data/gameData.js';
 import MiniGameGuideBanner from '../components/MiniGameGuideBanner.jsx';
+import Item3DViewer from '../components/Item3DViewer.jsx';
 
 export default function Act1View({
   onCompleteAct,
@@ -11,6 +12,7 @@ export default function Act1View({
   inspectedObjects,
   setInspectedObjects,
   onOpenHelp,
+  onOpen3DGallery,
   sessionIndex = 0
 }) {
   const [activeTab, setActiveTab] = useState('explore'); // 'explore' | 'sort'
@@ -209,9 +211,23 @@ export default function Act1View({
 
               <div className="countertop-bar-header">
                 <span className="countertop-label">Peralatan & Bahan di Meja</span>
-                <span className="countertop-badge-status">
-                  {inspectedObjects.length} dari {totalItems} diperiksa
-                </span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span className="countertop-badge-status">
+                    {inspectedObjects.length} dari {totalItems} diperiksa
+                  </span>
+                  {onOpen3DGallery && (
+                    <button
+                      type="button"
+                      className="btn-secondary-action"
+                      style={{ padding: '4px 10px', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '5px' }}
+                      onClick={() => onOpen3DGallery('serai')}
+                      title="Buka Galeri 3D Perkakas & Rempah"
+                    >
+                      <Box size={13} color="var(--color-orange)" />
+                      <span>Galeri 3D</span>
+                    </button>
+                  )}
+                </div>
               </div>
 
               {/* Grid Objek Visual Meja Gerobak */}
@@ -235,6 +251,28 @@ export default function Act1View({
                       aria-label={`${obj.name}${isInspected ? ', sudah diperiksa' : ''}`}
                     >
                       <div className="item-image-wrapper">
+                        {obj.model3d && (
+                          <span
+                            style={{
+                              position: 'absolute',
+                              top: '6px',
+                              right: '6px',
+                              background: 'rgba(18, 18, 24, 0.75)',
+                              backdropFilter: 'blur(3px)',
+                              color: 'var(--color-orange)',
+                              border: '1px solid rgba(255, 170, 68, 0.4)',
+                              borderRadius: '4px',
+                              padding: '1px 5px',
+                              fontSize: '0.62rem',
+                              fontWeight: 800,
+                              letterSpacing: '0.5px',
+                              zIndex: 2,
+                              pointerEvents: 'none'
+                            }}
+                          >
+                            3D
+                          </span>
+                        )}
                         <img
                           src={obj.image}
                           alt={obj.name}
@@ -250,7 +288,7 @@ export default function Act1View({
                 })}
               </div>
 
-              {/* Drawer Inspeksi Benda Aktif (Ringkas, Tanpa Teks Kuliah Panjang) */}
+              {/* Drawer Inspeksi Benda Aktif (Ringkas & Dilengkapi Model 3D) */}
               {selectedObject && (
                 <div className="inspect-drawer">
                   <div className="inspect-header">
@@ -258,21 +296,46 @@ export default function Act1View({
                       <img
                         src={selectedObject.image}
                         alt=""
-                        style={{ width: '42px', height: '42px', objectFit: 'contain' }}
+                        style={{ width: '40px', height: '40px', objectFit: 'contain' }}
                       />
                       <div>
                         <span className="inspect-category">{selectedObject.tag}</span>
                         <h3 className="inspect-title">{selectedObject.name}</h3>
                       </div>
                     </div>
-                    <button
-                      className="btn-secondary-action"
-                      style={{ padding: '6px 14px', fontSize: '0.8rem' }}
-                      onClick={() => setSelectedObject(null)}
-                    >
-                      Tutup
-                    </button>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      {selectedObject.model3d && onOpen3DGallery && (
+                        <button
+                          type="button"
+                          className="btn-secondary-action"
+                          style={{ padding: '6px 12px', fontSize: '0.78rem', display: 'flex', alignItems: 'center', gap: '5px' }}
+                          onClick={() => onOpen3DGallery(selectedObject.id)}
+                        >
+                          <Box size={13} color="var(--color-orange)" />
+                          <span>Perbesar 3D</span>
+                        </button>
+                      )}
+                      <button
+                        className="btn-secondary-action"
+                        style={{ padding: '6px 14px', fontSize: '0.8rem' }}
+                        onClick={() => setSelectedObject(null)}
+                      >
+                        Tutup
+                      </button>
+                    </div>
                   </div>
+
+                  {/* 3D Model Interaktif jika tersedia */}
+                  {selectedObject.model3d && (
+                    <div style={{ marginTop: '10px', marginBottom: '10px' }}>
+                      <Item3DViewer
+                        modelPath={selectedObject.model3d}
+                        itemName={selectedObject.name}
+                        fallbackImage={selectedObject.image}
+                        height={200}
+                      />
+                    </div>
+                  )}
 
                   <p className="inspect-clue-highlight">
                     <strong>Fungsi:</strong> {selectedObject.clue}
