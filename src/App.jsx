@@ -208,15 +208,9 @@ export default function App() {
         {currentStep === 'intro' && (
           <OpeningView
             onStartGame={handleStartGame}
-            gameMode={gameMode}
-            setGameMode={setGameMode}
             onOpenWalkthrough={() => setIsWalkthroughOpen(true)}
             onOpenHelp={() => setIsHelpOpen(true)}
             sessionIndex={sessionIndex}
-            isMuted={isMuted}
-            onToggleSound={handleToggleSound}
-            volumeLevel={volumeLevel}
-            onChangeVolume={handleVolumeChange}
           />
         )}
 
@@ -236,7 +230,6 @@ export default function App() {
         {currentStep === 'act2' && (
           <Act2View
             onCompleteAct={handleCompleteAct2}
-            gameMode={gameMode}
             onOpenHelp={() => setIsHelpOpen(true)}
             sessionIndex={sessionIndex}
           />

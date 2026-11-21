@@ -1,74 +1,39 @@
-import React, { useState } from 'react';
-import { Lightbulb, HelpCircle, ChevronDown, ChevronUp } from 'lucide-react';
+import React from 'react';
+import { HelpCircle, Sparkles } from 'lucide-react';
 import { soundManager } from '../utils/audio.js';
 
-// Panduan Ringkas & Fungsional (Sedikit teks, fokus pada tindakan)
 export default function MiniGameGuideBanner({
-  title,
-  tag,
-  steps = [],
-  onOpenHelp,
-  tip
+  instruction,
+  hint,
+  tag = "PANDUAN",
+  onOpenHelp
 }) {
-  const [expanded, setExpanded] = useState(false);
-
   return (
-    <div className="cue-bar">
-      <div className="cue-bar-main">
-        {tag && <span className="cue-tag">{tag}</span>}
-        <span className="cue-title">{title}</span>
-        {steps.length > 0 && !expanded && (
-          <span className="cue-short-hint">— {steps[0]}</span>
-        )}
-      </div>
-
-      <div className="cue-bar-actions">
-        {(steps.length > 1 || tip) && (
-          <button
-            className="cue-toggle-btn"
-            onClick={() => {
-              soundManager.playClickSound();
-              setExpanded(v => !v);
-            }}
-            aria-expanded={expanded}
-          >
-            <span>{expanded ? 'Ringkas' : 'Detail Langkah'}</span>
-            {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-          </button>
-        )}
-
-        {onOpenHelp && (
-          <button
-            className="cue-help-btn"
-            onClick={() => {
-              soundManager.playClickSound();
-              onOpenHelp();
-            }}
-            title="Buka Petunjuk Bertahap"
-          >
-            <HelpCircle size={15} />
-            <span>Bantuan</span>
-          </button>
-        )}
-      </div>
-
-      {expanded && (
-        <div className="cue-expanded-panel">
-          <div className="cue-steps-row">
-            {steps.map((step, i) => (
-              <div key={i} className="cue-step-chip">
-                <span className="cue-step-num">{i + 1}</span>
-                <span>{step}</span>
-              </div>
-            ))}
-          </div>
-          {tip && (
-            <div className="cue-tip-inline">
-              <Lightbulb size={14} />
-              <span>{tip}</span>
-            </div>
-          )}
+    <div className="prominent-guide-banner" role="region" aria-label="Panduan Utama Permainan">
+      <div className="guide-banner-content">
+        <div className="guide-tag-row">
+          <span className="guide-pill-badge">
+            <Sparkles size={13} />
+            <span>{tag}</span>
+          </span>
+          {hint && <span className="guide-sub-hint">{hint}</span>}
         </div>
+
+        <h3 className="guide-main-instruction">{instruction}</h3>
+      </div>
+
+      {onOpenHelp && (
+        <button
+          className="guide-help-action-btn"
+          onClick={() => {
+            soundManager.playClickSound();
+            onOpenHelp();
+          }}
+          title="Buka Bantuan & Petunjuk Bertahap"
+        >
+          <HelpCircle size={16} />
+          <span>Bantuan</span>
+        </button>
       )}
     </div>
   );

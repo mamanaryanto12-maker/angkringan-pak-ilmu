@@ -107,12 +107,9 @@ export default function EpilogueView({ onCompleteEpilogue, onOpenHelp, sessionIn
         {/* Panduan Singkat Epilog */}
         <div style={{ maxWidth: '780px', width: '100%', margin: '0 auto 12px auto' }}>
           <MiniGameGuideBanner
-            tag="Epilog"
-            title="Susun kata-kata di bawah menjadi kalimat hikmah lalu masukkan ke Toples Kawruh."
-            steps={[
-              "Ketuk kata berurutan untuk menyusun kalimat hikmah.",
-              "Ketuk ulang kata di bawah bila ingin membatalkannya."
-            ]}
+            tag="EPILOG"
+            instruction="Susun kepingan kata menjadi satu kalimat hikmah, lalu simpan ke Toples Kawruh."
+            hint="Ketuk kata-kata di bawah secara berurutan untuk menyusun pesan."
             onOpenHelp={onOpenHelp}
           />
         </div>

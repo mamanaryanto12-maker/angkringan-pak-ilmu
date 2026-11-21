@@ -107,32 +107,30 @@ export default function Act3View({ onCompleteAct, onOpenHelp, sessionIndex = 0 }
         </div>
       </div>
 
-      {/* Panduan 1 Baris Ringkas Sesuai Fase */}
+      {/* Panduan Utama yang Jelas Sesuai Tahapan */}
       {currentPhase === 1 && (
         <MiniGameGuideBanner
-          tag="Tahap 1"
-          title={`Pahami kondisi ${currentPersona.name} lalu pilih tindakan yang tepat.`}
-          steps={["Baca cerita pengunjung di kiri.", "Pilih pendekatan di kanan."]}
-          tip={currentPersona.clue}
+          tag="TAHAP 1"
+          instruction={`Pahami keluhan ${currentPersona.name} lalu pilih solusi yang tepat.`}
+          hint="Amati ekspresi dan cerita pengunjung di panel kiri."
           onOpenHelp={onOpenHelp}
         />
       )}
 
       {currentPhase === 2 && (
         <MiniGameGuideBanner
-          tag="Tahap 2"
-          title={`Racik minuman bebas untuk ${currentPersona.name} (boleh 2 atau lebih bahan).`}
-          steps={["Pilih kombinasi rempah dari toples & suhu penyajian.", "Cermati evaluasi kesesuaian sebelum menyeduh."]}
-          tip="Tidak ada satu kunci mutlak — pilih sesuai konteks tamu."
+          tag="TAHAP 2"
+          instruction={`Takar rempah dan tentukan suhu penyajian untuk ${currentPersona.name}.`}
+          hint="Pilih bahan rempah pada toples di bawah ini."
           onOpenHelp={onOpenHelp}
         />
       )}
 
       {currentPhase === 3 && (
         <MiniGameGuideBanner
-          tag="Tahap 3"
-          title={`Pilih tutur kata sapaan saat menyerahkan wedang kepada ${currentPersona.name}.`}
-          steps={["Pilih tutur kata di kanan lalu tekan Sajikan Wedang."]}
+          tag="TAHAP 3"
+          instruction={`Pilih tutur kata empati yang menyejukkan hati saat menyajikan wedang.`}
+          hint="Tutur kata yang tulus menyempurnakan kehangatan racikan."
           onOpenHelp={onOpenHelp}
         />
       )}

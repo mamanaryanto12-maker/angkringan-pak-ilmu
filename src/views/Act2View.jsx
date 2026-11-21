@@ -224,13 +224,9 @@ export default function Act2View({ onCompleteAct, onOpenHelp, sessionIndex = 0 }
       {subTab === 'puzzle' && (
         <div>
           <MiniGameGuideBanner
-            tag="Tantangan 1"
-            title="Susun 4 potongan resep menjadi struktur Pembuka, Isi, dan Penutup."
-            steps={[
-              "Pilih kepingan teks di panel kiri.",
-              "Klik slot tujuan di bingkai kanan sesuai kelanjutan alur kalimat."
-            ]}
-            tip="Perhatikan letak tanda titik-titik (...) untuk melihat sambungan kalimat."
+            tag="TANTANGAN 1"
+            instruction="Susun 4 kepingan naskah resep wedang jahe sesuai urutannya."
+            hint="Pilih kepingan di panel kiri, lalu pasang pada bingkai naskah di kanan."
             onOpenHelp={onOpenHelp}
           />
 
@@ -401,12 +397,9 @@ export default function Act2View({ onCompleteAct, onOpenHelp, sessionIndex = 0 }
       {subTab === 'sequence' && (
         <div style={{ maxWidth: '860px', margin: '0 auto', width: '100%' }}>
           <MiniGameGuideBanner
-            tag="Tantangan 2"
-            title="Urutkan 4 tahapan meracik wedang dari awal menyapa hingga menyajikan."
-            steps={[
-              "Gunakan tombol panah atas atau bawah untuk menukar posisi kartu."
-            ]}
-            tip="Selalu dengarkan tamu dahulu sebelum menyiapkan bahan."
+            tag="TANTANGAN 2"
+            instruction="Urutkan 4 langkah meracik wedang dari awal hingga siap disajikan."
+            hint="Gunakan tombol panah naik atau turun pada setiap kartu langkah."
             onOpenHelp={onOpenHelp}
           />
 
@@ -488,12 +481,9 @@ export default function Act2View({ onCompleteAct, onOpenHelp, sessionIndex = 0 }
       {subTab === 'matching' && (
         <div>
           <MiniGameGuideBanner
-            tag="Tantangan 3"
-            title="Pasangkan kondisi pengunjung di kiri dengan bahan rempah yang cocok di kanan."
-            steps={[
-              "Pilih kartu kondisi di kiri, lalu pilih rempah pasangannya di kanan."
-            ]}
-            tip="Jahe memberi hangat pedas, Serai wangi menenangkan, Gula Aren memulihkan manis tenaga."
+            tag="TANTANGAN 3"
+            instruction="Cocokkan kondisi raga pengunjung dengan khasiat rempah yang tepat."
+            hint="Pilih kondisi di sisi kiri, lalu pilih rempah penawarnya di sisi kanan."
             onOpenHelp={onOpenHelp}
           />
 

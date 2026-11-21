@@ -2,16 +2,14 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { RotateCw, Compass } from 'lucide-react';
 
 export default function Angkringan3DViewer({ modelPath = '/assets/models/angkringan.glb' }) {
   const mountRef = useRef(null);
   const [loading, setLoading] = useState(true);
-  const [hasInteracted, setHasInteracted] = useState(false);
-  const [isRotating, setIsRotating] = useState(true);
   const controlsRef = useRef(null);
   const sceneRef = useRef(null);
   const cameraRef = useRef(null);
+  const resumeTimerRef = useRef(null);
   const defaultCamPos = useRef(new THREE.Vector3(2.6, 1.8, 3.2));
   const defaultTarget = useRef(new THREE.Vector3(0, 0.95, 0));
 
@@ -25,7 +23,7 @@ export default function Angkringan3DViewer({ modelPath = '/assets/models/angkrin
 
     // 2. Camera Setup
     const width = container.clientWidth || 640;
-    const height = container.clientHeight || 380;
+    const height = container.clientHeight || 340;
     const camera = new THREE.PerspectiveCamera(38, width / height, 0.1, 50);
     camera.position.copy(defaultCamPos.current);
     cameraRef.current = camera;
@@ -42,16 +40,15 @@ export default function Angkringan3DViewer({ modelPath = '/assets/models/angkrin
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.15;
+    renderer.toneMappingExposure = 1.18;
     container.appendChild(renderer.domElement);
 
-    // 4. Lighting Setup (Atmosphere Malam Angkringan yang Hangat & Alami)
-    // Warm Ambient Light
-    const ambientLight = new THREE.AmbientLight(0xfff5ea, 1.1);
+    // 4. Atmospheric Warm Lighting (Nuansa Angkringan Elegan & Hidup)
+    const ambientLight = new THREE.AmbientLight(0xfff7ed, 1.15);
     scene.add(ambientLight);
 
-    // Key Light - Cahaya Utama Hangat (Matahari petang / lampu jalan)
-    const keyLight = new THREE.DirectionalLight(0xfff0db, 1.8);
+    // Key Light - Cahaya Hangat
+    const keyLight = new THREE.DirectionalLight(0xfff0db, 1.85);
     keyLight.position.set(3.5, 4.2, 3.0);
     keyLight.castShadow = true;
     keyLight.shadow.mapSize.width = 1024;
@@ -62,22 +59,22 @@ export default function Angkringan3DViewer({ modelPath = '/assets/models/angkrin
     scene.add(keyLight);
 
     // Fill Light - Teal khas Palet Gredupedia dari sudut belakang
-    const fillLight = new THREE.DirectionalLight(0x358c88, 0.9);
+    const fillLight = new THREE.DirectionalLight(0x358c88, 0.95);
     fillLight.position.set(-3.2, 2.8, -2.5);
     scene.add(fillLight);
 
-    // Point Light - Cahaya Lentera Sentir / Anglo (Pusat kehangatan gerobak)
-    const lanternLight = new THREE.PointLight(0xffa238, 2.2, 6.0, 1.2);
+    // Point Light - Lentera Sentir di bawah atap
+    const lanternLight = new THREE.PointLight(0xffa238, 2.3, 6.0, 1.2);
     lanternLight.position.set(0.0, 1.6, 0.1);
     scene.add(lanternLight);
 
     // Anglo Light - Bara arang kompor
-    const angloLight = new THREE.PointLight(0xff5511, 1.8, 3.5, 1.5);
+    const angloLight = new THREE.PointLight(0xff5511, 1.9, 3.5, 1.5);
     angloLight.position.set(0.68, 1.0, 0.0);
     scene.add(angloLight);
 
-    // Ground Shadow Receiver (Lingkaran bayangan lembut di bawah gerobak)
-    const shadowGeo = new THREE.PlaneGeometry(3.6, 2.4);
+    // Ground Shadow Receiver (Bayangan lembut menapak tanah)
+    const shadowGeo = new THREE.PlaneGeometry(3.8, 2.6);
     const shadowMat = new THREE.ShadowMaterial({ opacity: 0.28 });
     const shadowMesh = new THREE.Mesh(shadowGeo, shadowMat);
     shadowMesh.rotation.x = -Math.PI / 2;
@@ -85,27 +82,42 @@ export default function Angkringan3DViewer({ modelPath = '/assets/models/angkrin
     shadowMesh.receiveShadow = true;
     scene.add(shadowMesh);
 
-    // 5. OrbitControls (Interaksi Putar Halus)
+    // 5. OrbitControls (Animasi Putar Otomatis 360° & Sentuhan Responsif)
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.06;
     controls.autoRotate = true;
-    controls.autoRotateSpeed = 0.75;
+    controls.autoRotateSpeed = 0.95; // Kecepatan rotasi natural & halus
     controls.enablePan = false;
     controls.enableZoom = true;
-    controls.minDistance = 2.2;
-    controls.maxDistance = 5.2;
-    controls.minPolarAngle = Math.PI / 6; // 30 deg
+    controls.minDistance = 2.4;
+    controls.maxDistance = 4.6;
+    controls.minPolarAngle = Math.PI / 5; // ~36 deg (tampak atas wajar)
     controls.maxPolarAngle = Math.PI / 2 + 0.02; // Tidak tembus bawah tanah
     controls.target.copy(defaultTarget.current);
     controlsRef.current = controls;
 
-    const onUserInteractionStart = () => {
-      setHasInteracted(true);
+    // Saat pengunjung menyentuh/menggeser: hentikan putaran otomatis seketika
+    const handleInteractionStart = () => {
+      if (resumeTimerRef.current) {
+        clearTimeout(resumeTimerRef.current);
+        resumeTimerRef.current = null;
+      }
+      controls.autoRotate = false;
     };
-    controls.addEventListener('start', onUserInteractionStart);
 
-    // 6. Load 3D GLB Model
+    // Setelah interaksi selesai: jalankan kembali rotasi otomatis secara halus
+    const handleInteractionEnd = () => {
+      if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+      resumeTimerRef.current = setTimeout(() => {
+        controls.autoRotate = true;
+      }, 1600);
+    };
+
+    controls.addEventListener('start', handleInteractionStart);
+    controls.addEventListener('end', handleInteractionEnd);
+
+    // 6. Load Model GLB
     let modelRoot = null;
     const loader = new GLTFLoader();
     loader.load(
@@ -113,24 +125,20 @@ export default function Angkringan3DViewer({ modelPath = '/assets/models/angkrin
       (gltf) => {
         modelRoot = gltf.scene;
 
-        // Optimasi bayangan dan material dua sisi untuk terpal
         modelRoot.traverse((child) => {
           if (child.isMesh) {
             child.castShadow = true;
             child.receiveShadow = true;
-
             if (child.material) {
-              child.material.side = THREE.DoubleSide; // Terpal tampak dari luar dan dalam
+              child.material.side = THREE.DoubleSide;
               child.material.needsUpdate = true;
             }
           }
         });
 
-        // Hitung bounding box agar model berada tepat di atas tanah
+        // Posisikan alas gerobak tepat di atas tanah
         const box = new THREE.Box3().setFromObject(modelRoot);
         const center = box.getCenter(new THREE.Vector3());
-        
-        // Posisikan alas gerobak tepat di Y=0
         modelRoot.position.x = -center.x;
         modelRoot.position.z = -center.z;
         modelRoot.position.y = -box.min.y;
@@ -145,29 +153,29 @@ export default function Angkringan3DViewer({ modelPath = '/assets/models/angkrin
       }
     );
 
-    // 7. Animation Loop (Breathing Animation & Subtle Hover)
+    // 7. Animation Loop
     let animationFrameId;
-    let clock = new THREE.Clock();
+    const clock = new THREE.Clock();
 
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
       const elapsedTime = clock.getElapsedTime();
 
-      // Subtle breathing floating effect
+      // Gerakan mengambang / bernapas mikro yang sangat halus
       if (modelRoot) {
-        modelRoot.position.y = Math.sin(elapsedTime * 1.2) * 0.012;
+        modelRoot.position.y = Math.sin(elapsedTime * 1.2) * 0.01;
       }
 
-      // Dynamic flickering of lantern & anglo lights
-      lanternLight.intensity = 2.0 + Math.sin(elapsedTime * 4.5) * 0.18 + Math.cos(elapsedTime * 7.2) * 0.12;
-      angloLight.intensity = 1.6 + Math.cos(elapsedTime * 5.0) * 0.22;
+      // Kedipan hangat api lentera & bara arang
+      lanternLight.intensity = 2.1 + Math.sin(elapsedTime * 4.5) * 0.18 + Math.cos(elapsedTime * 7.2) * 0.12;
+      angloLight.intensity = 1.7 + Math.cos(elapsedTime * 5.0) * 0.20;
 
       controls.update();
       renderer.render(scene, camera);
     };
     animate();
 
-    // 8. Responsive Resize Observer
+    // 8. Responsive Resize
     const handleResize = () => {
       if (!container || !renderer || !camera) return;
       const newWidth = container.clientWidth;
@@ -184,7 +192,9 @@ export default function Angkringan3DViewer({ modelPath = '/assets/models/angkrin
     // 9. Cleanup
     return () => {
       cancelAnimationFrame(animationFrameId);
-      controls.removeEventListener('start', onUserInteractionStart);
+      if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+      controls.removeEventListener('start', handleInteractionStart);
+      controls.removeEventListener('end', handleInteractionEnd);
       resizeObserver.disconnect();
       window.removeEventListener('resize', handleResize);
 
@@ -197,65 +207,14 @@ export default function Angkringan3DViewer({ modelPath = '/assets/models/angkrin
     };
   }, [modelPath]);
 
-  // Handler: Reset Camera View
-  const handleResetCamera = (e) => {
-    e.stopPropagation();
-    if (controlsRef.current && cameraRef.current) {
-      cameraRef.current.position.copy(defaultCamPos.current);
-      controlsRef.current.target.copy(defaultTarget.current);
-      controlsRef.current.update();
-    }
-  };
-
-  // Handler: Toggle Auto Rotate
-  const handleToggleRotate = (e) => {
-    e.stopPropagation();
-    if (controlsRef.current) {
-      const nextState = !controlsRef.current.autoRotate;
-      controlsRef.current.autoRotate = nextState;
-      setIsRotating(nextState);
-    }
-  };
-
   return (
     <div className="angkringan-3d-stage">
-      {/* 3D Canvas Mount Point */}
       <div ref={mountRef} className="angkringan-3d-canvas-wrap" />
 
-      {/* Loading Overlay */}
       {loading && (
         <div className="angkringan-3d-loading">
           <div className="angkringan-loading-spinner" />
-          <p>Memuat Model Gerobak 3D...</p>
-        </div>
-      )}
-
-      {/* Floating Interactive Badge (Petunjuk Putar 360) */}
-      {!loading && (
-        <div className="angkringan-3d-overlay-ui">
-          <div className={`interaction-hint-pill ${hasInteracted ? 'subtle' : ''}`}>
-            <Compass size={14} className="pulse-icon" />
-            <span>Sentuh & Geser untuk Memutar Gerobak 360°</span>
-          </div>
-
-          <div className="model-view-controls">
-            <button
-              className={`view-btn ${isRotating ? 'active' : ''}`}
-              onClick={handleToggleRotate}
-              title={isRotating ? 'Jeda Putaran Otomatis' : 'Aktifkan Putaran Otomatis'}
-            >
-              <RotateCw size={14} />
-              <span>{isRotating ? 'Auto Putar' : 'Jeda'}</span>
-            </button>
-            <button
-              className="view-btn"
-              onClick={handleResetCamera}
-              title="Kembalikan Sudut Pandang Awal"
-            >
-              <Compass size={14} />
-              <span>Sudut Depan</span>
-            </button>
-          </div>
+          <p>Menyiapkan Gerobak 3D...</p>
         </div>
       )}
     </div>

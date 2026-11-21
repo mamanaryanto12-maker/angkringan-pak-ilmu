@@ -1,6 +1,6 @@
 import React from 'react';
 
-// Latar Belakang Pameran Berbasis Aset Asli Gredupedia (Tanpa Lapisan Opacity Kusam)
+// Latar Belakang Pameran Bergaya Nomaya: Colorful, Elegan, Memiliki Kedalaman & Hidup
 export default function ExhibitionBackdrop({ currentStep = 'intro' }) {
   const isNight = currentStep === 'act3';
   const isOpening = currentStep === 'intro';
@@ -8,30 +8,50 @@ export default function ExhibitionBackdrop({ currentStep = 'intro' }) {
   const isAct2 = currentStep === 'act2';
 
   return (
-    <div className={`exhibition-backdrop ${isNight ? 'mode-night' : 'mode-day'}`} aria-hidden="true">
-      {/* Lapisan 1: Langit Pameran Asli */}
+    <div
+      className={`exhibition-backdrop ${isNight ? 'mode-night' : 'mode-day'} step-${currentStep}`}
+      aria-hidden="true"
+    >
+      {/* Lapisan 1: Langit Dasar Pameran Asli */}
       <img
         src="/assets/exhibition/langit.jpg"
         alt=""
         className="backdrop-sky"
       />
 
-      {/* Nuansa Malam Hujan Khusus Babak 3 agar Suasana Malioboro Terasa Nyata */}
-      {isNight && <div className="backdrop-night-wash" />}
+      {/* Lapisan 2: Atmospheric Color Mesh (Pendekatan Nomaya: Kaya Warna, Gradasi Lembut, Hidup) */}
+      <div className="backdrop-aurora-mesh">
+        <div className="aurora-glow glow-amber" />
+        <div className="aurora-glow glow-teal" />
+        <div className="aurora-glow glow-coral" />
+        <div className="aurora-glow glow-violet" />
+      </div>
 
-      {/* Lapisan 2: Matahari & Awan (Pembuka, Epilog, Refleksi, Babak 1 & 2) */}
+      {/* Nuansa Malam Hujan Khusus Babak 3 (Atmosfer Malioboro Hangat & Dramatis) */}
+      {isNight && (
+        <div className="backdrop-night-wash">
+          <div className="night-lantern-halo" />
+        </div>
+      )}
+
+      {/* Lapisan 3: Matahari & Awan (Untuk Babak Siang & Sore) */}
       {!isNight && (
         <>
-          <img
-            src="/assets/exhibition/matahari.png"
-            alt=""
-            className={`backdrop-sun ${isOpening ? 'sun-intro' : 'sun-subtle'}`}
-          />
+          <div className={`sun-wrapper ${isOpening ? 'sun-intro' : 'sun-subtle'}`}>
+            <div className="sun-radiance-aura" />
+            <img
+              src="/assets/exhibition/matahari.png"
+              alt=""
+              className="backdrop-sun"
+            />
+          </div>
+
           <img
             src="/assets/exhibition/awan_baris.png"
             alt=""
             className="backdrop-clouds-row"
           />
+
           {isOpening && (
             <img
               src="/assets/exhibition/awan.png"
@@ -42,7 +62,7 @@ export default function ExhibitionBackdrop({ currentStep = 'intro' }) {
         </>
       )}
 
-      {/* Lapisan 3: Bingkai Naskah Proposal (Babak 2 & Summary) */}
+      {/* Lapisan 4: Bingkai Naskah Proposal (Babak 2 & Summary) */}
       {(isAct2 || isSummary) && (
         <img
           src="/assets/exhibition/bingkai_atas.png"
@@ -51,7 +71,7 @@ export default function ExhibitionBackdrop({ currentStep = 'intro' }) {
         />
       )}
 
-      {/* Lapisan 4: Kontur Bukit & Tanah Bumi Asli di Cakrawala Bawah */}
+      {/* Lapisan 5: Kontur Bukit & Tanah Bumi Asli di Cakrawala Bawah */}
       <img
         src="/assets/exhibition/bukit_kiri.png"
         alt=""
@@ -68,7 +88,7 @@ export default function ExhibitionBackdrop({ currentStep = 'intro' }) {
         className="backdrop-earth"
       />
 
-      {/* Lapisan 5: Ornamen Nusantara Tepi Layar */}
+      {/* Lapisan 6: Ornamen Nusantara Tepi Layar */}
       {(isOpening || isSummary) && (
         <>
           <img

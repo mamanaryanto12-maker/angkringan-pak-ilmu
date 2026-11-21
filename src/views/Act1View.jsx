@@ -21,12 +21,10 @@ export default function Act1View({
     return ACT_1_VARIANTS[sessionIndex % ACT_1_VARIANTS.length];
   }, [sessionIndex]);
 
-  // Acak tampilan meja gerobak sambil tetap menjaga ID unik & catatan asli tiap objek
   const randomizedTableObjects = useMemo(() => {
     return shuffleArray(activeVariant.objects);
   }, [activeVariant]);
 
-  // Sumber daftar sortir 100% sama dengan objek yang ada di Meja Gerobak (Bagian 1)
   const initialSortItems = useMemo(() => {
     return shuffleArray(activeVariant.objects);
   }, [activeVariant]);
@@ -36,8 +34,6 @@ export default function Act1View({
   const [alatBasket, setAlatBasket] = useState([]);
   const [sortFeedback, setSortFeedback] = useState(null);
   const [draggedItem, setDraggedItem] = useState(null);
-
-  // Sistem 2 kesempatan per item & pencatatan total kesalahan evaluasi
   const [wrongAttempts, setWrongAttempts] = useState({});
   const [totalMistakes, setTotalMistakes] = useState(0);
 
@@ -60,7 +56,6 @@ export default function Act1View({
       setInspectedObjects(prev => [...prev, obj]);
     }
 
-    // Validasi catatan tersembunyi menggunakan ID objek & ID note unik
     if (obj.hasHiddenNote && obj.noteId) {
       if (!collectedNotes.some(n => n.id === obj.noteId)) {
         const matchedNote = activeVariant.hiddenNotes.find(
@@ -88,14 +83,11 @@ export default function Act1View({
     setDraggedItem(null);
   };
 
-  // Validasi jawaban berdasarkan kategori objek dari ID sumber inventaris tunggal
   const placeItem = (item, targetCategory) => {
     const isCorrect = item.category === targetCategory;
     const currentAttempts = wrongAttempts[item.id] || 0;
     const targetName = targetCategory === 'bahan' ? 'Wadah Rempah' : 'Rak Peralatan';
     const correctReceptacle = item.category === 'bahan' ? 'Wadah Rempah' : 'Rak Peralatan';
-    const correctCategoryLabel = item.category === 'bahan' ? 'Bahan Rempah' : 'Peralatan';
-    const cleanHint = (item.hint || '').replace(/\.+$/, '');
 
     if (isCorrect) {
       soundManager.playPlaceSuccess();
@@ -113,7 +105,6 @@ export default function Act1View({
       return;
     }
 
-    // Jawaban salah: catat kesalahan, beri 1 kesempatan mencoba kembali
     soundManager.playGentleWrong();
     const newAttempts = currentAttempts + 1;
     setWrongAttempts(prev => ({ ...prev, [item.id]: newAttempts }));
@@ -122,13 +113,12 @@ export default function Act1View({
     if (newAttempts === 1) {
       setSortFeedback({
         type: 'warning',
-        message: `Belum tepat. ${item.name} — perhatikan cirinya: ${cleanHint}. Coba sekali lagi!`
+        message: `Belum tepat. ${item.name} bukan untuk ${targetName}. Coba lagi!`
       });
     } else {
-      // Percobaan ke-2 salah: jelaskan jawaban tepat lalu bantu lanjutkan permainan
       setSortFeedback({
         type: 'error',
-        message: `${item.name} termasuk kategori ${correctCategoryLabel} (${cleanHint}), sehingga diletakkan di ${correctReceptacle}. Sudah dibantu ditempatkan agar bisa lanjut.`
+        message: `${item.name} ditempatkan ke ${correctReceptacle}.`
       });
 
       setPoolItems(prev => prev.filter(i => i.id !== item.id));
@@ -151,7 +141,7 @@ export default function Act1View({
       {/* Header Ringkas Babak 1 */}
       <div className="act-header-banner">
         <div>
-          <span className="act-zone-kicker">Zona Aku Berkarya • {activeVariant.name}</span>
+          <span className="act-zone-kicker">Zona Aku Berkarya</span>
           <h2 className="act-main-title">Babak 1: Pesanan Pertama</h2>
         </div>
 
@@ -182,48 +172,49 @@ export default function Act1View({
         </div>
       </div>
 
-      {/* BAGIAN 1: EKSPLORASI MEJA GEROBAK */}
+      {/* ============================================================ */}
+      {/* TAHAP 1: EKSPLORASI MEJA GEROBAK                             */}
+      {/* ============================================================ */}
       {activeTab === 'explore' && (
-        <div>
+        <div className="act1-view-wrap">
+          {/* Panduan Utama yang Jelas, Singkat, dan Menonjol */}
           <MiniGameGuideBanner
-            tag="Langkah 1"
-            title="Periksa benda di meja gerobak untuk menemukan 3 sobekan resep."
-            steps={[
-              "Ketuk benda di gerobak memakai mouse atau tombol Tab + Enter / Spasi.",
-              "Temukan 3 sobekan catatan resep lalu lanjut ke tab 2. Penataan."
-            ]}
-            tip="Daftar benda di gerobak inilah yang akan kamu tata di langkah berikutnya."
+            tag="LANGKAH 1"
+            instruction="Pilih dan periksa benda di meja gerobak untuk menemukan 3 sobekan resep."
+            hint="Klik objek yang bersinar untuk membaca petunjuknya."
             onOpenHelp={onOpenHelp}
           />
 
+          {/* Notifikasi Temuan Sobekan Resep */}
           {lastDiscoveredNote && (
             <div className="discovery-toast-card">
               <div className="discovery-toast-text">
-                <h5>Sobekan Resep #{lastDiscoveredNote.num} Ditemukan ({lastDiscoveredNote.foundAt})</h5>
+                <h5>Sobekan Resep Bagian #{lastDiscoveredNote.num} Ditemukan!</h5>
                 <p>“{lastDiscoveredNote.text}”</p>
               </div>
-              <button className="toast-close-mini" onClick={() => setLastDiscoveredNote(null)} aria-label="Tutup pesan">
-                <X size={14} />
+              <button
+                className="toast-close-mini"
+                onClick={() => setLastDiscoveredNote(null)}
+                aria-label="Tutup notifikasi"
+              >
+                <X size={15} />
               </button>
             </div>
           )}
 
           <div className="angkringan-board">
-            {/* Panggung Meja Gerobak Kayu */}
+            {/* Panggung Meja Gerobak */}
             <div className="countertop-view">
               <div className="countertop-awning" />
 
               <div className="countertop-bar-header">
-                <span className="countertop-label">Meja Gerobak Pak Ilmu</span>
-                <div className="kbd-hint-group" aria-label="Pintasan Keyboard">
-                  <span>Navigasi:</span>
-                  <kbd className="kbd-key">Tab</kbd>
-                  <kbd className="kbd-key">Enter</kbd>
-                  <span>/</span>
-                  <kbd className="kbd-key">Spasi</kbd>
-                </div>
+                <span className="countertop-label">Peralatan & Bahan di Meja</span>
+                <span className="countertop-badge-status">
+                  {inspectedObjects.length} dari {totalItems} diperiksa
+                </span>
               </div>
 
+              {/* Grid Objek Visual Meja Gerobak */}
               <div className="counter-grid-objects grid-4x2">
                 {randomizedTableObjects.map((obj) => {
                   const isInspected = inspectedObjects.some(o => o.id === obj.id);
@@ -259,12 +250,16 @@ export default function Act1View({
                 })}
               </div>
 
-              {/* Panel Inspeksi Benda Aktif */}
+              {/* Drawer Inspeksi Benda Aktif (Ringkas, Tanpa Teks Kuliah Panjang) */}
               {selectedObject && (
                 <div className="inspect-drawer">
                   <div className="inspect-header">
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      <img src={selectedObject.image} alt="" style={{ width: '40px', height: '40px', objectFit: 'contain' }} />
+                      <img
+                        src={selectedObject.image}
+                        alt=""
+                        style={{ width: '42px', height: '42px', objectFit: 'contain' }}
+                      />
                       <div>
                         <span className="inspect-category">{selectedObject.tag}</span>
                         <h3 className="inspect-title">{selectedObject.name}</h3>
@@ -272,22 +267,21 @@ export default function Act1View({
                     </div>
                     <button
                       className="btn-secondary-action"
-                      style={{ padding: '6px 12px', fontSize: '0.78rem' }}
+                      style={{ padding: '6px 14px', fontSize: '0.8rem' }}
                       onClick={() => setSelectedObject(null)}
                     >
                       Tutup
                     </button>
                   </div>
 
-                  <p className="inspect-body">{selectedObject.desc}</p>
-                  <p className="inspect-clue-inline">
+                  <p className="inspect-clue-highlight">
                     <strong>Fungsi:</strong> {selectedObject.clue}
                   </p>
                 </div>
               )}
             </div>
 
-            {/* Panel Kanan: Sobekan Resep Terkumpul */}
+            {/* Panel Sobekan Resep Terkumpul */}
             <aside className="notes-tracker-panel">
               <div className="notes-panel-head">
                 <FileText size={18} color="var(--color-orange)" />
@@ -303,11 +297,11 @@ export default function Act1View({
                       <div className="note-snippet-header">
                         <span className="note-num-label">Bagian #{num}</span>
                         <span className={`note-status-pill ${note ? 'done' : 'pending'}`}>
-                          {note ? note.foundAt : 'Belum Ditemukan'}
+                          {note ? 'Ditemukan' : 'Mencari...'}
                         </span>
                       </div>
                       <p className="note-snippet-text">
-                        {note ? `“${note.text}”` : 'Periksa benda di gerobak...'}
+                        {note ? `“${note.text}”` : 'Periksa benda gerobak...'}
                       </p>
                     </div>
                   );
@@ -316,15 +310,21 @@ export default function Act1View({
 
               {isExploreComplete && (
                 <button
-                  className="btn-primary-action"
-                  style={{ width: '100%', marginTop: '14px', justifyContent: 'center', padding: '11px 16px', fontSize: '0.88rem' }}
+                  className="btn-primary-action pulse-ready"
+                  style={{
+                    width: '100%',
+                    marginTop: '14px',
+                    justifyContent: 'center',
+                    padding: '12px 18px',
+                    fontSize: '0.92rem'
+                  }}
                   onClick={() => {
                     soundManager.playClickSound();
                     setActiveTab('sort');
                   }}
                 >
                   <span>Lanjut ke Penataan</span>
-                  <ArrowRight size={16} />
+                  <ArrowRight size={17} />
                 </button>
               )}
             </aside>
@@ -332,17 +332,16 @@ export default function Act1View({
         </div>
       )}
 
-      {/* BAGIAN 2: PENATAAN BAHAN REMPAH & RAK PERALATAN */}
+      {/* ============================================================ */}
+      {/* TAHAP 2: PENATAAN BAHAN REMPAH & RAK PERALATAN               */}
+      {/* ============================================================ */}
       {activeTab === 'sort' && (
-        <div>
+        <div className="act1-view-wrap">
+          {/* Panduan Utama Penataan */}
           <MiniGameGuideBanner
-            tag="Langkah 2"
-            title="Kelompokkan benda gerobak ke Wadah Rempah atau Rak Peralatan."
-            steps={[
-              "Tarik kartu atau tekan '+ Rempah' / '+ Peralatan' (atau tombol angka 1 / 2).",
-              "Kamu punya 2 kesempatan per benda jika keliru."
-            ]}
-            tip={`Terdaftar ${totalMistakes} kesalahan saat berlatih.`}
+            tag="LANGKAH 2"
+            instruction="Pilah benda ke Wadah Rempah atau Rak Peralatan."
+            hint="Seret kartu ke wadah tujuan atau klik tombol pilihan pada kartu."
             onOpenHelp={onOpenHelp}
           />
 
@@ -353,15 +352,13 @@ export default function Act1View({
             </div>
           )}
 
-          {/* Area Kartu yang Akan Dikelompokkan */}
+          {/* Kolam Kartu yang Harus Dipilah */}
           <div className="sorting-pool-area">
             {poolItems.length === 0 ? (
               <div className="sorting-done-state">
-                <CheckCircle2 size={28} color="var(--color-teal)" />
-                <span>Semua {totalItems} benda sudah tertata di tempatnya!</span>
-                {totalMistakes > 0 && (
-                  <small>Catatan evaluasi: {totalMistakes} percobaan salah telah diperbaiki.</small>
-                )}
+                <CheckCircle2 size={32} color="var(--color-teal)" />
+                <h4>Semua benda telah tertata rapi di tempatnya!</h4>
+                <p>Gerobak siap digunakan untuk meracik pesanan.</p>
               </div>
             ) : (
               <div className="sort-cards-grid">
@@ -375,15 +372,7 @@ export default function Act1View({
                       draggable
                       onDragStart={(e) => handleDragStart(e, item)}
                       tabIndex={0}
-                      onKeyDown={(e) => {
-                        if (e.key === '1' || e.key.toLowerCase() === 'r') placeItem(item, 'bahan');
-                        if (e.key === '2' || e.key.toLowerCase() === 'p') placeItem(item, 'alat');
-                      }}
                     >
-                      {attempts === 1 && (
-                        <span className="retry-chance-tag">Kesempatan 2</span>
-                      )}
-
                       <div className="sort-thumb-box">
                         <img src={item.image} alt={item.name} />
                       </div>
@@ -394,12 +383,14 @@ export default function Act1View({
                         <button
                           className="sort-pick-btn bahan"
                           onClick={() => placeItem(item, 'bahan')}
+                          title="Masukkan ke Wadah Rempah"
                         >
                           + Rempah
                         </button>
                         <button
                           className="sort-pick-btn alat"
                           onClick={() => placeItem(item, 'alat')}
+                          title="Masukkan ke Rak Peralatan"
                         >
                           + Peralatan
                         </button>
@@ -411,7 +402,7 @@ export default function Act1View({
             )}
           </div>
 
-          {/* 2 Area Penempatan: Wadah Rempah & Rak Peralatan */}
+          {/* Dua Dropzone Sasaran */}
           <div className="dropzone-grid">
             <div
               className="dropzone-box zone-bahan"
@@ -424,7 +415,7 @@ export default function Act1View({
               </div>
               <div className="dropzone-items-list">
                 {bahanBasket.length === 0 ? (
-                  <span className="dropzone-placeholder">Letakkan bahan rempah di sini...</span>
+                  <span className="dropzone-placeholder">Tempatkan bahan rempah di sini...</span>
                 ) : (
                   bahanBasket.map((item) => (
                     <div key={item.id} className="sorted-chip">
@@ -448,7 +439,7 @@ export default function Act1View({
               </div>
               <div className="dropzone-items-list">
                 {alatBasket.length === 0 ? (
-                  <span className="dropzone-placeholder">Letakkan peralatan angkringan di sini...</span>
+                  <span className="dropzone-placeholder">Tempatkan peralatan di sini...</span>
                 ) : (
                   alatBasket.map((item) => (
                     <div key={item.id} className="sorted-chip">
@@ -464,11 +455,10 @@ export default function Act1View({
         </div>
       )}
 
-      {/* Footer Aksi */}
+      {/* Footer Navigasi Babak */}
       <div className="action-footer-bar">
         <div className="footer-progress-note">
-          Benda diperiksa: {inspectedObjects.length}/4 • Sobekan resep: {collectedNotes.length}/3 • Penataan: {sortedCount}/{totalItems}
-          {totalMistakes > 0 ? ` • Kesalahan tercatat: ${totalMistakes}` : ''}
+          Sobekan: {collectedNotes.length}/3 • Benda Tertata: {sortedCount}/{totalItems}
         </div>
 
         <button
