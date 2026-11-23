@@ -11,7 +11,7 @@ export const ITEMS_3D_LIST = [
     category: 'Bahan Rempah',
     model3d: '/assets/models/items/serai.glb',
     image: '/assets/spices/sereh.svg',
-    materialDesc: 'Tekstur serat alami, pangkal putih ungu, dan helaian daun hijau aromatik.',
+    materialDesc: 'Dua batang serai segar terikat rapi simpul daun di tengah, berpangkal umbi bulat gading dengan serabut akar halus.',
     culturalRole: 'Dimemarkan sebelum diseduh air mendidih untuk melepas minyak atsiri sitrus alami yang menenangkan pikiran penat.',
     clue: 'Aromanya segar dan membantu suasana hati terasa lebih tenang.'
   },
@@ -21,7 +21,7 @@ export const ITEMS_3D_LIST = [
     category: 'Peralatan',
     model3d: '/assets/models/items/cangkir.glb',
     image: '/background/cangkir.png',
-    materialDesc: 'Lapisan enamel halus motif loreng hijau-putih klasik khas Yogyakarta dengan bibir lis perak gelap.',
+    materialDesc: 'Cangkir seng enamel terbuka motif lurik blirik hijau tentara klasik dengan lis bibir hitam mengilap dan gagang D.',
     culturalRole: 'Wadah saji legendaris penahan hangat minuman wedang, simbol kehangatan dan obrolan akrab di gerobak angkringan.',
     clue: 'Menahan panas minuman sekaligus menjadi simbol kehangatan akrab.'
   },
@@ -31,7 +31,7 @@ export const ITEMS_3D_LIST = [
     category: 'Bahan Rempah',
     model3d: '/assets/models/items/gula_aren.glb',
     image: '/assets/spices/gula_aren.svg',
-    materialDesc: 'Bongkahan padat kubah setengah batok kelapa warna karamel cokelat tua dengan remahan legit bertekstur alami.',
+    materialDesc: 'Dua silinder cetakan bumbung aren (tegak karamel gelap dan miring keemasan) bertabur remahan kristal legit di depannya.',
     culturalRole: 'Olahan tradisional dari nira pohon aren yang memberikan rasa manis gurih legit dan memulihkan stamina raga.',
     clue: 'Menyeimbangkan rasa pedas rempah dan memberi rasa nyaman berenergi.'
   },
@@ -41,7 +41,7 @@ export const ITEMS_3D_LIST = [
     category: 'Peralatan',
     model3d: '/assets/models/items/sendok.glb',
     image: '/assets/tools/sendok.svg',
-    materialDesc: 'Kayu jati alami dengan serat halus, cekungan oval proporsional, dan gagang ergonomis.',
+    materialDesc: 'Kayu jati alami bercekungan oval proporsional, berbatang ramping dengan lubang gantungan bundar di ujungnya.',
     culturalRole: 'Alat pengaduk seduhan tradisional yang tidak merusak lapisan cangkir enamel serta tidak menghantarkan panas berlebih ke tangan.',
     clue: 'Mengaduk perlahan menyatukan manis gula dan hangatnya rempah.'
   },
@@ -51,7 +51,7 @@ export const ITEMS_3D_LIST = [
     category: 'Peralatan',
     model3d: '/assets/models/items/ceret.glb',
     image: '/background/cerek.png',
-    materialDesc: 'Tembaga dan kuningan tempa berkilau hangat dengan pegangan lengkung dan moncong angsa berproporsi presisi.',
+    materialDesc: 'Badan bulat tempaan tembaga rose-gold berkilau, bertutup kubah kenop kayu gelap, dan gagang lengkung tembaga berpegangan kayu.',
     culturalRole: 'Perkakas perebus air di atas bara arang anglo untuk menjaga air selalu mendidih matang sempurna setiap saat.',
     clue: 'Air mendidih sempurna membantu sari jahe dan serai keluar maksimal.'
   },
@@ -71,7 +71,7 @@ export const ITEMS_3D_LIST = [
     category: 'Bahan Rempah',
     model3d: '/assets/models/items/cengkeh.glb',
     image: '/assets/spices/cengkeh.svg',
-    materialDesc: 'Kuncup bunga kering warna cokelat tua dengan kelopak empat mahkota dan tangkai berpori khas rempah kepulauan Maluku.',
+    materialDesc: 'Dua butir cengkeh kering bersisian dengan 4 kelopak calyx mekar menyangga kuncup bunga bulat bersegmen.',
     culturalRole: 'Rempah primadona Nusantara beraroma harum manis-hangat yang memberi kedalaman rasa pada wedang uwuh.',
     clue: 'Cukup beberapa butir untuk memperkaya wangi seduhan malam.'
   },
@@ -91,7 +91,7 @@ export const ITEMS_3D_LIST = [
     category: 'Bahan Rempah',
     model3d: '/assets/models/items/kayu_manis.glb',
     image: '/assets/spices/kayu_manis.svg',
-    materialDesc: 'Gulungan kulit kayu alami berlapir cokelat kemerahan dengan aroma manis harum lembut.',
+    materialDesc: 'Ikatan 4 batang gulungan kulit kayu manis berongga (quills) terikat rapi oleh tali rami berpita simpul di bagian tengah.',
     culturalRole: 'Menyeimbangkan rasa rempah dan memberi ketenangan pikiran serta rasa nyaman di tenggorokan.',
     clue: 'Aroma manis lembut menenangkan suasana hati.'
   },
@@ -111,7 +111,7 @@ export const ITEMS_3D_LIST = [
     category: 'Peralatan',
     model3d: '/assets/models/items/saringan.glb',
     image: '/assets/tools/saringan.svg',
-    materialDesc: 'Kantong kain blacu tenun dengan lingkar kawat baja tahan karat dan pegangan kayu jati ergonomis.',
+    materialDesc: 'Ring bingkai kayu bundar dengan gagang kayu pipih ergonomis dan kantong kain blacu tenun unbleached menggantung rapi.',
     culturalRole: 'Peralatan penyaring tradisional untuk memisahkan ampas rempah agar seduhan wedang jernih dan nyaman diminum.',
     clue: 'Menyaring seduhan rempah agar wedang jernih tanpa ampas kasar.'
   },
@@ -121,7 +121,7 @@ export const ITEMS_3D_LIST = [
     category: 'Wadah Hikmah',
     model3d: '/assets/models/items/toples.glb',
     image: '/background/toples.png',
-    materialDesc: 'Toples kaca tebal vintage silindris dengan tutup ulir logam kuningan dan gulungan kertas hikmah di dalamnya.',
+    materialDesc: 'Toples silinder kaca transparan tebal dengan tutup bundar kayu jati, lilitan tali rami berpita simpul, label hati kraft, dan berisi lipatan naskah origami.',
     culturalRole: 'Tempat menyimpan mutiara hikmah dan pelajaran rasa dari obrolan malam bersama pengunjung angkringan.',
     clue: 'Menampung kawruh kehidupan yang telah disimpulkan.'
   }

@@ -10,8 +10,8 @@ export default function Angkringan3DViewer({ modelPath = '/assets/models/angkrin
   const sceneRef = useRef(null);
   const cameraRef = useRef(null);
   const resumeTimerRef = useRef(null);
-  const defaultCamPos = useRef(new THREE.Vector3(2.35, 1.45, 2.95));
-  const defaultTarget = useRef(new THREE.Vector3(0, 0.82, 0));
+  const defaultCamPos = useRef(new THREE.Vector3(2.60, 1.50, 3.10));
+  const defaultTarget = useRef(new THREE.Vector3(0, 0.95, 0));
 
   useEffect(() => {
     const container = mountRef.current;
@@ -90,8 +90,8 @@ export default function Angkringan3DViewer({ modelPath = '/assets/models/angkrin
     controls.autoRotateSpeed = 0.95; // Kecepatan rotasi natural & halus
     controls.enablePan = false;
     controls.enableZoom = true;
-    controls.minDistance = 0.95; // Jangkauan zoom in sangat dekat untuk melihat detail perkakas & teko
-    controls.maxDistance = 6.0;  // Jangkauan zoom out luas dan leluasa tanpa terpotong
+    controls.minDistance = 1.80; // Batas zoom in aman agar atap dan roda tidak pernah terpotong
+    controls.maxDistance = 6.5;  // Jangkauan zoom out luas dan leluasa tanpa terpotong
     controls.minPolarAngle = Math.PI / 6; // ~30 deg (tampak atas anggun)
     controls.maxPolarAngle = Math.PI / 2 + 0.04; // Tidak tembus bawah tanah
     controls.target.copy(defaultTarget.current);
@@ -136,8 +136,8 @@ export default function Angkringan3DViewer({ modelPath = '/assets/models/angkrin
           }
         });
 
-        // Skala gerobak proporsional dan gagah di dalam panggung luas
-        const dominantScale = 1.08;
+        // Skala gerobak proporsional dan gagah di dalam panggung luas (tidak terpotong saat zoom)
+        const dominantScale = 0.94;
         modelRoot.scale.setScalar(dominantScale);
 
         // Posisikan alas gerobak tepat di atas tanah & titik tumpu kamera seimbang
@@ -147,10 +147,11 @@ export default function Angkringan3DViewer({ modelPath = '/assets/models/angkrin
         modelRoot.position.z = -center.z;
         modelRoot.position.y = -box.min.y;
 
-        // Target kamera di tengah vertikal gerobak
+        // Target kamera tepat di titik pusat vertikal gerobak (antara atap dan roda)
         const heightCart = box.max.y - box.min.y;
-        defaultTarget.current.set(0, heightCart * 0.46, 0);
+        defaultTarget.current.set(0, heightCart * 0.51, 0);
         controls.target.copy(defaultTarget.current);
+        camera.lookAt(controls.target);
 
         scene.add(modelRoot);
         setLoading(false);

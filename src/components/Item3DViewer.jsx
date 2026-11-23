@@ -34,11 +34,11 @@ export default function Item3DViewer({
     // 1. Scene
     const scene = new THREE.Scene();
 
-    // 2. Camera Setup (Jarak pandang proporsional & dekat agar objek tampil besar)
+    // 2. Camera Setup (Jarak pandang proporsional, seimbang & tidak terpotong)
     const width = container.clientWidth || 300;
     const heightPx = typeof height === 'number' ? height : parseInt(height, 10) || 220;
-    const camera = new THREE.PerspectiveCamera(36, width / heightPx, 0.05, 50);
-    camera.position.set(0.35, 0.55, 2.25);
+    const camera = new THREE.PerspectiveCamera(34, width / heightPx, 0.05, 50);
+    camera.position.set(0.28, 0.48, 2.40);
 
     // 3. Renderer dengan ACESFilmic Tone Mapping & High Precision
     const renderer = new THREE.WebGLRenderer({
@@ -112,7 +112,7 @@ export default function Item3DViewer({
     });
     const contactMesh = new THREE.Mesh(contactGeo, contactMat);
     contactMesh.rotation.x = -Math.PI / 2;
-    contactMesh.position.y = -0.68;
+    contactMesh.position.y = -0.52;
     scene.add(contactMesh);
 
     // B. Real Directional Shadow Receiver Plane
@@ -120,7 +120,7 @@ export default function Item3DViewer({
     const shadowMat = new THREE.ShadowMaterial({ opacity: 0.24, depthWrite: false });
     const shadowPlane = new THREE.Mesh(shadowGeo, shadowMat);
     shadowPlane.rotation.x = -Math.PI / 2;
-    shadowPlane.position.y = -0.678;
+    shadowPlane.position.y = -0.518;
     shadowPlane.receiveShadow = true;
     scene.add(shadowPlane);
 
@@ -137,11 +137,11 @@ export default function Item3DViewer({
     controls.enablePan = false;
     controls.enableZoom = interactive;
     controls.enableRotate = interactive;
-    controls.minDistance = 0.85; // Pengunjung bisa zoom in sangat dekat untuk melihat tekstur
-    controls.maxDistance = 4.0;
+    controls.minDistance = 1.20; // Batas zoom in aman agar objek tidak terpotong
+    controls.maxDistance = 4.2;
     controls.minPolarAngle = Math.PI / 6;
     controls.maxPolarAngle = Math.PI / 2 + 0.05;
-    controls.target.set(0, 0, 0);
+    controls.target.set(0, 0.04, 0);
     controlsRef.current = controls;
 
     const onStart = () => {
@@ -174,8 +174,8 @@ export default function Item3DViewer({
         const size = bbox.getSize(new THREE.Vector3());
         const maxDim = Math.max(size.x, size.y, size.z) || 1.0;
 
-        // Skala lebih besar agar objek tampil dominan, jelas, dan proporsional
-        const targetScale = (compact ? 1.75 : 1.90) / maxDim;
+        // Skala proporsional: seluruh bentuk objek tampak utuh, indah, dan tidak terpotong
+        const targetScale = (compact ? 0.95 : 1.08) / maxDim;
         root.scale.setScalar(targetScale);
 
         // Recenter
@@ -185,7 +185,7 @@ export default function Item3DViewer({
 
         // Posisikan alas model persis di atas bayangan lantai
         const updatedBox = new THREE.Box3().setFromObject(root);
-        root.position.y += (-0.66 - updatedBox.min.y);
+        root.position.y += (-0.51 - updatedBox.min.y);
 
         // Optimalkan material PBR (refleksi kaca, logam, enamel, dan batu)
         root.traverse((child) => {

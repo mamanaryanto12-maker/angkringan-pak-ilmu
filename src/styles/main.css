@@ -1059,14 +1059,14 @@ button:focus-visible, [tabindex]:focus-visible {
   border: 1.5px solid rgba(238, 114, 23, 0.35);
   border-left: 5px solid var(--color-orange);
   border-radius: var(--radius-md);
-  padding: 10px 18px;
-  margin: 0 0 14px 0;
+  padding: 8px 16px;
+  margin: 0 0 10px 0;
   max-width: 100%;
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 14px;
+  gap: 12px;
   box-shadow: 0 4px 18px rgba(68, 44, 22, 0.08), 0 1px 4px rgba(68, 44, 22, 0.04);
   backdrop-filter: blur(8px);
   position: relative;
@@ -2322,8 +2322,9 @@ button:focus-visible, [tabindex]:focus-visible {
 .customer-encounter-panel {
   display: grid;
   grid-template-columns: 390px 1fr;
-  gap: 18px;
+  gap: 16px;
   align-items: stretch;
+  margin-top: 2px;
 }
 
 .customer-scene-card {
@@ -2332,15 +2333,22 @@ button:focus-visible, [tabindex]:focus-visible {
   border-radius: var(--radius-md);
   overflow: hidden;
   box-shadow: var(--shadow-medium);
+  display: flex;
+  flex-direction: column;
 }
 
 .malioboro-stage {
   width: 100%;
   background: #1B2A38;
   overflow: hidden;
+  max-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .malioboro-svg {
   width: 100%;
+  max-height: 200px;
   height: auto;
   display: block;
 }
@@ -2384,41 +2392,45 @@ button:focus-visible, [tabindex]:focus-visible {
 }
 
 .customer-scene-info {
-  padding: 14px 18px;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  justify-content: space-between;
 }
 .customer-head-line {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 8px;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 .customer-head-line h3 {
-  font-size: 1.25rem;
+  font-size: 1.18rem;
   font-weight: 800;
 }
 .weather-tag-mini {
-  font-size: 0.72rem;
+  font-size: 0.70rem;
   font-weight: 700;
   color: var(--color-teal-dark);
   background: var(--color-teal-soft);
-  padding: 3px 10px;
-  border-radius: 12px;
+  padding: 2px 8px;
+  border-radius: 10px;
 }
 .customer-condition-line {
-  font-size: 0.86rem;
+  font-size: 0.82rem;
   font-weight: 700;
   color: var(--color-bata);
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 .customer-quote-bubble {
   background: var(--bg-cream);
   border: 1px solid var(--border-natural);
   border-left: 3px solid var(--color-orange);
-  padding: 10px 14px;
+  padding: 8px 12px;
   border-radius: 6px;
-  font-size: 0.90rem;
-  line-height: 1.5;
+  font-size: 0.86rem;
+  line-height: 1.45;
   color: var(--text-primary);
   font-style: italic;
 }
@@ -2427,8 +2439,11 @@ button:focus-visible, [tabindex]:focus-visible {
   background: rgba(255, 253, 248, 0.96);
   border: 1.5px solid var(--border-strong);
   border-radius: var(--radius-md);
-  padding: 18px 22px;
+  padding: 14px 18px;
   box-shadow: var(--shadow-medium);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .phase-stack {
