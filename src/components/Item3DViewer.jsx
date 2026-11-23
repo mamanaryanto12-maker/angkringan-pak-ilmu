@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { RotateCw, Box } from 'lucide-react';
 
 export default function Item3DViewer({
@@ -32,13 +33,13 @@ export default function Item3DViewer({
     // 1. Scene
     const scene = new THREE.Scene();
 
-    // 2. Camera
+    // 2. Camera Setup (Jarak pandang proporsional & dekat agar objek tampil besar)
     const width = container.clientWidth || 300;
     const heightPx = typeof height === 'number' ? height : parseInt(height, 10) || 220;
-    const camera = new THREE.PerspectiveCamera(40, width / heightPx, 0.1, 50);
-    camera.position.set(2.0, 1.4, 2.4);
+    const camera = new THREE.PerspectiveCamera(36, width / heightPx, 0.05, 50);
+    camera.position.set(1.65, 1.15, 2.05);
 
-    // 3. Renderer
+    // 3. Renderer dengan ACESFilmic Tone Mapping & High Precision
     const renderer = new THREE.WebGLRenderer({
       antialias: true,
       alpha: true,
@@ -48,38 +49,47 @@ export default function Item3DViewer({
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.22;
+    renderer.toneMappingExposure = 1.25;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
     container.innerHTML = '';
     container.appendChild(renderer.domElement);
 
-    // 4. Lighting Setup (Harmonis dengan Palet Angkringan & PBR Shaders)
-    const ambientLight = new THREE.AmbientLight(0xfff8ee, 1.35);
+    // 4. Room Environment (PBR Refleksi Kaca & Logam Realistis seperti di Blender)
+    const pmremGenerator = new THREE.PMREMGenerator(renderer);
+    pmremGenerator.compileEquirectangularShader();
+    const envTexture = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
+    scene.environment = envTexture;
+
+    // 5. Studio Multi-Point Lighting (Nuansa Hangat Otentik Angkringan)
+    const ambientLight = new THREE.AmbientLight(0xfff7ee, 1.2);
     scene.add(ambientLight);
 
-    const keyLight = new THREE.DirectionalLight(0xfff2e0, 2.4);
-    keyLight.position.set(3.2, 4.0, 2.8);
+    const keyLight = new THREE.DirectionalLight(0xfff0db, 2.6);
+    keyLight.position.set(2.8, 3.8, 2.4);
+    keyLight.castShadow = true;
+    keyLight.shadow.bias = -0.0005;
     scene.add(keyLight);
 
-    // Teal fill rim light khas identitas Gredupedia
-    const fillLight = new THREE.DirectionalLight(0x358c88, 1.1);
-    fillLight.position.set(-3.0, 1.8, -2.5);
+    const fillLight = new THREE.DirectionalLight(0x358c88, 1.2);
+    fillLight.position.set(-2.8, 1.6, -2.2);
     scene.add(fillLight);
 
-    // Warm amber backlight untuk memunculkan siluet & pantulan logam/kayu
-    const warmRimLight = new THREE.PointLight(0xffaa44, 1.8, 8.0, 1.4);
-    warmRimLight.position.set(0.0, -1.2, 1.5);
+    const warmRimLight = new THREE.PointLight(0xffaa44, 2.0, 7.0, 1.2);
+    warmRimLight.position.set(0.0, -0.8, 1.8);
     scene.add(warmRimLight);
 
-    // Shadow receiver plane halus di bawah objek
-    const shadowGeo = new THREE.PlaneGeometry(3.0, 3.0);
-    const shadowMat = new THREE.ShadowMaterial({ opacity: 0.18 });
+    // Bayangan lembut menapak tanah di bawah objek
+    const shadowGeo = new THREE.PlaneGeometry(3.2, 3.2);
+    const shadowMat = new THREE.ShadowMaterial({ opacity: 0.22 });
     const shadowPlane = new THREE.Mesh(shadowGeo, shadowMat);
     shadowPlane.rotation.x = -Math.PI / 2;
-    shadowPlane.position.y = -0.75;
+    shadowPlane.position.y = -0.72;
     shadowPlane.receiveShadow = true;
     scene.add(shadowPlane);
 
-    // 5. Controls
+    // 6. OrbitControls (Responsif & Zoom In Dekat)
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.08;
@@ -88,8 +98,8 @@ export default function Item3DViewer({
     controls.enablePan = false;
     controls.enableZoom = interactive;
     controls.enableRotate = interactive;
-    controls.minDistance = 1.3;
-    controls.maxDistance = 4.2;
+    controls.minDistance = 0.85; // Pengunjung bisa zoom in sangat dekat untuk melihat tekstur
+    controls.maxDistance = 4.0;
     controls.target.set(0, 0, 0);
     controlsRef.current = controls;
 
@@ -107,7 +117,7 @@ export default function Item3DViewer({
     controls.addEventListener('start', onStart);
     controls.addEventListener('end', onEnd);
 
-    // 6. Load GLB Model
+    // 7. Load GLB Model
     const loader = new GLTFLoader();
     let isDisposed = false;
 
@@ -124,8 +134,8 @@ export default function Item3DViewer({
         const size = bbox.getSize(new THREE.Vector3());
         const maxDim = Math.max(size.x, size.y, size.z) || 1.0;
 
-        // Skala standar agar pas di viewport
-        const targetScale = 1.55 / maxDim;
+        // Skala lebih besar agar objek tampil dominan, jelas, dan proporsional
+        const targetScale = (compact ? 1.75 : 1.90) / maxDim;
         root.scale.setScalar(targetScale);
 
         // Recenter
@@ -133,16 +143,16 @@ export default function Item3DViewer({
         bbox.getCenter(center);
         root.position.sub(center);
 
-        // Sedikit miringkan sudut pandang default agar estetis
+        // Sedikit miringkan sudut pandang default agar tampak tiga dimensi natural
         root.rotation.y = 0.35;
 
-        // Aktifkan shadows & specular
+        // Optimalkan material PBR (refleksi kaca, logam, enamel, dan batu)
         root.traverse((child) => {
           if (child.isMesh) {
             child.castShadow = true;
             child.receiveShadow = true;
             if (child.material) {
-              child.material.envMapIntensity = 1.0;
+              child.material.envMapIntensity = 1.35;
               child.material.needsUpdate = true;
             }
           }
@@ -161,7 +171,7 @@ export default function Item3DViewer({
       }
     );
 
-    // 7. Render Loop
+    // 8. Render Loop
     let animId;
     const animate = () => {
       animId = requestAnimationFrame(animate);
@@ -170,7 +180,7 @@ export default function Item3DViewer({
     };
     animate();
 
-    // 8. Resize Observer
+    // 9. Resize Observer
     const handleResize = () => {
       if (!container) return;
       const newW = container.clientWidth;
@@ -184,7 +194,7 @@ export default function Item3DViewer({
     const resizeObserver = new ResizeObserver(handleResize);
     resizeObserver.observe(container);
 
-    // Cleanup
+    // 10. Cleanup
     return () => {
       isDisposed = true;
       if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
@@ -194,23 +204,14 @@ export default function Item3DViewer({
       controls.removeEventListener('end', onEnd);
       controls.dispose();
 
-      scene.traverse((obj) => {
-        if (obj.geometry) obj.geometry.dispose();
-        if (obj.material) {
-          if (Array.isArray(obj.material)) {
-            obj.material.forEach((m) => m.dispose());
-          } else {
-            obj.material.dispose();
-          }
-        }
-      });
-
+      envTexture.dispose();
+      pmremGenerator.dispose();
       renderer.dispose();
       if (container.contains(renderer.domElement)) {
         container.removeChild(renderer.domElement);
       }
     };
-  }, [modelPath, height, autoRotateSpeed]);
+  }, [modelPath, height, autoRotateSpeed, interactive, compact]);
 
   const handleResetCamera = (e) => {
     e.stopPropagation();

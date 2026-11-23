@@ -116,12 +116,12 @@ export default function EpilogueView({ onCompleteEpilogue, onOpenHelp, sessionIn
         </div>
 
         {/* Visual Model 3D Toples Kawruh Kaca Realistis (Blender PBR) */}
-        <div className="toples-kawruh-visual" style={{ width: '280px', height: '260px', margin: '0 auto 16px auto', position: 'relative' }}>
+        <div className="toples-kawruh-visual" style={{ width: '300px', height: '280px', margin: '0 auto 16px auto', position: 'relative' }}>
           <Item3DViewer
             modelPath="/assets/models/items/toples.glb"
             itemName="Toples Kawruh Pak Ilmu"
             fallbackImage="/background/toples.png"
-            height={260}
+            height={280}
             showBadge={true}
             autoRotateSpeed={1.5}
           />

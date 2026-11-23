@@ -10,8 +10,8 @@ export default function Angkringan3DViewer({ modelPath = '/assets/models/angkrin
   const sceneRef = useRef(null);
   const cameraRef = useRef(null);
   const resumeTimerRef = useRef(null);
-  const defaultCamPos = useRef(new THREE.Vector3(2.6, 1.8, 3.2));
-  const defaultTarget = useRef(new THREE.Vector3(0, 0.95, 0));
+  const defaultCamPos = useRef(new THREE.Vector3(2.1, 1.35, 2.65));
+  const defaultTarget = useRef(new THREE.Vector3(0, 0.85, 0));
 
   useEffect(() => {
     const container = mountRef.current;
@@ -21,10 +21,10 @@ export default function Angkringan3DViewer({ modelPath = '/assets/models/angkrin
     const scene = new THREE.Scene();
     sceneRef.current = scene;
 
-    // 2. Camera Setup
-    const width = container.clientWidth || 640;
-    const height = container.clientHeight || 340;
-    const camera = new THREE.PerspectiveCamera(38, width / height, 0.1, 50);
+    // 2. Camera Setup (Luas jangkauan & Near-plane tidak memotong saat zoom dekat)
+    const width = container.clientWidth || 720;
+    const height = container.clientHeight || 380;
+    const camera = new THREE.PerspectiveCamera(36, width / height, 0.05, 100);
     camera.position.copy(defaultCamPos.current);
     cameraRef.current = camera;
 
@@ -82,7 +82,7 @@ export default function Angkringan3DViewer({ modelPath = '/assets/models/angkrin
     shadowMesh.receiveShadow = true;
     scene.add(shadowMesh);
 
-    // 5. OrbitControls (Animasi Putar Otomatis 360° & Sentuhan Responsif)
+    // 5. OrbitControls (Animasi Putar Otomatis 360° & Zoom In/Out Luas)
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.06;
@@ -90,10 +90,10 @@ export default function Angkringan3DViewer({ modelPath = '/assets/models/angkrin
     controls.autoRotateSpeed = 0.95; // Kecepatan rotasi natural & halus
     controls.enablePan = false;
     controls.enableZoom = true;
-    controls.minDistance = 2.4;
-    controls.maxDistance = 4.6;
-    controls.minPolarAngle = Math.PI / 5; // ~36 deg (tampak atas wajar)
-    controls.maxPolarAngle = Math.PI / 2 + 0.02; // Tidak tembus bawah tanah
+    controls.minDistance = 1.15; // Jangkauan zoom in sangat dekat untuk melihat detail perkakas & teko
+    controls.maxDistance = 5.4;  // Jangkauan zoom out luas
+    controls.minPolarAngle = Math.PI / 6; // ~30 deg (tampak atas anggun)
+    controls.maxPolarAngle = Math.PI / 2 + 0.04; // Tidak tembus bawah tanah
     controls.target.copy(defaultTarget.current);
     controlsRef.current = controls;
 
@@ -136,12 +136,21 @@ export default function Angkringan3DViewer({ modelPath = '/assets/models/angkrin
           }
         });
 
-        // Posisikan alas gerobak tepat di atas tanah
+        // Perbesar skala gerobak secara proporsional agar dominan dan megah
+        const dominantScale = 1.16;
+        modelRoot.scale.setScalar(dominantScale);
+
+        // Posisikan alas gerobak tepat di atas tanah & titik tumpu kamera seimbang
         const box = new THREE.Box3().setFromObject(modelRoot);
         const center = box.getCenter(new THREE.Vector3());
         modelRoot.position.x = -center.x;
         modelRoot.position.z = -center.z;
         modelRoot.position.y = -box.min.y;
+
+        // Target kamera di tengah vertikal gerobak
+        const heightCart = box.max.y - box.min.y;
+        defaultTarget.current.set(0, heightCart * 0.46, 0);
+        controls.target.copy(defaultTarget.current);
 
         scene.add(modelRoot);
         setLoading(false);

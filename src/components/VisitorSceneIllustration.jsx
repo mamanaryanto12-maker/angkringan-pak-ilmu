@@ -128,66 +128,95 @@ export default function VisitorSceneIllustration({
         <rect x="250" y="152" width="105" height="10" rx="2" fill="#5E3516" />
         <rect x="262" y="162" width="8" height="28" fill="#482810" />
 
-        {/* 3. Tokoh Pengunjung: Karakter Realistis & Bernyawa */}
-        <g className={!isServed && isRain ? 'character-shiver' : 'character-calm'} transform="translate(186, 70)">
+        {/* 3. Tokoh Pengunjung: Karakter Realistis & Bernyawa (Diperbesar & Detail) */}
+        <g className={!isServed && isRain ? 'character-shiver' : 'character-calm'} transform="translate(178, 48) scale(1.24)">
           {/* Bayangan Menapak di Bangku */}
-          <ellipse cx="0" cy="116" rx="38" ry="7" fill="#100C08" opacity="0.65" />
+          <ellipse cx="0" cy="116" rx="42" ry="8" fill="#100C08" opacity="0.65" />
 
           {/* Badan / Punggung & Bahu Natural */}
           <path
-            d="M-34 114 C-34 68, -26 56, -14 54 L14 54 C26 56, 34 68, 34 114 Z"
+            d="M-36 114 C-36 66, -28 54, -14 52 L14 52 C28 54, 36 66, 36 114 Z"
             fill="url(#jacketGrad)"
           />
-          {/* Lipatan Jaket & Garis Jahitan Bahu */}
-          <path d="M-22 62 C-26 78, -30 96, -32 112" fill="none" stroke={jacketShadow} strokeWidth="1.8" />
-          <path d="M22 62 C26 78, 30 96, 32 112" fill="none" stroke={jacketShadow} strokeWidth="1.8" />
+          {/* Lipatan Pakaian & Garis Jahitan Bahu */}
+          <path d="M-24 62 C-28 78, -32 96, -34 112" fill="none" stroke={jacketShadow} strokeWidth="1.8" />
+          <path d="M24 62 C28 78, 32 96, 34 112" fill="none" stroke={jacketShadow} strokeWidth="1.8" />
           <path d="M-10 68 Q0 74 10 68" fill="none" stroke={jacketHighlight} strokeWidth="1.5" opacity="0.6" />
 
-          {/* Kerah Jaket Parka & Resleting */}
-          <path d="M-14 54 L-6 78 L6 78 L14 54 Z" fill="#E06B22" opacity="0.95" />
-          <line x1="0" y1="78" x2="0" y2="114" stroke="#D18738" strokeWidth="2.2" strokeDasharray="3 1" />
+          {/* Kerah Pakaian Sesuai Karakter */}
+          {personaId === 'persona-danang' ? (
+            /* Kerah Parka Mas Danang */
+            <>
+              <path d="M-14 52 L-6 76 L6 76 L14 52 Z" fill="#E06B22" opacity="0.95" />
+              <line x1="0" y1="76" x2="0" y2="114" stroke="#D18738" strokeWidth="2.2" strokeDasharray="3 1" />
+            </>
+          ) : personaId === 'persona-sari' ? (
+            /* Kerah Kardigan Rajut & Syal Mbak Sari */
+            <>
+              <path d="M-14 52 C-10 66, 10 66, 14 52 Z" fill="#FFFDF8" opacity="0.9" />
+              <path d="M-16 52 L-8 80 L8 80 L16 52" fill="none" stroke="#571D30" strokeWidth="2.5" />
+              <line x1="0" y1="80" x2="0" y2="114" stroke="#A34865" strokeWidth="1.8" />
+            </>
+          ) : (
+            /* Syal Batik Pak Broto */
+            <>
+              <path d="M-16 54 Q0 72 16 54" fill="#3D2B1A" stroke="#C49B5B" strokeWidth="1.2" />
+              <line x1="0" y1="72" x2="0" y2="114" stroke="#482810" strokeWidth="2" />
+            </>
+          )}
 
           {/* Leher Human Proportional */}
-          <path d="M-9 42 L-9 56 L9 56 L9 42 Z" fill="#C9895E" />
+          <path d="M-9 40 L-9 54 L9 54 L9 40 Z" fill="#C9895E" />
 
           {/* Wajah / Kepala Manusia Berkarakter */}
           <path
-            d="M-16 18 C-18 28, -17 38, -12 46 C-8 52, 8 52, 12 46 C17 38, 18 28, 16 18 C14 8, -14 8, -16 18 Z"
+            d="M-16 16 C-18 26, -17 38, -12 46 C-8 52, 8 52, 12 46 C17 38, 18 26, 16 16 C14 6, -14 6, -16 16 Z"
             fill="url(#skinGrad)"
           />
 
           {/* Telinga */}
-          <ellipse cx="-17" cy="30" rx="3" ry="5.5" fill="#CF8E62" />
-          <ellipse cx="17" cy="30" rx="3" ry="5.5" fill="#CF8E62" />
+          <ellipse cx="-17" cy="28" rx="3.2" ry="5.5" fill="#CF8E62" />
+          <ellipse cx="17" cy="28" rx="3.2" ry="5.5" fill="#CF8E62" />
+          {personaId === 'persona-sari' && (
+            /* Anting Mutiara Kecil Mbak Sari */
+            <circle cx="17" cy="33" r="1.5" fill="#FFFDF8" />
+          )}
 
           {/* Rambut Manusia Alami Bertekstur */}
           {personaId === 'persona-danang' ? (
             /* Gaya Rambut Mas Danang: Sisir samping natural sedikit basah gerimis */
             <g fill="#1A130E">
-              <path d="M-18 18 C-18 4, 18 4, 18 18 C16 10, 8 8, 0 10 C-8 12, -15 15, -18 18 Z" />
-              <path d="M-17 17 C-15 10, -8 13, -3 15 C-8 11, -14 11, -17 17 Z" fill="#291F18" />
-              <path d="M-18 18 C-18 25, -16 28, -15 28 C-16 24, -16 20, -18 18 Z" />
-              <path d="M18 18 C18 25, 16 28, 15 28 C16 24, 16 20, 18 18 Z" />
+              <path d="M-18 16 C-18 2, 18 2, 18 16 C16 8, 8 6, 0 8 C-8 10, -15 13, -18 16 Z" />
+              <path d="M-17 15 C-15 8, -8 11, -3 13 C-8 9, -14 9, -17 15 Z" fill="#291F18" />
+              <path d="M-18 16 C-18 23, -16 26, -15 26 C-16 22, -16 18, -18 16 Z" />
+              <path d="M18 16 C18 23, 16 26, 15 26 C16 22, 16 18, 18 16 Z" />
             </g>
           ) : personaId === 'persona-sari' ? (
-            /* Rambut Mbak Sari: Gelung anggun rapi */
-            <g fill="#1C1410">
-              <path d="M-19 20 C-20 6, 20 6, 19 20 C18 12, 10 9, 0 10 C-10 11, -17 15, -19 20 Z" />
-              <ellipse cx="0" cy="5" rx="10" ry="7" fill="#1C1410" />
-              <path d="M-18 20 C-18 36, -14 42, -13 42 C-16 34, -16 24, -18 20 Z" />
-              <path d="M18 20 C18 36, 14 42, 13 42 C16 34, 16 24, 18 20 Z" />
+            /* Rambut Mbak Sari: Gelung Anggun Bertekstur Lembut */
+            <g fill="#18120E">
+              <path d="M-20 18 C-21 2, 21 2, 20 18 C18 9, 10 7, 0 8 C-10 9, -17 13, -20 18 Z" />
+              <ellipse cx="0" cy="2" rx="12" ry="8" fill="#18120E" />
+              <path d="M-19 18 C-19 36, -15 42, -14 42 C-17 34, -17 22, -19 18 Z" />
+              <path d="M19 18 C19 36, 15 42, 14 42 C17 34, 17 22, 19 18 Z" />
+              {/* Tusuk Konde Halus */}
+              <line x1="8" y1="-2" x2="16" y2="4" stroke="#D18738" strokeWidth="1.5" />
             </g>
           ) : (
             /* Caping / Blangkon Pak Broto */
             <g>
-              <path d="M-28 16 Q0 -6 28 16 Q0 10 -28 16 Z" fill="#9C7338" stroke="#5E431B" strokeWidth="1.5" />
-              <path d="M-18 14 C-12 8, 12 8, 18 14" fill="#3D2B1A" />
+              <path d="M-28 14 Q0 -8 28 14 Q0 8 -28 14 Z" fill="#9C7338" stroke="#5E431B" strokeWidth="1.5" />
+              <path d="M-18 12 C-12 6, 12 6, 18 12" fill="#3D2B1A" />
             </g>
           )}
 
+          {/* Kumis Tipis Pak Broto */}
+          {personaId === 'persona-broto' && (
+            <path d="M-8 38 Q0 35 8 38 Q0 40 -8 38 Z" fill="#2B1D12" />
+          )}
+
           {/* Alis Mata Natural */}
-          <path d="M-12 24 Q-8 22 -4 24" fill="none" stroke="#221811" strokeWidth="1.8" strokeLinecap="round" />
-          <path d="M4 24 Q8 22 12 24" fill="none" stroke="#221811" strokeWidth="1.8" strokeLinecap="round" />
+          <path d="M-12 22 Q-8 20 -4 22" fill="none" stroke="#221811" strokeWidth="1.8" strokeLinecap="round" />
+          <path d="M4 22 Q8 20 12 22" fill="none" stroke="#221811" strokeWidth="1.8" strokeLinecap="round" />
 
           {/* Mata Manusia (Lelah Kedinginan vs Senyum Lega) */}
           {isWarmSmile ? (

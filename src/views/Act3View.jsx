@@ -246,12 +246,12 @@ export default function Act3View({ onCompleteAct, onOpenHelp, sessionIndex = 0 }
                       </span>
 
                       {/* Model 3D Interaktif Langsung pada Kartu Rempah */}
-                      <div className="pantry-3d-box" style={{ width: '100%', height: '115px', position: 'relative', marginBottom: '6px' }}>
+                      <div className="pantry-3d-box" style={{ width: '100%', height: '125px', position: 'relative', marginBottom: '6px' }}>
                         <Item3DViewer
                           modelPath={item.model3d}
                           itemName={item.name}
                           fallbackImage={item.image}
-                          height={115}
+                          height={125}
                           compact={true}
                           autoRotateSpeed={isChecked ? 2.4 : 1.2}
                         />

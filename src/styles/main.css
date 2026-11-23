@@ -570,7 +570,8 @@ button:focus-visible, [tabindex]:focus-visible {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 18px 28px 24px;
+  justify-content: space-between;
+  padding: 12px 24px 16px;
   max-width: 1320px;
   width: 100%;
   margin: 0 auto;
@@ -660,15 +661,15 @@ button:focus-visible, [tabindex]:focus-visible {
 .angkringan-3d-stage {
   position: relative;
   width: 100%;
-  max-width: 680px;
-  height: clamp(250px, 34vh, 350px);
-  margin: 2px auto 8px auto;
+  max-width: 840px;
+  height: clamp(300px, 44vh, 480px);
+  margin: 4px auto 12px auto;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   border-radius: var(--radius-md);
-  background: radial-gradient(circle at center, rgba(253, 198, 49, 0.08) 0%, rgba(53, 140, 136, 0.04) 50%, transparent 75%);
+  background: radial-gradient(circle at center, rgba(253, 198, 49, 0.10) 0%, rgba(53, 140, 136, 0.05) 50%, transparent 75%);
   user-select: none;
   overflow: hidden;
 }
@@ -1806,19 +1807,19 @@ button:focus-visible, [tabindex]:focus-visible {
 
 .puzzle-assembly-arena {
   display: grid;
-  grid-template-columns: 1fr 1.15fr;
-  gap: 20px;
+  grid-template-columns: 1fr 1.22fr;
+  gap: 18px;
   align-items: stretch;
 }
 .puzzle-panel {
   background: rgba(255, 253, 248, 0.96);
   border: 1.5px solid var(--border-strong);
   border-radius: var(--radius-md);
-  padding: 16px;
+  padding: 14px 18px;
   box-shadow: var(--shadow-medium);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 .puzzle-panel-header {
   display: flex;
@@ -1829,7 +1830,7 @@ button:focus-visible, [tabindex]:focus-visible {
   border-bottom: 1px solid var(--border-natural);
 }
 .panel-title-kicker {
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   font-weight: 800;
   text-transform: uppercase;
 }
@@ -1843,7 +1844,7 @@ button:focus-visible, [tabindex]:focus-visible {
 .puzzle-pieces-grid, .puzzle-slots-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 10px;
   flex: 1;
 }
 
@@ -1856,8 +1857,8 @@ button:focus-visible, [tabindex]:focus-visible {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 8px;
-  min-height: 112px;
+  gap: 6px;
+  min-height: 104px;
 }
 .puzzle-piece-card:hover {
   border-color: var(--color-orange);
@@ -1877,7 +1878,7 @@ button:focus-visible, [tabindex]:focus-visible {
   gap: 6px;
 }
 .piece-role-chip {
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   font-weight: 800;
   color: var(--color-bata);
   background: var(--color-bata-soft);
@@ -1885,15 +1886,16 @@ button:focus-visible, [tabindex]:focus-visible {
   border-radius: 10px;
 }
 .piece-selected-tag {
-  font-size: 0.68rem;
+  font-size: 0.7rem;
   font-weight: 800;
   color: var(--color-teal-dark);
 }
 .piece-text {
-  font-size: 0.84rem;
-  line-height: 1.45;
+  font-size: 0.90rem;
+  line-height: 1.42;
   color: var(--text-primary);
   font-style: italic;
+  font-weight: 600;
 }
 
 .puzzle-piece-placed-placeholder {
@@ -1904,22 +1906,22 @@ button:focus-visible, [tabindex]:focus-visible {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   font-weight: 700;
   color: var(--color-teal-dark);
-  min-height: 112px;
+  min-height: 104px;
 }
 
 .puzzle-slot {
   background: var(--bg-cream);
   border: 2px dashed var(--border-strong);
   border-radius: var(--radius-sm);
-  padding: 12px;
+  padding: 10px 14px;
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  min-height: 126px;
+  gap: 6px;
+  min-height: 114px;
 }
 .puzzle-slot.slot-ready {
   border-color: var(--color-orange);
@@ -1939,13 +1941,13 @@ button:focus-visible, [tabindex]:focus-visible {
   gap: 8px;
 }
 .slot-icon-img {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   object-fit: contain;
   flex-shrink: 0;
 }
 .slot-title {
-  font-size: 0.74rem;
+  font-size: 0.78rem;
   font-weight: 800;
   text-transform: uppercase;
 }
@@ -2087,15 +2089,17 @@ button:focus-visible, [tabindex]:focus-visible {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  max-width: 920px;
+  margin: 0 auto;
 }
 .sequence-card {
   background: rgba(255, 253, 248, 0.96);
   border: 1.5px solid var(--border-natural);
   border-radius: var(--radius-sm);
-  padding: 12px 16px;
+  padding: 10px 18px;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
   box-shadow: var(--shadow-soft);
 }
 .sequence-card.is-aligned {
@@ -2103,24 +2107,24 @@ button:focus-visible, [tabindex]:focus-visible {
   background: var(--bg-paper);
 }
 .sequence-badge {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background: var(--color-teal);
   color: #FFF;
   font-weight: 800;
-  font-size: 0.9rem;
+  font-size: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
 .sequence-visual-thumb {
-  width: 58px;
-  height: 58px;
+  width: 66px;
+  height: 66px;
   border-radius: 8px;
   background: var(--bg-cream);
-  border: 1px solid var(--border-natural);
+  border: 1.5px solid var(--border-natural);
   padding: 4px;
   display: flex;
   align-items: center;
@@ -2136,7 +2140,7 @@ button:focus-visible, [tabindex]:focus-visible {
   flex: 1;
 }
 .sequence-step-label {
-  font-size: 0.74rem;
+  font-size: 0.76rem;
   font-weight: 800;
   color: var(--color-bata);
   text-transform: uppercase;
@@ -2146,7 +2150,7 @@ button:focus-visible, [tabindex]:focus-visible {
   margin-bottom: 2px;
 }
 .sequence-step-text {
-  font-size: 0.94rem;
+  font-size: 0.98rem;
   font-weight: 600;
   color: var(--text-primary);
   line-height: 1.4;
@@ -2156,8 +2160,8 @@ button:focus-visible, [tabindex]:focus-visible {
   gap: 6px;
 }
 .seq-btn {
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   border-radius: 6px;
   background: var(--bg-cream);
   border: 1px solid var(--border-strong);
@@ -2176,11 +2180,13 @@ button:focus-visible, [tabindex]:focus-visible {
   cursor: not-allowed;
 }
 
-/* Matching Pairs */
+/* Matching Pairs (Khasiat Rempah) */
 .matching-board {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
+  max-width: 1040px;
+  margin: 0 auto;
 }
 .match-column {
   display: flex;
@@ -2188,10 +2194,10 @@ button:focus-visible, [tabindex]:focus-visible {
   gap: 10px;
 }
 .match-col-title {
-  font-size: 0.82rem;
+  font-size: 0.84rem;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.5px;
 }
 .match-col-title.orange { color: var(--color-bata); }
 .match-col-title.teal { color: var(--color-teal-dark); }
@@ -2200,12 +2206,12 @@ button:focus-visible, [tabindex]:focus-visible {
   background: rgba(255, 253, 248, 0.96);
   border: 1.5px solid var(--border-strong);
   border-radius: var(--radius-sm);
-  padding: 14px 16px;
+  padding: 12px 18px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 14px;
   box-shadow: var(--shadow-soft);
 }
 .match-card:hover:not(.matched) {
@@ -2230,21 +2236,21 @@ button:focus-visible, [tabindex]:focus-visible {
 }
 .match-card-content strong {
   display: block;
-  font-size: 0.92rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--text-primary);
-  margin-bottom: 2px;
+  margin-bottom: 3px;
 }
 .match-card-sub {
-  font-size: 0.76rem;
+  font-size: 0.80rem;
   color: var(--text-muted);
 }
 .remedy-thumb {
-  width: 50px;
-  height: 50px;
+  width: 62px;
+  height: 62px;
   border-radius: 8px;
   background: var(--bg-cream);
-  border: 1px solid var(--border-natural);
+  border: 1.5px solid var(--border-natural);
   padding: 4px;
   display: flex;
   align-items: center;
@@ -2260,7 +2266,7 @@ button:focus-visible, [tabindex]:focus-visible {
 /* --- 11. BABAK 3: SUASANA MALIOBORO HUJAN & PERACIKAN BEBAS --- */
 .customer-encounter-panel {
   display: grid;
-  grid-template-columns: 375px 1fr;
+  grid-template-columns: 420px 1fr;
   gap: 20px;
   align-items: start;
 }
@@ -2307,9 +2313,12 @@ button:focus-visible, [tabindex]:focus-visible {
   animation: subtleCharacterChill 2.2s ease-in-out infinite;
 }
 @keyframes subtleCharacterChill {
-  0%, 100% { transform: translate(182px, 74px); }
-  25% { transform: translate(181px, 74.5px); }
-  75% { transform: translate(183px, 74px); }
+  0%, 100% { transform: translate(176px, 50px) scale(1.24); }
+  25% { transform: translate(175px, 50.5px) scale(1.24); }
+  75% { transform: translate(177px, 50px) scale(1.24); }
+}
+.character-calm {
+  transform: translate(178px, 48px) scale(1.24);
 }
 .svg-steam-float {
   animation: steamRiseSlow 2.4s ease-in-out infinite;
@@ -2320,7 +2329,7 @@ button:focus-visible, [tabindex]:focus-visible {
 }
 
 .customer-scene-info {
-  padding: 16px 18px;
+  padding: 14px 18px;
 }
 .customer-head-line {
   display: flex;
@@ -2330,30 +2339,30 @@ button:focus-visible, [tabindex]:focus-visible {
   margin-bottom: 4px;
 }
 .customer-head-line h3 {
-  font-size: 1.15rem;
+  font-size: 1.25rem;
   font-weight: 800;
 }
 .weather-tag-mini {
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   font-weight: 700;
   color: var(--color-teal-dark);
   background: var(--color-teal-soft);
-  padding: 3px 9px;
+  padding: 3px 10px;
   border-radius: 12px;
 }
 .customer-condition-line {
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: 0.86rem;
+  font-weight: 700;
   color: var(--color-bata);
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 .customer-quote-bubble {
   background: var(--bg-cream);
   border: 1px solid var(--border-natural);
   border-left: 3px solid var(--color-orange);
-  padding: 10px 12px;
+  padding: 10px 14px;
   border-radius: 6px;
-  font-size: 0.86rem;
+  font-size: 0.90rem;
   line-height: 1.5;
   color: var(--text-primary);
   font-style: italic;
@@ -2363,14 +2372,14 @@ button:focus-visible, [tabindex]:focus-visible {
   background: rgba(255, 253, 248, 0.96);
   border: 1.5px solid var(--border-strong);
   border-radius: var(--radius-md);
-  padding: 20px 22px;
+  padding: 18px 22px;
   box-shadow: var(--shadow-medium);
 }
 
 .phase-stack {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 .phase-heading-block.with-cup {
   display: flex;
@@ -2384,7 +2393,7 @@ button:focus-visible, [tabindex]:focus-visible {
   color: var(--color-orange);
 }
 .phase-heading-block h3 {
-  font-size: 1.12rem;
+  font-size: 1.18rem;
   font-weight: 800;
   color: var(--text-primary);
 }
@@ -2407,10 +2416,10 @@ button:focus-visible, [tabindex]:focus-visible {
   background: var(--bg-cream);
   border: 1.5px solid var(--border-natural);
   border-radius: var(--radius-sm);
-  padding: 12px 16px;
+  padding: 12px 18px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 .choice-item-btn:hover {
   border-color: var(--color-teal);
@@ -2426,19 +2435,19 @@ button:focus-visible, [tabindex]:focus-visible {
 }
 .choice-main strong {
   display: block;
-  font-size: 0.92rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--text-primary);
 }
 .choice-main span {
-  font-size: 0.82rem;
+  font-size: 0.86rem;
   color: var(--text-secondary);
 }
 .choice-feedback-line {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   font-weight: 700;
   padding-top: 6px;
   border-top: 1px dashed var(--border-strong);
@@ -2450,13 +2459,13 @@ button:focus-visible, [tabindex]:focus-visible {
 .pantry-selection-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  gap: 12px;
 }
 .pantry-card {
   background: var(--bg-paper);
   border: 1.5px solid var(--border-natural);
   border-radius: var(--radius-sm);
-  padding: 10px 8px;
+  padding: 8px 8px 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -2476,8 +2485,8 @@ button:focus-visible, [tabindex]:focus-visible {
   position: absolute;
   top: 7px;
   right: 7px;
-  width: 18px;
-  height: 18px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   border: 1.5px solid var(--border-strong);
   background: var(--bg-cream);
@@ -2490,17 +2499,17 @@ button:focus-visible, [tabindex]:focus-visible {
   border-color: var(--color-teal);
 }
 .pantry-img {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   object-fit: contain;
 }
 .pantry-name {
-  font-size: 0.82rem;
+  font-size: 0.94rem;
   font-weight: 700;
   color: var(--text-primary);
 }
 .pantry-prop {
-  font-size: 0.7rem;
+  font-size: 0.76rem;
   color: var(--text-muted);
   line-height: 1.25;
 }

@@ -250,34 +250,23 @@ export default function Act1View({
                       tabIndex={0}
                       aria-label={`${obj.name}${isInspected ? ', sudah diperiksa' : ''}`}
                     >
-                      <div className="item-image-wrapper">
-                        {obj.model3d && (
-                          <span
-                            style={{
-                              position: 'absolute',
-                              top: '6px',
-                              right: '6px',
-                              background: 'rgba(18, 18, 24, 0.75)',
-                              backdropFilter: 'blur(3px)',
-                              color: 'var(--color-orange)',
-                              border: '1px solid rgba(255, 170, 68, 0.4)',
-                              borderRadius: '4px',
-                              padding: '1px 5px',
-                              fontSize: '0.62rem',
-                              fontWeight: 800,
-                              letterSpacing: '0.5px',
-                              zIndex: 2,
-                              pointerEvents: 'none'
-                            }}
-                          >
-                            3D
-                          </span>
+                      <div className="item-image-wrapper" style={{ height: '125px', position: 'relative' }}>
+                        {obj.model3d ? (
+                          <Item3DViewer
+                            modelPath={obj.model3d}
+                            itemName={obj.name}
+                            fallbackImage={obj.image}
+                            height={125}
+                            compact={true}
+                            autoRotateSpeed={1.5}
+                          />
+                        ) : (
+                          <img
+                            src={obj.image}
+                            alt={obj.name}
+                            className="item-official-img"
+                          />
                         )}
-                        <img
-                          src={obj.image}
-                          alt={obj.name}
-                          className="item-official-img"
-                        />
                       </div>
                       <div className="item-meta-footer">
                         <div className="item-title">{obj.name}</div>
@@ -332,7 +321,7 @@ export default function Act1View({
                         modelPath={selectedObject.model3d}
                         itemName={selectedObject.name}
                         fallbackImage={selectedObject.image}
-                        height={200}
+                        height={250}
                       />
                     </div>
                   )}

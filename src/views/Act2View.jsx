@@ -288,18 +288,33 @@ export default function Act2View({ onCompleteAct, onOpenHelp, sessionIndex = 0 }
             <div className="puzzle-panel">
               <div className="puzzle-panel-header">
                 <span className="panel-title-kicker teal">Bingkai Naskah Utuh</span>
-                {isPuzzleComplete && (
-                  <button
-                    className="btn-read-manuscript"
-                    onClick={() => {
-                      soundManager.playPaperRustle();
-                      setIsManuscriptModalOpen(true);
-                    }}
-                  >
-                    <BookOpen size={14} />
-                    <span>Naskah Utuh</span>
-                  </button>
-                )}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  {isPuzzleComplete && (
+                    <>
+                      <button
+                        className="btn-read-manuscript"
+                        onClick={() => {
+                          soundManager.playPaperRustle();
+                          setIsManuscriptModalOpen(true);
+                        }}
+                      >
+                        <BookOpen size={14} />
+                        <span>Naskah Utuh</span>
+                      </button>
+                      <button
+                        className="btn-primary-action pulse-ready"
+                        style={{ padding: '6px 14px', fontSize: '0.8rem' }}
+                        onClick={() => {
+                          soundManager.playClickSound();
+                          setSubTab('sequence');
+                        }}
+                      >
+                        <span>Ke Urutan Seduh</span>
+                        <ArrowRight size={14} />
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
 
               <div className="puzzle-slots-grid">
@@ -343,26 +358,6 @@ export default function Act2View({ onCompleteAct, onOpenHelp, sessionIndex = 0 }
               </div>
             </div>
           </div>
-
-          {isPuzzleComplete && (
-            <div className="discovery-toast-card" style={{ marginTop: '18px' }}>
-              <div className="discovery-toast-text">
-                <h5>Naskah Lengkap Terangkai</h5>
-                <p>Kamu siap melanjutkan ke tantangan urutan penyeduhan.</p>
-              </div>
-              <button
-                className="btn-primary-action"
-                style={{ padding: '9px 18px', fontSize: '0.86rem' }}
-                onClick={() => {
-                  soundManager.playClickSound();
-                  setSubTab('sequence');
-                }}
-              >
-                <span>Lanjut: 2. Urutan Seduh</span>
-                <ArrowRight size={16} />
-              </button>
-            </div>
-          )}
         </div>
       )}
 
@@ -377,9 +372,24 @@ export default function Act2View({ onCompleteAct, onOpenHelp, sessionIndex = 0 }
           />
 
           {seqFeedback && (
-            <div className="feedback-strip success">
-              <CheckCircle2 size={18} />
-              <span>{seqFeedback.message}</span>
+            <div className="feedback-strip success" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <CheckCircle2 size={18} />
+                <span>{seqFeedback.message}</span>
+              </div>
+              {isSequenceComplete && (
+                <button
+                  className="btn-primary-action pulse-ready"
+                  style={{ padding: '6px 14px', fontSize: '0.8rem', whiteSpace: 'nowrap' }}
+                  onClick={() => {
+                    soundManager.playClickSound();
+                    setSubTab('matching');
+                  }}
+                >
+                  <span>Ke Khasiat Rempah</span>
+                  <ArrowRight size={14} />
+                </button>
+              )}
             </div>
           )}
 
@@ -427,26 +437,6 @@ export default function Act2View({ onCompleteAct, onOpenHelp, sessionIndex = 0 }
               );
             })}
           </div>
-
-          {isSequenceComplete && (
-            <div className="discovery-toast-card" style={{ marginTop: '18px' }}>
-              <div className="discovery-toast-text">
-                <h5>Urutan Seduh Runtut</h5>
-                <p>Lanjutkan ke tahap mengenali sifat dan kehangatan setiap rempah.</p>
-              </div>
-              <button
-                className="btn-primary-action"
-                style={{ padding: '9px 18px', fontSize: '0.86rem' }}
-                onClick={() => {
-                  soundManager.playClickSound();
-                  setSubTab('matching');
-                }}
-              >
-                <span>Lanjut: 3. Khasiat Rempah</span>
-                <ArrowRight size={16} />
-              </button>
-            </div>
-          )}
         </div>
       )}
 
