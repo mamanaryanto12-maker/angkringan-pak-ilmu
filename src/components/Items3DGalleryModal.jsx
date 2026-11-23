@@ -84,6 +84,36 @@ export const ITEMS_3D_LIST = [
     materialDesc: 'Rimpang bercabang dengan ruas bertekstur kerut alami dan semburat arang kehitaman di pucuknya hasil pemanggangan.',
     culturalRole: 'Rimpang pedas menghangatkan yang dipanggang sejenak di atas bara agar aroma pedas atsiri terlepas sempurna.',
     clue: 'Memberi sensasi hangat kuat di badan dan tenggorokan.'
+  },
+  {
+    id: 'kayu_manis',
+    name: 'Kulit Kayu Manis',
+    category: 'Bahan Rempah',
+    model3d: '/assets/models/items/kayu_manis.glb',
+    image: '/assets/spices/kayu_manis.svg',
+    materialDesc: 'Gulungan kulit kayu alami berlapir cokelat kemerahan dengan aroma manis harum lembut.',
+    culturalRole: 'Menyeimbangkan rasa rempah dan memberi ketenangan pikiran serta rasa nyaman di tenggorokan.',
+    clue: 'Aroma manis lembut menenangkan suasana hati.'
+  },
+  {
+    id: 'kunyit',
+    name: 'Rimpang Kunyit',
+    category: 'Bahan Rempah',
+    model3d: '/assets/models/items/kunyit.glb',
+    image: '/assets/spices/kunyit.svg',
+    materialDesc: 'Rimpang oranye keemasan dengan ruas cincin melingkar dan penampang inti berwarna kunyit cerah.',
+    culturalRole: 'Rempah penjaga stamina tubuh dan pencernaan, memberikan warna kuning hangat khas jamu Nusantara.',
+    clue: 'Hangat lembut bersahabat di lambung dan raga.'
+  },
+  {
+    id: 'toples',
+    name: 'Toples Kawruh Kaca',
+    category: 'Wadah Hikmah',
+    model3d: '/assets/models/items/toples.glb',
+    image: '/background/toples.png',
+    materialDesc: 'Toples kaca tebal vintage silindris dengan tutup ulir logam kuningan dan gulungan kertas hikmah di dalamnya.',
+    culturalRole: 'Tempat menyimpan mutiara hikmah dan pelajaran rasa dari obrolan malam bersama pengunjung angkringan.',
+    clue: 'Menampung kawruh kehidupan yang telah disimpulkan.'
   }
 ];
 

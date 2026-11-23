@@ -10,7 +10,10 @@ export default function Item3DViewer({
   height = 220,
   fallbackImage = null,
   showBadge = true,
-  autoRotateSpeed = 2.0
+  autoRotateSpeed = 2.0,
+  compact = false,
+  interactive = true,
+  onClick = null
 }) {
   const mountRef = useRef(null);
   const [loading, setLoading] = useState(true);
@@ -83,7 +86,8 @@ export default function Item3DViewer({
     controls.autoRotate = true;
     controls.autoRotateSpeed = autoRotateSpeed;
     controls.enablePan = false;
-    controls.enableZoom = true;
+    controls.enableZoom = interactive;
+    controls.enableRotate = interactive;
     controls.minDistance = 1.3;
     controls.maxDistance = 4.2;
     controls.target.set(0, 0, 0);
@@ -292,7 +296,7 @@ export default function Item3DViewer({
       )}
 
       {/* Badge Interaktif 3D */}
-      {showBadge && !loading && !error && (
+      {!compact && showBadge && !loading && !error && (
         <div
           style={{
             position: 'absolute',
@@ -319,7 +323,7 @@ export default function Item3DViewer({
       )}
 
       {/* Tombol Reset Tampilan */}
-      {!loading && !error && (
+      {!compact && !loading && !error && (
         <button
           type="button"
           onClick={handleResetCamera}
@@ -349,7 +353,7 @@ export default function Item3DViewer({
       )}
 
       {/* Hint Teks Geser */}
-      {!loading && !error && (
+      {!compact && !loading && !error && (
         <div
           style={{
             position: 'absolute',

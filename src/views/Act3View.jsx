@@ -113,7 +113,7 @@ export default function Act3View({ onCompleteAct, onOpenHelp, sessionIndex = 0 }
         <MiniGameGuideBanner
           tag="TAHAP 1"
           instruction={`Pahami keluhan ${currentPersona.name} lalu pilih solusi yang tepat.`}
-          hint="Amati ekspresi dan cerita pengunjung di panel kiri."
+          hint="Amati situasi dan cerita pengunjung di panel kiri."
           onOpenHelp={onOpenHelp}
         />
       )}
@@ -121,8 +121,8 @@ export default function Act3View({ onCompleteAct, onOpenHelp, sessionIndex = 0 }
       {currentPhase === 2 && (
         <MiniGameGuideBanner
           tag="TAHAP 2"
-          instruction={`Takar rempah dan tentukan suhu penyajian untuk ${currentPersona.name}.`}
-          hint="Pilih bahan rempah pada toples di bawah ini."
+          instruction={`Pilih bahan rempah 3D dan suhu penyajian untuk ${currentPersona.name}.`}
+          hint="Ketuk kartu rempah untuk menambah atau mengurangi bahan."
           onOpenHelp={onOpenHelp}
         />
       )}
@@ -130,8 +130,8 @@ export default function Act3View({ onCompleteAct, onOpenHelp, sessionIndex = 0 }
       {currentPhase === 3 && (
         <MiniGameGuideBanner
           tag="TAHAP 3"
-          instruction={`Pilih tutur kata empati yang menyejukkan hati saat menyajikan wedang.`}
-          hint="Tutur kata yang tulus menyempurnakan kehangatan racikan."
+          instruction={`Pilih tutur kata tulus saat menyerahkan wedang kepada ${currentPersona.name}.`}
+          hint="Tutur kata yang hangat melengkapi kebaikan racikanmu."
           onOpenHelp={onOpenHelp}
         />
       )}
@@ -227,7 +227,7 @@ export default function Act3View({ onCompleteAct, onOpenHelp, sessionIndex = 0 }
                 </div>
               </div>
 
-              {/* Grid 6 Bahan Rempah */}
+              {/* Grid 6 Bahan Rempah dengan Model 3D Asli Langsung */}
               <div className="pantry-selection-grid">
                 {PANTRY_INGREDIENTS.map((item) => {
                   const isChecked = selectedIngredients.includes(item.id);
@@ -239,34 +239,24 @@ export default function Act3View({ onCompleteAct, onOpenHelp, sessionIndex = 0 }
                       className={`pantry-card ${isChecked ? 'selected' : ''}`}
                       onClick={() => handleToggleIngredient(item.id)}
                       aria-pressed={isChecked}
-                      style={{ position: 'relative' }}
+                      style={{ position: 'relative', overflow: 'hidden' }}
                     >
-                      {item.model3d && (
-                        <span
-                          style={{
-                            position: 'absolute',
-                            top: '6px',
-                            right: '6px',
-                            background: 'rgba(20, 20, 28, 0.75)',
-                            backdropFilter: 'blur(3px)',
-                            color: 'var(--color-orange)',
-                            border: '1px solid rgba(255, 170, 68, 0.4)',
-                            borderRadius: '4px',
-                            padding: '1px 5px',
-                            fontSize: '0.62rem',
-                            fontWeight: 800,
-                            letterSpacing: '0.5px',
-                            zIndex: 2,
-                            pointerEvents: 'none'
-                          }}
-                        >
-                          3D
-                        </span>
-                      )}
                       <span className="pantry-check-dot">
                         {isChecked && <Check size={12} color="#FFF" />}
                       </span>
-                      <img src={item.image} alt={item.name} className="pantry-img" />
+
+                      {/* Model 3D Interaktif Langsung pada Kartu Rempah */}
+                      <div className="pantry-3d-box" style={{ width: '100%', height: '115px', position: 'relative', marginBottom: '6px' }}>
+                        <Item3DViewer
+                          modelPath={item.model3d}
+                          itemName={item.name}
+                          fallbackImage={item.image}
+                          height={115}
+                          compact={true}
+                          autoRotateSpeed={isChecked ? 2.4 : 1.2}
+                        />
+                      </div>
+
                       <strong className="pantry-name">{item.name}</strong>
                       <span className="pantry-prop">{item.property}</span>
                     </button>

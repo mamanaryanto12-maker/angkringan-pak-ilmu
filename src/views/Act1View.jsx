@@ -182,8 +182,8 @@ export default function Act1View({
           {/* Panduan Utama yang Jelas, Singkat, dan Menonjol */}
           <MiniGameGuideBanner
             tag="LANGKAH 1"
-            instruction="Pilih dan periksa benda di meja gerobak untuk menemukan 3 sobekan resep."
-            hint="Klik objek yang bersinar untuk membaca petunjuknya."
+            instruction="Temukan 3 sobekan resep pada benda di meja gerobak."
+            hint="Ketuk benda untuk mengamati dan membaca catatannya."
             onOpenHelp={onOpenHelp}
           />
 
@@ -403,8 +403,8 @@ export default function Act1View({
           {/* Panduan Utama Penataan */}
           <MiniGameGuideBanner
             tag="LANGKAH 2"
-            instruction="Pilah benda ke Wadah Rempah atau Rak Peralatan."
-            hint="Seret kartu ke wadah tujuan atau klik tombol pilihan pada kartu."
+            instruction="Pilah setiap benda ke Wadah Rempah atau Rak Peralatan."
+            hint="Lihat bentuk 3D benda, lalu klik tombol Rempah / Peralatan di bawahnya."
             onOpenHelp={onOpenHelp}
           />
 
@@ -415,13 +415,13 @@ export default function Act1View({
             </div>
           )}
 
-          {/* Kolam Kartu yang Harus Dipilah */}
+          {/* Kolam Kartu yang Harus Dipilah (Menggunakan Model 3D Asli Langsung) */}
           <div className="sorting-pool-area">
             {poolItems.length === 0 ? (
               <div className="sorting-done-state">
-                <CheckCircle2 size={32} color="var(--color-teal)" />
-                <h4>Semua benda telah tertata rapi di tempatnya!</h4>
-                <p>Gerobak siap digunakan untuk meracik pesanan.</p>
+                <CheckCircle2 size={36} color="var(--color-teal)" />
+                <h4>Semua Benda Berhasil Dipilah!</h4>
+                <p>Seluruh bahan rempah dan peralatan telah tertata rapi di posisinya.</p>
               </div>
             ) : (
               <div className="sort-cards-grid">
@@ -436,8 +436,16 @@ export default function Act1View({
                       onDragStart={(e) => handleDragStart(e, item)}
                       tabIndex={0}
                     >
-                      <div className="sort-thumb-box">
-                        <img src={item.image} alt={item.name} />
+                      {/* Render Model 3D Interaktif Langsung pada Kartu */}
+                      <div className="sort-thumb-box" style={{ height: '135px', position: 'relative' }}>
+                        <Item3DViewer
+                          modelPath={item.model3d}
+                          itemName={item.name}
+                          fallbackImage={item.image}
+                          height={135}
+                          compact={true}
+                          autoRotateSpeed={1.8}
+                        />
                       </div>
 
                       <div className="sort-card-title">{item.name}</div>
@@ -446,14 +454,14 @@ export default function Act1View({
                         <button
                           className="sort-pick-btn bahan"
                           onClick={() => placeItem(item, 'bahan')}
-                          title="Masukkan ke Wadah Rempah"
+                          title="Pilah ke Wadah Rempah"
                         >
                           + Rempah
                         </button>
                         <button
                           className="sort-pick-btn alat"
                           onClick={() => placeItem(item, 'alat')}
-                          title="Masukkan ke Rak Peralatan"
+                          title="Pilah ke Rak Peralatan"
                         >
                           + Peralatan
                         </button>
@@ -482,7 +490,7 @@ export default function Act1View({
                 ) : (
                   bahanBasket.map((item) => (
                     <div key={item.id} className="sorted-chip">
-                      <img src={item.image} alt="" />
+                      <span className="chip-badge-tag">Rempah</span>
                       <span>{item.name}</span>
                       <Check size={14} color="var(--color-teal)" style={{ marginLeft: 'auto' }} />
                     </div>
@@ -506,7 +514,7 @@ export default function Act1View({
                 ) : (
                   alatBasket.map((item) => (
                     <div key={item.id} className="sorted-chip">
-                      <img src={item.image} alt="" />
+                      <span className="chip-badge-tag alat">Alat</span>
                       <span>{item.name}</span>
                       <Check size={14} color="var(--color-teal)" style={{ marginLeft: 'auto' }} />
                     </div>

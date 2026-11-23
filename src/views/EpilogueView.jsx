@@ -4,6 +4,7 @@ import confetti from 'canvas-confetti';
 import { soundManager } from '../utils/audio.js';
 import { EPILOGUE_VARIANTS, shuffleArray } from '../data/gameData.js';
 import MiniGameGuideBanner from '../components/MiniGameGuideBanner.jsx';
+import Item3DViewer from '../components/Item3DViewer.jsx';
 
 export default function EpilogueView({ onCompleteEpilogue, onOpenHelp, sessionIndex = 0 }) {
   const [placedWords, setPlacedWords] = useState([]);
@@ -114,19 +115,24 @@ export default function EpilogueView({ onCompleteEpilogue, onOpenHelp, sessionIn
           />
         </div>
 
-        {/* Visual Toples Kawruh dengan Gambar Asli toples.png */}
-        <div className="toples-kawruh-visual">
-          <img
-            src="/background/toples.png"
-            alt="Toples Kawruh Pak Ilmu"
-            className="toples-official-img"
-            onError={(e) => { e.target.style.display = 'none'; }}
+        {/* Visual Model 3D Toples Kawruh Kaca Realistis (Blender PBR) */}
+        <div className="toples-kawruh-visual" style={{ width: '280px', height: '260px', margin: '0 auto 16px auto', position: 'relative' }}>
+          <Item3DViewer
+            modelPath="/assets/models/items/toples.glb"
+            itemName="Toples Kawruh Pak Ilmu"
+            fallbackImage="/background/toples.png"
+            height={260}
+            showBadge={true}
+            autoRotateSpeed={1.5}
           />
 
           {isNoteSubmitted && (
             <div style={{
               position: 'absolute',
-              bottom: '18px',
+              bottom: '12px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              whiteSpace: 'nowrap',
               background: '#FFFDF9',
               color: 'var(--color-teal-dark)',
               border: '1.5px solid var(--color-teal)',
@@ -138,10 +144,11 @@ export default function EpilogueView({ onCompleteEpilogue, onOpenHelp, sessionIn
               animation: 'snapInPiece 0.5s ease',
               display: 'flex',
               alignItems: 'center',
-              gap: '6px'
+              gap: '6px',
+              zIndex: 4
             }}>
               <CheckCircle2 size={16} color="var(--color-teal)" />
-              <span>Kawruh Berhasil Tersimpan di Toples</span>
+              <span>Kawruh Tersimpan di Toples Kaca</span>
             </div>
           )}
         </div>

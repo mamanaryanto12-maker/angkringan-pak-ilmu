@@ -225,37 +225,10 @@ export default function Act2View({ onCompleteAct, onOpenHelp, sessionIndex = 0 }
         <div>
           <MiniGameGuideBanner
             tag="TANTANGAN 1"
-            instruction="Susun 4 kepingan naskah resep wedang jahe sesuai urutannya."
-            hint="Pilih kepingan di panel kiri, lalu pasang pada bingkai naskah di kanan."
+            instruction="Susun 4 kepingan naskah resep wedang sesuai urutannya."
+            hint="Pilih kepingan di kiri lalu pasang ke bingkai di kanan."
             onOpenHelp={onOpenHelp}
           />
-
-          {/* Ilustrasi Visual Struktur 3 Bagian Naskah (Contoh Ringkas) */}
-          <div className="structure-visual-strip">
-            <div className="structure-step-badge">
-              <img src="/assets/tools/naskah_pembuka.svg" alt="" />
-              <div>
-                <strong>Pembuka</strong>
-                <span>Sapa tamu & pilih rimpang awal</span>
-              </div>
-            </div>
-            <div className="structure-arrow">→</div>
-            <div className="structure-step-badge">
-              <img src="/assets/tools/naskah_isi.svg" alt="" />
-              <div>
-                <strong>Isi</strong>
-                <span>Memar rempah & tuang air didih</span>
-              </div>
-            </div>
-            <div className="structure-arrow">→</div>
-            <div className="structure-step-badge">
-              <img src="/assets/tools/naskah_penutup.svg" alt="" />
-              <div>
-                <strong>Penutup</strong>
-                <span>Aduk gula aren & sajikan hangat</span>
-              </div>
-            </div>
-          </div>
 
           {puzzleFeedback && (
             <div className={`feedback-strip ${puzzleFeedback.type}`}>
@@ -268,8 +241,8 @@ export default function Act2View({ onCompleteAct, onOpenHelp, sessionIndex = 0 }
             {/* Panel Kiri: Kepingan Acak */}
             <div className="puzzle-panel">
               <div className="puzzle-panel-header">
-                <span className="panel-title-kicker orange">Kepingan Sobekan ({placedPieces.filter(Boolean).length}/4)</span>
-                <span className="panel-hint-mini">Klik kepingan untuk memilih</span>
+                <span className="panel-title-kicker orange">Kepingan Naskah ({placedPieces.filter(Boolean).length}/4)</span>
+                <span className="panel-hint-mini">Klik untuk memilih</span>
               </div>
 
               <div className="puzzle-pieces-grid">
@@ -314,7 +287,7 @@ export default function Act2View({ onCompleteAct, onOpenHelp, sessionIndex = 0 }
             {/* Panel Kanan: Bingkai Target 4 Slot */}
             <div className="puzzle-panel">
               <div className="puzzle-panel-header">
-                <span className="panel-title-kicker teal">Bingkai Naskah Utuh (4 Bagian)</span>
+                <span className="panel-title-kicker teal">Bingkai Naskah Utuh</span>
                 {isPuzzleComplete && (
                   <button
                     className="btn-read-manuscript"
@@ -324,7 +297,7 @@ export default function Act2View({ onCompleteAct, onOpenHelp, sessionIndex = 0 }
                     }}
                   >
                     <BookOpen size={14} />
-                    <span>Buka Naskah Utuh</span>
+                    <span>Naskah Utuh</span>
                   </button>
                 )}
               </div>
@@ -361,7 +334,7 @@ export default function Act2View({ onCompleteAct, onOpenHelp, sessionIndex = 0 }
                         <p className="slot-filled-text">“{placed.text}”</p>
                       ) : (
                         <div className="slot-empty-prompt">
-                          {isReady ? 'Klik untuk meletakkan kepingan di sini' : 'Slot kosong'}
+                          {isReady ? 'Klik untuk memasang di sini' : 'Slot kosong'}
                         </div>
                       )}
                     </div>
@@ -477,13 +450,13 @@ export default function Act2View({ onCompleteAct, onOpenHelp, sessionIndex = 0 }
         </div>
       )}
 
-      {/* SUBBABAK 3: KHASIAT & RAGA (HANYA REMPAH ASLI DI INVENTORY) */}
+      {/* SUBBABAK 3: KHASIAT & RAGA (REMPAH ASLI NUSANTARA) */}
       {subTab === 'matching' && (
         <div>
           <MiniGameGuideBanner
             tag="TANTANGAN 3"
-            instruction="Cocokkan kondisi raga pengunjung dengan khasiat rempah yang tepat."
-            hint="Pilih kondisi di sisi kiri, lalu pilih rempah penawarnya di sisi kanan."
+            instruction="Pasangkan kondisi pengunjung dengan bahan rempah yang tepat."
+            hint="Pilih kondisi di sisi kiri, lalu ketuk rempah yang cocok di sisi kanan."
             onOpenHelp={onOpenHelp}
           />
 
