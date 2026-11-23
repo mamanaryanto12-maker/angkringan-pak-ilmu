@@ -20,8 +20,9 @@ export default function Item3DViewer({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const controlsRef = useRef(null);
-  const modelRef = useRef(null);
+  const turntableRef = useRef(null);
   const resumeTimerRef = useRef(null);
+  const autoRotateRef = useRef(true);
 
   useEffect(() => {
     const container = mountRef.current;
@@ -37,7 +38,7 @@ export default function Item3DViewer({
     const width = container.clientWidth || 300;
     const heightPx = typeof height === 'number' ? height : parseInt(height, 10) || 220;
     const camera = new THREE.PerspectiveCamera(36, width / heightPx, 0.05, 50);
-    camera.position.set(1.65, 1.15, 2.05);
+    camera.position.set(0.35, 0.55, 2.25);
 
     // 3. Renderer dengan ACESFilmic Tone Mapping & High Precision
     const renderer = new THREE.WebGLRenderer({
@@ -62,62 +63,102 @@ export default function Item3DViewer({
     const envTexture = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
     scene.environment = envTexture;
 
-    // 5. Studio Multi-Point Lighting (Nuansa Hangat Otentik Angkringan)
-    const ambientLight = new THREE.AmbientLight(0xfff7ee, 1.2);
+    // 5. Studio Multi-Point Lighting (Pencahayaan Statis Konsisten)
+    const ambientLight = new THREE.AmbientLight(0xfff7ee, 1.25);
     scene.add(ambientLight);
 
-    const keyLight = new THREE.DirectionalLight(0xfff0db, 2.6);
-    keyLight.position.set(2.8, 3.8, 2.4);
+    // Key Light - Cahaya Utama Atas-Kanan Menyinari Objek
+    const keyLight = new THREE.DirectionalLight(0xfff5ea, 2.8);
+    keyLight.position.set(2.2, 3.6, 2.0);
     keyLight.castShadow = true;
-    keyLight.shadow.bias = -0.0005;
+    keyLight.shadow.mapSize.width = 1024;
+    keyLight.shadow.mapSize.height = 1024;
+    keyLight.shadow.bias = -0.0004;
+    keyLight.shadow.camera.near = 0.5;
+    keyLight.shadow.camera.far = 10;
     scene.add(keyLight);
 
-    const fillLight = new THREE.DirectionalLight(0x358c88, 1.2);
-    fillLight.position.set(-2.8, 1.6, -2.2);
+    // Fill Light - Sudut Kiri Bawah Lembut
+    const fillLight = new THREE.DirectionalLight(0x358c88, 1.1);
+    fillLight.position.set(-2.6, 1.8, -2.0);
     scene.add(fillLight);
 
-    const warmRimLight = new THREE.PointLight(0xffaa44, 2.0, 7.0, 1.2);
-    warmRimLight.position.set(0.0, -0.8, 1.8);
+    // Rim Light - Hangat dari Belakang
+    const warmRimLight = new THREE.PointLight(0xffaa44, 1.8, 6.0, 1.2);
+    warmRimLight.position.set(0.0, -0.6, 1.8);
     scene.add(warmRimLight);
 
-    // Bayangan lembut menapak tanah di bawah objek
-    const shadowGeo = new THREE.PlaneGeometry(3.2, 3.2);
-    const shadowMat = new THREE.ShadowMaterial({ opacity: 0.22 });
+    // 6. Sistem Bayangan Statis Menapak Tanah (Tidak Berputar Sendiri Secara Liar)
+    // A. Contact Shadow Radial Texture (Pijakan Alami)
+    const shadowCanvas = document.createElement('canvas');
+    shadowCanvas.width = 128;
+    shadowCanvas.height = 128;
+    const ctx = shadowCanvas.getContext('2d');
+    const grad = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+    grad.addColorStop(0, 'rgba(25, 16, 10, 0.42)');
+    grad.addColorStop(0.35, 'rgba(35, 22, 14, 0.22)');
+    grad.addColorStop(0.70, 'rgba(50, 32, 20, 0.08)');
+    grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 128, 128);
+    const contactShadowTex = new THREE.CanvasTexture(shadowCanvas);
+
+    const contactGeo = new THREE.PlaneGeometry(2.4, 2.4);
+    const contactMat = new THREE.MeshBasicMaterial({
+      map: contactShadowTex,
+      transparent: true,
+      opacity: 0.85,
+      depthWrite: false
+    });
+    const contactMesh = new THREE.Mesh(contactGeo, contactMat);
+    contactMesh.rotation.x = -Math.PI / 2;
+    contactMesh.position.y = -0.68;
+    scene.add(contactMesh);
+
+    // B. Real Directional Shadow Receiver Plane
+    const shadowGeo = new THREE.PlaneGeometry(3.6, 3.6);
+    const shadowMat = new THREE.ShadowMaterial({ opacity: 0.24, depthWrite: false });
     const shadowPlane = new THREE.Mesh(shadowGeo, shadowMat);
     shadowPlane.rotation.x = -Math.PI / 2;
-    shadowPlane.position.y = -0.72;
+    shadowPlane.position.y = -0.678;
     shadowPlane.receiveShadow = true;
     scene.add(shadowPlane);
 
-    // 6. OrbitControls (Responsif & Zoom In Dekat)
+    // 7. Turntable Group (Hanya Objek yang Berputar di Atas Dudukan, Bayangan Tetap Menapak Alami)
+    const turntableGroup = new THREE.Group();
+    scene.add(turntableGroup);
+    turntableRef.current = turntableGroup;
+
+    // 8. OrbitControls (Hanya untuk Interaksi Pengguna, Tidak Memutar Kamera Otomatis)
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.08;
-    controls.autoRotate = true;
-    controls.autoRotateSpeed = autoRotateSpeed;
+    controls.autoRotate = false; // Kamera tetap diam; animasi putar dilakukan oleh Turntable Group
     controls.enablePan = false;
     controls.enableZoom = interactive;
     controls.enableRotate = interactive;
     controls.minDistance = 0.85; // Pengunjung bisa zoom in sangat dekat untuk melihat tekstur
     controls.maxDistance = 4.0;
+    controls.minPolarAngle = Math.PI / 6;
+    controls.maxPolarAngle = Math.PI / 2 + 0.05;
     controls.target.set(0, 0, 0);
     controlsRef.current = controls;
 
     const onStart = () => {
       if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
-      controls.autoRotate = false;
+      autoRotateRef.current = false;
     };
     const onEnd = () => {
       if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
       resumeTimerRef.current = setTimeout(() => {
-        controls.autoRotate = true;
-      }, 1500);
+        autoRotateRef.current = true;
+      }, 1600);
     };
 
     controls.addEventListener('start', onStart);
     controls.addEventListener('end', onEnd);
 
-    // 7. Load GLB Model
+    // 9. Load GLB Model
     const loader = new GLTFLoader();
     let isDisposed = false;
 
@@ -126,7 +167,6 @@ export default function Item3DViewer({
       (gltf) => {
         if (isDisposed) return;
         const root = gltf.scene;
-        modelRef.current = root;
 
         // Auto-center and auto-scale to bounding box
         const bbox = new THREE.Box3().setFromObject(root);
@@ -143,8 +183,9 @@ export default function Item3DViewer({
         bbox.getCenter(center);
         root.position.sub(center);
 
-        // Sedikit miringkan sudut pandang default agar tampak tiga dimensi natural
-        root.rotation.y = 0.35;
+        // Posisikan alas model persis di atas bayangan lantai
+        const updatedBox = new THREE.Box3().setFromObject(root);
+        root.position.y += (-0.66 - updatedBox.min.y);
 
         // Optimalkan material PBR (refleksi kaca, logam, enamel, dan batu)
         root.traverse((child) => {
@@ -152,13 +193,27 @@ export default function Item3DViewer({
             child.castShadow = true;
             child.receiveShadow = true;
             if (child.material) {
-              child.material.envMapIntensity = 1.35;
+              const matName = (child.material.name || '').toLowerCase();
+              // Cek Material Kaca Toples Kawruh
+              if (matName.includes('glass') || child.material.transmission > 0.1) {
+                child.material.transparent = true;
+                child.material.transmission = 0.94;
+                child.material.roughness = 0.04;
+                child.material.ior = 1.52;
+                child.material.thickness = 0.45;
+                child.material.envMapIntensity = 2.2;
+                child.castShadow = true;
+              } else if (child.material.metallic > 0.5) {
+                child.material.envMapIntensity = 1.5;
+              } else {
+                child.material.envMapIntensity = 1.15;
+              }
               child.material.needsUpdate = true;
             }
           }
         });
 
-        scene.add(root);
+        turntableGroup.add(root);
         setLoading(false);
       },
       undefined,
@@ -171,16 +226,22 @@ export default function Item3DViewer({
       }
     );
 
-    // 8. Render Loop
+    // 10. Render Loop (Animasi Putar Turntable Halus & Alami)
     let animId;
     const animate = () => {
       animId = requestAnimationFrame(animate);
+
+      // Putar turntable objek secara halus pada sumbu Y
+      if (autoRotateRef.current && turntableRef.current) {
+        turntableRef.current.rotation.y += autoRotateSpeed * 0.007;
+      }
+
       controls.update();
       renderer.render(scene, camera);
     };
     animate();
 
-    // 9. Resize Observer
+    // 11. Resize Observer
     const handleResize = () => {
       if (!container) return;
       const newW = container.clientWidth;
@@ -194,7 +255,7 @@ export default function Item3DViewer({
     const resizeObserver = new ResizeObserver(handleResize);
     resizeObserver.observe(container);
 
-    // 10. Cleanup
+    // 12. Cleanup
     return () => {
       isDisposed = true;
       if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
@@ -204,6 +265,7 @@ export default function Item3DViewer({
       controls.removeEventListener('end', onEnd);
       controls.dispose();
 
+      contactShadowTex.dispose();
       envTexture.dispose();
       pmremGenerator.dispose();
       renderer.dispose();
@@ -217,7 +279,10 @@ export default function Item3DViewer({
     e.stopPropagation();
     if (controlsRef.current) {
       controlsRef.current.reset();
-      controlsRef.current.autoRotate = true;
+      autoRotateRef.current = true;
+    }
+    if (turntableRef.current) {
+      turntableRef.current.rotation.set(0, 0, 0);
     }
   };
 
@@ -264,19 +329,19 @@ export default function Item3DViewer({
         >
           <div
             style={{
-              width: '26px',
-              height: '26px',
-              border: '2.5px solid rgba(255, 170, 68, 0.25)',
+              width: '24px',
+              height: '24px',
+              border: '2px solid rgba(255, 255, 255, 0.3)',
               borderTopColor: 'var(--color-orange)',
               borderRadius: '50%',
-              animation: 'spin 0.9s linear infinite'
+              animation: 'spin 1s linear infinite'
             }}
           />
-          <span>Memuat model 3D...</span>
+          <span>Memuat 3D...</span>
         </div>
       )}
 
-      {/* Fallback Image jika WebGL/Model gagal */}
+      {/* Fallback Image jika Model Gagal */}
       {error && fallbackImage && (
         <div
           style={{
@@ -296,78 +361,71 @@ export default function Item3DViewer({
         </div>
       )}
 
-      {/* Badge Interaktif 3D */}
-      {!compact && showBadge && !loading && !error && (
-        <div
-          style={{
-            position: 'absolute',
-            top: '8px',
-            left: '8px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '5px',
-            padding: '3px 8px',
-            background: 'rgba(18, 18, 24, 0.72)',
-            backdropFilter: 'blur(4px)',
-            borderRadius: '999px',
-            border: '1px solid rgba(255, 170, 68, 0.35)',
-            color: 'var(--color-orange)',
-            fontSize: '0.68rem',
-            fontWeight: 600,
-            pointerEvents: 'none',
-            zIndex: 3
-          }}
-        >
-          <Box size={11} />
-          <span>3D Interaktif</span>
-        </div>
-      )}
+      {/* Floating Badge & Interactivity Controls */}
+      {!loading && !error && (
+        <>
+          {showBadge && (
+            <div
+              style={{
+                position: 'absolute',
+                top: compact ? '4px' : '8px',
+                left: compact ? '4px' : '8px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
+                padding: compact ? '2px 6px' : '3px 8px',
+                background: 'rgba(20, 20, 26, 0.75)',
+                backdropFilter: 'blur(4px)',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                borderRadius: '12px',
+                fontSize: compact ? '0.62rem' : '0.68rem',
+                color: 'var(--color-gold)',
+                fontWeight: 700,
+                letterSpacing: '0.4px',
+                pointerEvents: 'none',
+                zIndex: 3
+              }}
+            >
+              <Box size={compact ? 10 : 12} />
+              <span>3D</span>
+            </div>
+          )}
 
-      {/* Tombol Reset Tampilan */}
-      {!compact && !loading && !error && (
-        <button
-          type="button"
-          onClick={handleResetCamera}
-          title="Reset Sudut Pandang"
-          aria-label="Reset sudut pandang 3D"
-          style={{
-            position: 'absolute',
-            bottom: '8px',
-            right: '8px',
-            width: '28px',
-            height: '28px',
-            borderRadius: '50%',
-            background: 'rgba(20, 20, 28, 0.75)',
-            backdropFilter: 'blur(4px)',
-            border: '1px solid rgba(255, 255, 255, 0.15)',
-            color: 'var(--color-cream-light)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-            zIndex: 3
-          }}
-        >
-          <RotateCw size={13} />
-        </button>
-      )}
-
-      {/* Hint Teks Geser */}
-      {!compact && !loading && !error && (
-        <div
-          style={{
-            position: 'absolute',
-            bottom: '8px',
-            left: '8px',
-            color: 'rgba(245, 242, 235, 0.55)',
-            fontSize: '0.65rem',
-            pointerEvents: 'none',
-            zIndex: 2
-          }}
-        >
-          Geser untuk memutar
-        </div>
+          {interactive && (
+            <div
+              style={{
+                position: 'absolute',
+                bottom: compact ? '4px' : '8px',
+                right: compact ? '4px' : '8px',
+                display: 'flex',
+                gap: '4px',
+                zIndex: 3
+              }}
+            >
+              <button
+                type="button"
+                onClick={handleResetCamera}
+                title="Reset Sudut Pandang Kamera"
+                style={{
+                  background: 'rgba(20, 20, 26, 0.75)',
+                  backdropFilter: 'blur(4px)',
+                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  borderRadius: '50%',
+                  width: compact ? '22px' : '28px',
+                  height: compact ? '22px' : '28px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'var(--color-cream-light)',
+                  cursor: 'pointer',
+                  padding: 0
+                }}
+              >
+                <RotateCw size={compact ? 11 : 14} />
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

@@ -250,15 +250,15 @@ export default function Act1View({
                       tabIndex={0}
                       aria-label={`${obj.name}${isInspected ? ', sudah diperiksa' : ''}`}
                     >
-                      <div className="item-image-wrapper" style={{ height: '125px', position: 'relative' }}>
+                      <div className="item-image-wrapper" style={{ height: '100px', position: 'relative' }}>
                         {obj.model3d ? (
                           <Item3DViewer
                             modelPath={obj.model3d}
                             itemName={obj.name}
                             fallbackImage={obj.image}
-                            height={125}
+                            height={100}
                             compact={true}
-                            autoRotateSpeed={1.5}
+                            autoRotateSpeed={1.4}
                           />
                         ) : (
                           <img
@@ -276,67 +276,63 @@ export default function Act1View({
                   );
                 })}
               </div>
+            </div>
 
-              {/* Drawer Inspeksi Benda Aktif (Ringkas & Dilengkapi Model 3D) */}
+            {/* Panel Kanan: Inspeksi Benda Aktif & Sobekan Resep Terkumpul */}
+            <aside className="notes-tracker-panel">
+              {/* Kartu Detail Benda yang Sedang Diperiksa */}
               {selectedObject && (
-                <div className="inspect-drawer">
-                  <div className="inspect-header">
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div className="sidebar-inspect-card">
+                  <div className="sidebar-inspect-header">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
                       <img
                         src={selectedObject.image}
                         alt=""
-                        style={{ width: '40px', height: '40px', objectFit: 'contain' }}
+                        style={{ width: '28px', height: '28px', objectFit: 'contain', flexShrink: 0 }}
                       />
-                      <div>
-                        <span className="inspect-category">{selectedObject.tag}</span>
-                        <h3 className="inspect-title">{selectedObject.name}</h3>
+                      <div style={{ minWidth: 0 }}>
+                        <span className="sidebar-inspect-tag">{selectedObject.tag}</span>
+                        <h4 className="sidebar-inspect-name">{selectedObject.name}</h4>
                       </div>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      {selectedObject.model3d && onOpen3DGallery && (
-                        <button
-                          type="button"
-                          className="btn-secondary-action"
-                          style={{ padding: '6px 12px', fontSize: '0.78rem', display: 'flex', alignItems: 'center', gap: '5px' }}
-                          onClick={() => onOpen3DGallery(selectedObject.id)}
-                        >
-                          <Box size={13} color="var(--color-orange)" />
-                          <span>Perbesar 3D</span>
-                        </button>
-                      )}
-                      <button
-                        className="btn-secondary-action"
-                        style={{ padding: '6px 14px', fontSize: '0.8rem' }}
-                        onClick={() => setSelectedObject(null)}
-                      >
-                        Tutup
-                      </button>
-                    </div>
+                    <button
+                      className="sidebar-inspect-close"
+                      onClick={() => setSelectedObject(null)}
+                      title="Tutup detail benda"
+                    >
+                      <X size={14} />
+                    </button>
                   </div>
 
-                  {/* 3D Model Interaktif jika tersedia */}
-                  {selectedObject.model3d && (
-                    <div style={{ marginTop: '10px', marginBottom: '10px' }}>
-                      <Item3DViewer
-                        modelPath={selectedObject.model3d}
-                        itemName={selectedObject.name}
-                        fallbackImage={selectedObject.image}
-                        height={250}
-                      />
-                    </div>
-                  )}
-
-                  <p className="inspect-clue-highlight">
+                  <p className="sidebar-inspect-clue">
                     <strong>Fungsi:</strong> {selectedObject.clue}
                   </p>
+
+                  {selectedObject.model3d && onOpen3DGallery && (
+                    <button
+                      type="button"
+                      className="btn-secondary-action"
+                      style={{
+                        width: '100%',
+                        marginTop: '6px',
+                        padding: '5px 8px',
+                        fontSize: '0.74rem',
+                        justifyContent: 'center',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '5px'
+                      }}
+                      onClick={() => onOpen3DGallery(selectedObject.id)}
+                    >
+                      <Box size={13} color="var(--color-orange)" />
+                      <span>Perbesar Tampilan 3D</span>
+                    </button>
+                  )}
                 </div>
               )}
-            </div>
 
-            {/* Panel Sobekan Resep Terkumpul */}
-            <aside className="notes-tracker-panel">
               <div className="notes-panel-head">
-                <FileText size={18} color="var(--color-orange)" />
+                <FileText size={16} color="var(--color-orange)" />
                 <h4>Sobekan Resep ({collectedNotes.length}/3)</h4>
               </div>
 
@@ -365,10 +361,10 @@ export default function Act1View({
                   className="btn-primary-action pulse-ready"
                   style={{
                     width: '100%',
-                    marginTop: '14px',
+                    marginTop: '10px',
                     justifyContent: 'center',
-                    padding: '12px 18px',
-                    fontSize: '0.92rem'
+                    padding: '10px 14px',
+                    fontSize: '0.88rem'
                   }}
                   onClick={() => {
                     soundManager.playClickSound();
@@ -376,7 +372,7 @@ export default function Act1View({
                   }}
                 >
                   <span>Lanjut ke Penataan</span>
-                  <ArrowRight size={17} />
+                  <ArrowRight size={16} />
                 </button>
               )}
             </aside>
@@ -426,12 +422,12 @@ export default function Act1View({
                       tabIndex={0}
                     >
                       {/* Render Model 3D Interaktif Langsung pada Kartu */}
-                      <div className="sort-thumb-box" style={{ height: '135px', position: 'relative' }}>
+                      <div className="sort-thumb-box" style={{ height: '105px', position: 'relative' }}>
                         <Item3DViewer
                           modelPath={item.model3d}
                           itemName={item.name}
                           fallbackImage={item.image}
-                          height={135}
+                          height={105}
                           compact={true}
                           autoRotateSpeed={1.8}
                         />
@@ -518,20 +514,37 @@ export default function Act1View({
       {/* Footer Navigasi Babak */}
       <div className="action-footer-bar">
         <div className="footer-progress-note">
-          Sobekan: {collectedNotes.length}/3 • Benda Tertata: {sortedCount}/{totalItems}
+          {activeTab === 'explore'
+            ? `Sobekan Resep: ${collectedNotes.length}/3 • Diperiksa: ${inspectedObjects.length}/${totalItems}`
+            : `Benda Tertata: ${sortedCount}/${totalItems}`
+          }
         </div>
 
-        <button
-          className="btn-primary-action"
-          disabled={!isAct1Ready}
-          onClick={() => {
-            soundManager.playActCompletion();
-            onCompleteAct();
-          }}
-        >
-          <span>Lanjut ke Babak 2</span>
-          <ArrowRight size={18} />
-        </button>
+        {activeTab === 'explore' ? (
+          <button
+            className={`btn-primary-action ${isExploreComplete ? 'pulse-ready' : ''}`}
+            disabled={!isExploreComplete}
+            onClick={() => {
+              soundManager.playClickSound();
+              setActiveTab('sort');
+            }}
+          >
+            <span>Lanjut ke Penataan</span>
+            <ArrowRight size={18} />
+          </button>
+        ) : (
+          <button
+            className={`btn-primary-action ${isAct1Ready ? 'pulse-ready' : ''}`}
+            disabled={!isAct1Ready}
+            onClick={() => {
+              soundManager.playActCompletion();
+              onCompleteAct();
+            }}
+          >
+            <span>Lanjut ke Babak 2</span>
+            <ArrowRight size={18} />
+          </button>
+        )}
       </div>
     </div>
   );

@@ -106,6 +106,16 @@ export const ITEMS_3D_LIST = [
     clue: 'Hangat lembut bersahabat di lambung dan raga.'
   },
   {
+    id: 'saringan',
+    name: 'Saringan Kain',
+    category: 'Peralatan',
+    model3d: '/assets/models/items/saringan.glb',
+    image: '/assets/tools/saringan.svg',
+    materialDesc: 'Kantong kain blacu tenun dengan lingkar kawat baja tahan karat dan pegangan kayu jati ergonomis.',
+    culturalRole: 'Peralatan penyaring tradisional untuk memisahkan ampas rempah agar seduhan wedang jernih dan nyaman diminum.',
+    clue: 'Menyaring seduhan rempah agar wedang jernih tanpa ampas kasar.'
+  },
+  {
     id: 'toples',
     name: 'Toples Kawruh Kaca',
     category: 'Wadah Hikmah',

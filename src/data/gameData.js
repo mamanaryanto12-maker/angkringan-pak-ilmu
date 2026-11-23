@@ -222,6 +222,7 @@ export const MASTER_ANGKRINGAN_INVENTORY = {
     category: "alat",
     tag: "Peralatan",
     image: "/assets/tools/saringan.svg",
+    model3d: "/assets/models/items/saringan.glb",
     desc: "Saringan tradisional pemisah ampas rempah agar seduhan bersih.",
     clue: "Memastikan wedang nyaman diminum tanpa ampas kasar.",
     hint: "Perkakas penyaring minuman (Peralatan).",
