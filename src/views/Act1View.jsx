@@ -182,7 +182,7 @@ export default function Act1View({
       {/* TAHAP 1: EKSPLORASI MEJA GEROBAK                             */}
       {/* ============================================================ */}
       {activeTab === 'explore' && (
-        <div className="act1-view-wrap">
+        <div key="explore" className="act1-view-wrap subview-enter">
           {/* Panduan Utama Ringkas */}
           <MiniGameGuideBanner
             tag="LANGKAH 1"
@@ -239,14 +239,15 @@ export default function Act1View({
                       tabIndex={0}
                       aria-label={`${obj.name}${isInspected ? ', sudah diperiksa' : ''}`}
                     >
-                      <div className="item-image-wrapper" style={{ height: '100px', position: 'relative' }}>
+                      <div className="item-image-wrapper" style={{ height: '136px', position: 'relative' }}>
                         {obj.model3d ? (
                           <Item3DViewer
                             modelPath={obj.model3d}
                             itemName={obj.name}
                             fallbackImage={obj.image}
-                            height={100}
+                            height={136}
                             compact={true}
+                            showBadge={false}
                             autoRotateSpeed={1.4}
                           />
                         ) : (
@@ -259,7 +260,6 @@ export default function Act1View({
                       </div>
                       <div className="item-meta-footer">
                         <div className="item-title">{obj.name}</div>
-                        <span className="item-tag">{obj.tag}</span>
                       </div>
                     </div>
                   );
@@ -350,7 +350,7 @@ export default function Act1View({
       {/* TAHAP 2: PENATAAN BAHAN REMPAH & RAK PERALATAN               */}
       {/* ============================================================ */}
       {activeTab === 'sort' && (
-        <div className="act1-view-wrap">
+        <div key="sort" className="act1-view-wrap subview-enter">
           {/* Panduan Utama Penataan */}
           <MiniGameGuideBanner
             tag="LANGKAH 2"

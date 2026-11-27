@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { ArrowRight, HeartHandshake, CheckCircle2, AlertCircle, Check, Flame, ThermometerSnowflake, Thermometer, Sparkles } from 'lucide-react';
 import { soundManager } from '../utils/audio.js';
 import { ACT_3_PERSONAS, PANTRY_INGREDIENTS, evaluateCustomRecipe } from '../data/gameData.js';
@@ -8,11 +8,21 @@ import Item3DViewer from '../components/Item3DViewer.jsx';
 
 export default function Act3View({ onCompleteAct, onOpenHelp, onSubStepChange, sessionIndex = 0 }) {
   const [currentPhase, setCurrentPhase] = useState(1); // 1: needs, 2: recipe, 3: delivery, 4: serving cutscene
-  const [serveCutsceneBeat, setServeCutsceneBeat] = useState('placing'); // 'placing' | 'tasting'
+  const [serveCutsceneBeat, setServeCutsceneBeat] = useState('pouring'); // 'pouring' | 'offering' | 'receiving' | 'tasting'
+  const serveTimersRef = useRef([]);
 
   useEffect(() => {
     if (onSubStepChange) onSubStepChange(`act3:${currentPhase}`);
   }, [currentPhase, onSubStepChange]);
+
+  const clearServeTimers = () => {
+    serveTimersRef.current.forEach(t => clearTimeout(t));
+    serveTimersRef.current = [];
+  };
+
+  useEffect(() => {
+    return () => clearServeTimers();
+  }, []);
 
   const currentPersona = useMemo(() => {
     return ACT_3_PERSONAS[sessionIndex % ACT_3_PERSONAS.length];
@@ -24,12 +34,13 @@ export default function Act3View({ onCompleteAct, onOpenHelp, onSubStepChange, s
   const [selectedDecision, setSelectedDecision] = useState(null);
 
   useEffect(() => {
+    clearServeTimers();
     setCurrentPhase(1);
     setSelectedNeed(null);
     setSelectedIngredients(['jahe', 'serai']);
     setServingTemp('hangat_panas');
     setSelectedDecision(null);
-    setServeCutsceneBeat('placing');
+    setServeCutsceneBeat('pouring');
   }, [currentPersona]);
 
   const evaluation = useMemo(() => {
@@ -43,14 +54,27 @@ export default function Act3View({ onCompleteAct, onOpenHelp, onSubStepChange, s
     );
   };
 
+  // Animasi Penyerahan Wedang 5 Detik (5000ms) yang Halus dalam 3 Fase Berurutan
   const handleFinalServe = () => {
+    clearServeTimers();
     soundManager.playCupServe();
-    setServeCutsceneBeat('placing');
+    setServeCutsceneBeat('pouring');
     setCurrentPhase(4);
-    setTimeout(() => {
+
+    const t1 = setTimeout(() => {
+      setServeCutsceneBeat('offering');
+    }, 1700);
+
+    const t2 = setTimeout(() => {
+      setServeCutsceneBeat('receiving');
+    }, 3500);
+
+    const t3 = setTimeout(() => {
       soundManager.playPlaceSuccess();
       setServeCutsceneBeat('tasting');
-    }, 1000);
+    }, 5000);
+
+    serveTimersRef.current = [t1, t2, t3];
   };
 
   // Kutipan respons pengunjung berdasarkan tingkat kesesuaian racikan
@@ -112,12 +136,11 @@ export default function Act3View({ onCompleteAct, onOpenHelp, onSubStepChange, s
         </div>
       </div>
 
-      {/* Panduan Utama Ringkas Sesuai Tahapan */}
+      {/* Panduan Singkat 1 Baris per Tahap */}
       {currentPhase === 1 && (
         <MiniGameGuideBanner
           tag="TAHAP 1"
-          instruction={`Pahami cerita ${currentPersona.name}, lalu pilih jawaban yang tepat.`}
-          hint="Baca kondisi tamu di sisi kiri."
+          instruction={`Pilih tanggapan yang tepat untuk ${currentPersona.name}.`}
           onOpenHelp={onOpenHelp}
         />
       )}
@@ -125,8 +148,7 @@ export default function Act3View({ onCompleteAct, onOpenHelp, onSubStepChange, s
       {currentPhase === 2 && (
         <MiniGameGuideBanner
           tag="TAHAP 2"
-          instruction={`Racik rempah dan pilih suhu minuman untuk ${currentPersona.name}.`}
-          hint="Klik kartu rempah 3D untuk memilih bahan."
+          instruction="Pilih rempah 3D dan suhu minuman."
           onOpenHelp={onOpenHelp}
         />
       )}
@@ -134,8 +156,7 @@ export default function Act3View({ onCompleteAct, onOpenHelp, onSubStepChange, s
       {currentPhase === 3 && (
         <MiniGameGuideBanner
           tag="TAHAP 3"
-          instruction={`Pilih sapaan hangat saat menyajikan wedang kepada ${currentPersona.name}.`}
-          hint="Klik satu pilihan lalu tekan Sajikan Wedang."
+          instruction={`Pilih sapaan saat menyajikan wedang ke ${currentPersona.name}.`}
           onOpenHelp={onOpenHelp}
         />
       )}
@@ -165,13 +186,12 @@ export default function Act3View({ onCompleteAct, onOpenHelp, onSubStepChange, s
         </aside>
 
         {/* Kanan: Area Aksi Interaktif */}
-        <section className="brewing-workshop">
-          {/* FASE 1: ANALISIS KEBUTUHAN */}
+        <section key={currentPhase} className="brewing-workshop subview-enter">
+          {/* FASE 1: KEBUTUHAN */}
           {currentPhase === 1 && (
             <div className="phase-stack">
               <div className="phase-heading-block">
-                <span className="phase-kicker">Langkah 1 • Kepekaan</span>
-                <h3>Apa yang paling dibutuhkan {currentPersona.name} saat ini?</h3>
+                <h3>Apa yang dibutuhkan {currentPersona.name}?</h3>
               </div>
 
               <div className="choice-list-clean">
@@ -218,20 +238,17 @@ export default function Act3View({ onCompleteAct, onOpenHelp, onSubStepChange, s
             </div>
           )}
 
-          {/* FASE 2: RACIKAN BEBAS (2+ BAHAN + SUHU + EVALUASI KONTEKSTUAL) */}
+          {/* FASE 2: RACIKAN BEBAS (VISUAL-FIRST) */}
           {currentPhase === 2 && (
             <div className="phase-stack">
               <div className="phase-heading-block with-cup">
-                <div>
-                  <span className="phase-kicker">Langkah 2 • Komposisi Bebas</span>
-                  <h3>Pilih Kombinasi Rempah & Suhu Penyajian</h3>
-                </div>
+                <h3>Pilih Rempah & Suhu</h3>
                 <div className="cup-counter-badge">
-                  <span>{selectedIngredients.length} Bahan Terpilih</span>
+                  <span>{selectedIngredients.length} Dipilih</span>
                 </div>
               </div>
 
-              {/* Grid 6 Bahan Rempah dengan Model 3D Asli Langsung */}
+              {/* Grid 6 Bahan Rempah dengan Model 3D Langsung */}
               <div className="pantry-selection-grid">
                 {PANTRY_INGREDIENTS.map((item) => {
                   const isChecked = selectedIngredients.includes(item.id);
@@ -249,20 +266,19 @@ export default function Act3View({ onCompleteAct, onOpenHelp, onSubStepChange, s
                         {isChecked && <Check size={12} color="#FFF" />}
                       </span>
 
-                      {/* Model 3D Interaktif Langsung pada Kartu Rempah */}
-                      <div className="pantry-3d-box" style={{ width: '100%', height: '100px', position: 'relative', marginBottom: '2px' }}>
+                      <div className="pantry-3d-box" style={{ width: '100%', height: '104px', position: 'relative', marginBottom: '2px' }}>
                         <Item3DViewer
                           modelPath={item.model3d}
                           itemName={item.name}
                           fallbackImage={item.image}
-                          height={100}
+                          height={104}
                           compact={true}
+                          showBadge={false}
                           autoRotateSpeed={isChecked ? 2.4 : 1.2}
                         />
                       </div>
 
                       <strong className="pantry-name">{item.name}</strong>
-                      <span className="pantry-prop">{item.property}</span>
                     </button>
                   );
                 })}
@@ -270,7 +286,7 @@ export default function Act3View({ onCompleteAct, onOpenHelp, onSubStepChange, s
 
               {/* Pemilih Suhu Seduhan */}
               <div className="temp-selector-row">
-                <span className="temp-label">Suhu Sajian:</span>
+                <span className="temp-label">Suhu:</span>
                 <div className="temp-buttons">
                   <button
                     type="button"
@@ -299,7 +315,7 @@ export default function Act3View({ onCompleteAct, onOpenHelp, onSubStepChange, s
                 </div>
               </div>
 
-              {/* Evaluasi Kesesuaian Racikan Kontekstual */}
+              {/* Evaluasi Singkat 1 Baris */}
               <div className={`tier-eval-card ${evaluation.tier}`}>
                 <div className="tier-eval-head">
                   <span className="tier-badge-pill">{evaluation.badge}</span>
@@ -307,8 +323,7 @@ export default function Act3View({ onCompleteAct, onOpenHelp, onSubStepChange, s
                     {selectedIngredientNames.length > 0 ? selectedIngredientNames.join(' + ') : 'Belum ada bahan'}
                   </span>
                 </div>
-                <p className="tier-analysis-text">{evaluation.analysis}</p>
-                <span className="tier-rec-line">{evaluation.recommendation}</span>
+                <p className="tier-analysis-text" style={{ marginBottom: 0 }}>{evaluation.analysis}</p>
               </div>
 
               <div className="phase-footer-actions split">
@@ -324,23 +339,18 @@ export default function Act3View({ onCompleteAct, onOpenHelp, onSubStepChange, s
                     setCurrentPhase(3);
                   }}
                 >
-                  <span>
-                    {evaluation.tier === 'sangat_sesuai'
-                      ? 'Lanjut Penyajian'
-                      : 'Sajikan Racikan Ini'}
-                  </span>
+                  <span>Lanjut Penyajian</span>
                   <ArrowRight size={17} />
                 </button>
               </div>
             </div>
           )}
 
-          {/* FASE 3: TUTUR KATA PENYAJIAN */}
+          {/* FASE 3: PENYAJIAN */}
           {currentPhase === 3 && (
             <div className="phase-stack">
               <div className="phase-heading-block">
-                <span className="phase-kicker">Langkah 3 • Tutur Kata</span>
-                <h3>Pilih cara menyerahkan cangkir kepada {currentPersona.name}</h3>
+                <h3>Pilih sapaan untuk {currentPersona.name}</h3>
               </div>
 
               <div className="decision-options-group">
@@ -357,10 +367,10 @@ export default function Act3View({ onCompleteAct, onOpenHelp, onSubStepChange, s
                         setSelectedDecision(dec);
                       }}
                     >
-                      <HeartHandshake size={28} color={isSelected ? 'var(--color-teal-dark)' : 'var(--color-teal)'} style={{ flexShrink: 0 }} />
+                      <HeartHandshake size={24} color={isSelected ? 'var(--color-teal-dark)' : 'var(--color-teal)'} style={{ flexShrink: 0 }} />
                       <div>
                         <strong className="decision-quote">“{dec.quote}”</strong>
-                        <span className="decision-tone">Sikap: {dec.tone}</span>
+                        <span className="decision-tone">{dec.tone}</span>
                       </div>
                     </button>
                   );
@@ -383,13 +393,12 @@ export default function Act3View({ onCompleteAct, onOpenHelp, onSubStepChange, s
             </div>
           )}
 
-          {/* FASE 4: ANIMASI PENYAJIAN, RESPONS PENGUNJUNG, & CATATAN PEMBELAJARAN */}
+          {/* FASE 4: ANIMASI PENYERAHAN WEDANG 5 DETIK & RESPONS PENGUNJUNG */}
           {currentPhase === 4 && (
             <div className="serving-cutscene-panel">
-              {/* Tahap 1 Animasi: Cangkir Diletakkan & Mengepul */}
               <div className="serving-stage-box">
-                {serveCutsceneBeat === 'placing' ? (
-                  <div className="serving-beat-pouring">
+                {serveCutsceneBeat !== 'tasting' ? (
+                  <div className={`serving-beat-pouring beat-${serveCutsceneBeat}`}>
                     {servingTemp !== 'dingin_es' && (
                       <div className="steam-wrap">
                         <div className="steam-smoke" />
@@ -397,17 +406,28 @@ export default function Act3View({ onCompleteAct, onOpenHelp, onSubStepChange, s
                         <div className="steam-smoke" />
                       </div>
                     )}
-                    <div style={{ width: '160px', height: '140px', margin: '0 auto 8px', position: 'relative' }}>
+
+                    <div className={`serving-cup-motion-wrap beat-${serveCutsceneBeat}`}>
                       <Item3DViewer
                         modelPath="/assets/models/items/cangkir.glb"
                         itemName="Cangkir Blirik Wedang"
                         fallbackImage="/background/cangkir.png"
-                        height={140}
+                        height={155}
                         showBadge={false}
-                        autoRotateSpeed={2.8}
+                        interactive={false}
+                        autoRotateSpeed={serveCutsceneBeat === 'offering' ? 1.4 : 2.2}
                       />
                     </div>
-                    <p className="serving-beat-caption">Menyerahkan cangkir dengan dua tangan...</p>
+
+                    <p key={serveCutsceneBeat} className="serving-beat-caption">
+                      {serveCutsceneBeat === 'pouring' && 'Menyiapkan wedang di cangkir blirik...'}
+                      {serveCutsceneBeat === 'offering' && `Menyerahkan cangkir hangat ke ${currentPersona.name}...`}
+                      {serveCutsceneBeat === 'receiving' && `${currentPersona.name} menerima dan mencicipi...`}
+                    </p>
+
+                    <div className="serving-progress-track" aria-hidden="true">
+                      <div className="serving-progress-fill" />
+                    </div>
                   </div>
                 ) : (
                   <div className="serving-beat-reaction">
@@ -415,28 +435,22 @@ export default function Act3View({ onCompleteAct, onOpenHelp, onSubStepChange, s
                       <img src="/background/cangkir.png" alt="" className="reaction-cup-mini" />
                       <div>
                         <span className="reaction-status-chip">
-                          {evaluation.tier === 'kurang_sesuai' ? 'Catatan Reflektif Tamu' : `${currentPersona.name} Merasa Lebih Nyaman`}
+                          {evaluation.tier === 'kurang_sesuai' ? 'Tanggapan Tamu' : `${currentPersona.name} Merasa Nyaman`}
                         </span>
                         <div className="reaction-served-list">
-                          Racikanmu: {selectedIngredientNames.join(', ')} ({servingTemp === 'dingin_es' ? 'Dingin' : 'Hangat'})
+                          {selectedIngredientNames.join(' + ')} ({servingTemp === 'dingin_es' ? 'Dingin' : 'Hangat'})
                         </div>
                       </div>
                     </div>
 
-                    {/* Dialog Respons Kontekstual Pengunjung */}
                     <blockquote className="visitor-reaction-quote">
                       “{visitorResponseQuote}”
                     </blockquote>
 
-                    {selectedDecision && (
-                      <p className="visitor-decision-impact">{selectedDecision.impact}</p>
-                    )}
-
-                    {/* Catatan Pembelajaran Singkat */}
                     <div className="learning-reflection-note">
                       <div className="reflection-head">
                         <Sparkles size={15} color="var(--color-orange)" />
-                        <span>Catatan Pembelajaran</span>
+                        <span>Makna</span>
                       </div>
                       <p>{currentPersona.learningNote}</p>
                     </div>

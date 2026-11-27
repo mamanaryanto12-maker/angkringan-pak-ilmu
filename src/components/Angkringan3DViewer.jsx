@@ -43,13 +43,13 @@ export default function Angkringan3DViewer({ modelPath = '/assets/models/angkrin
     renderer.toneMappingExposure = 1.18;
     container.appendChild(renderer.domElement);
 
-    // 4. Atmospheric Warm Lighting (Nuansa Angkringan Elegan & Hidup)
-    const ambientLight = new THREE.AmbientLight(0xfff7ed, 1.15);
+    // 4. Atmospheric Warm Lighting (Pencahayaan Statis Konsisten)
+    const ambientLight = new THREE.AmbientLight(0xfff7ed, 1.2);
     scene.add(ambientLight);
 
     // Key Light - Cahaya Hangat
     const keyLight = new THREE.DirectionalLight(0xfff0db, 1.85);
-    keyLight.position.set(3.5, 4.2, 3.0);
+    keyLight.position.set(3.2, 4.4, 2.8);
     keyLight.castShadow = true;
     keyLight.shadow.mapSize.width = 1024;
     keyLight.shadow.mapSize.height = 1024;
@@ -73,29 +73,52 @@ export default function Angkringan3DViewer({ modelPath = '/assets/models/angkrin
     angloLight.position.set(0.68, 1.0, 0.0);
     scene.add(angloLight);
 
-    // Ground Shadow Receiver (Bayangan lembut menapak tanah)
-    const shadowGeo = new THREE.PlaneGeometry(3.8, 2.6);
-    const shadowMat = new THREE.ShadowMaterial({ opacity: 0.28 });
-    const shadowMesh = new THREE.Mesh(shadowGeo, shadowMat);
-    shadowMesh.rotation.x = -Math.PI / 2;
-    shadowMesh.position.y = 0.002;
-    shadowMesh.receiveShadow = true;
-    scene.add(shadowMesh);
+    // Bayangan Statis Terpusat di Permukaan Tanah (Terpisah dari Rotasi Gerobak)
+    // Menggunakan radial gradient simetris sehingga bayangan tetap diam di satu titik saat gerobak diputar
+    const shadowCanvas = document.createElement('canvas');
+    shadowCanvas.width = 256;
+    shadowCanvas.height = 256;
+    const ctx = shadowCanvas.getContext('2d');
+    const grad = ctx.createRadialGradient(128, 128, 8, 128, 128, 124);
+    grad.addColorStop(0.0, 'rgba(32, 20, 12, 0.44)');
+    grad.addColorStop(0.38, 'rgba(38, 24, 14, 0.28)');
+    grad.addColorStop(0.70, 'rgba(48, 30, 18, 0.10)');
+    grad.addColorStop(1.0, 'rgba(48, 30, 18, 0.0)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 256, 256);
 
-    // 5. OrbitControls (Animasi Putar Otomatis 360° & Zoom In/Out Luas)
+    const contactShadowTex = new THREE.CanvasTexture(shadowCanvas);
+    const contactGeo = new THREE.PlaneGeometry(2.55, 2.55);
+    const contactMat = new THREE.MeshBasicMaterial({
+      map: contactShadowTex,
+      transparent: true,
+      opacity: 0.92,
+      depthWrite: false
+    });
+    const contactShadowMesh = new THREE.Mesh(contactGeo, contactMat);
+    contactShadowMesh.rotation.x = -Math.PI / 2;
+    contactShadowMesh.position.set(0, 0.002, 0);
+    scene.add(contactShadowMesh);
+
+    // Grup Turntable Terpisah: Hanya Gerobak yang Berputar, Bayangan Tetap Diam di Satu Titik
+    const turntableGroup = new THREE.Group();
+    scene.add(turntableGroup);
+
+    // 5. OrbitControls (Interaksi Manual Pengguna; Putar Otomatis Dilakukan pada Gerobak Saja)
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.06;
-    controls.autoRotate = true;
-    controls.autoRotateSpeed = 0.95; // Kecepatan rotasi natural & halus
+    controls.autoRotate = false;
     controls.enablePan = false;
     controls.enableZoom = true;
     controls.minDistance = 1.80; // Batas zoom in aman agar atap dan roda tidak pernah terpotong
     controls.maxDistance = 6.5;  // Jangkauan zoom out luas dan leluasa tanpa terpotong
     controls.minPolarAngle = Math.PI / 6; // ~30 deg (tampak atas anggun)
-    controls.maxPolarAngle = Math.PI / 2 + 0.04; // Tidak tembus bawah tanah
+    controls.maxPolarAngle = Math.PI / 2 + 0.03; // Tidak tembus bawah tanah
     controls.target.copy(defaultTarget.current);
     controlsRef.current = controls;
+
+    let isAutoSpinning = true;
 
     // Saat pengunjung menyentuh/menggeser: hentikan putaran otomatis seketika
     const handleInteractionStart = () => {
@@ -103,14 +126,14 @@ export default function Angkringan3DViewer({ modelPath = '/assets/models/angkrin
         clearTimeout(resumeTimerRef.current);
         resumeTimerRef.current = null;
       }
-      controls.autoRotate = false;
+      isAutoSpinning = false;
     };
 
-    // Setelah interaksi selesai: jalankan kembali rotasi otomatis secara halus
+    // Setelah interaksi selesai: lanjutkan putaran lembut gerobak
     const handleInteractionEnd = () => {
       if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
       resumeTimerRef.current = setTimeout(() => {
-        controls.autoRotate = true;
+        isAutoSpinning = true;
       }, 1600);
     };
 
@@ -140,7 +163,7 @@ export default function Angkringan3DViewer({ modelPath = '/assets/models/angkrin
         const dominantScale = 0.94;
         modelRoot.scale.setScalar(dominantScale);
 
-        // Posisikan alas gerobak tepat di atas tanah & titik tumpu kamera seimbang
+        // Posisikan alas gerobak menapak mantap tepat di atas bayangan tanah
         const box = new THREE.Box3().setFromObject(modelRoot);
         const center = box.getCenter(new THREE.Vector3());
         modelRoot.position.x = -center.x;
@@ -153,7 +176,7 @@ export default function Angkringan3DViewer({ modelPath = '/assets/models/angkrin
         controls.target.copy(defaultTarget.current);
         camera.lookAt(controls.target);
 
-        scene.add(modelRoot);
+        turntableGroup.add(modelRoot);
         setLoading(false);
       },
       undefined,
@@ -169,11 +192,12 @@ export default function Angkringan3DViewer({ modelPath = '/assets/models/angkrin
 
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
-      const elapsedTime = clock.getElapsedTime();
+      const delta = Math.min(clock.getDelta(), 0.05);
+      const elapsedTime = clock.elapsedTime;
 
-      // Gerakan mengambang / bernapas mikro yang sangat halus
-      if (modelRoot) {
-        modelRoot.position.y = Math.sin(elapsedTime * 1.2) * 0.01;
+      // Putar gerobak secara halus pada porosnya sementara bayangan tetap diam di titik tanah
+      if (isAutoSpinning && modelRoot) {
+        turntableGroup.rotation.y += delta * 0.28;
       }
 
       // Kedipan hangat api lentera & bara arang

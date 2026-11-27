@@ -1319,7 +1319,7 @@ button:focus-visible, [tabindex]:focus-visible {
   background: rgba(255, 253, 248, 0.96);
   border: 2px solid var(--border-strong);
   border-radius: var(--radius-md);
-  padding: 26px 16px 14px;
+  padding: 20px 14px 12px;
   box-shadow: var(--shadow-medium);
 }
 
@@ -1387,14 +1387,14 @@ button:focus-visible, [tabindex]:focus-visible {
   background: var(--bg-cream);
   border: 1.5px solid var(--border-natural);
   border-radius: var(--radius-sm);
-  padding: 8px 6px;
+  padding: 6px 6px 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
   cursor: pointer;
   position: relative;
-  min-height: 135px;
+  min-height: 162px;
   justify-content: space-between;
   box-shadow: var(--shadow-soft);
   transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
@@ -3475,6 +3475,204 @@ button:focus-visible, [tabindex]:focus-visible {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+
+/* ==========================================================================
+   15. ANIMASI PENYERAHAN WEDANG 5 DETIK & TRANSISI NATURAL KESELURUHAN
+   ========================================================================== */
+
+/* A. Animasi Penyerahan Wedang 5 Detik (3 Fase Berurutan & Halus) */
+.serving-cup-motion-wrap {
+  width: 175px;
+  height: 155px;
+  margin: 0 auto 12px;
+  position: relative;
+  will-change: transform, opacity;
+}
+.serving-cup-motion-wrap.beat-pouring {
+  animation: servePourSettle 1.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.serving-cup-motion-wrap.beat-offering {
+  animation: serveOfferGlide 1.8s cubic-bezier(0.25, 0.9, 0.35, 1) forwards;
+}
+.serving-cup-motion-wrap.beat-receiving {
+  animation: serveReceiveWarm 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes servePourSettle {
+  0% { transform: translateY(14px) scale(0.92); opacity: 0.25; }
+  45% { transform: translateY(-2px) scale(1.02); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+@keyframes serveOfferGlide {
+  0% { transform: translate(0, 0) scale(1); }
+  40% { transform: translate(-10px, -8px) scale(1.05); }
+  100% { transform: translate(-18px, -4px) scale(1.04); }
+}
+@keyframes serveReceiveWarm {
+  0% { transform: translate(-18px, -4px) scale(1.04); opacity: 1; }
+  65% { transform: translate(-6px, 0) scale(1.01); opacity: 1; }
+  100% { transform: translate(0, 2px) scale(0.98); opacity: 0.92; }
+}
+
+.serving-beat-caption {
+  margin-top: 8px;
+  font-size: 0.94rem;
+  font-weight: 700;
+  color: var(--color-teal-dark);
+  animation: captionFadeIn 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes captionFadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.serving-progress-track {
+  width: 220px;
+  height: 5px;
+  background: var(--bg-parchment);
+  border-radius: 999px;
+  margin: 14px auto 0;
+  overflow: hidden;
+  border: 1px solid var(--border-natural);
+}
+.serving-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--color-teal) 0%, var(--color-orange) 100%);
+  border-radius: 999px;
+  animation: servingProgress5s 5s linear forwards;
+}
+@keyframes servingProgress5s {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
+/* B. Transisi Perpindahan Halaman & Sub-Aktivitas */
+.subview-enter {
+  animation: subviewEnterAnim 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes subviewEnterAnim {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* C. Kemunculan Elemen Beragam & Natural (Bukan Template Generik) */
+.opening-hero-header {
+  animation: heroHeaderSettle 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes heroHeaderSettle {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.angkringan-3d-stage {
+  animation: stageDepthFade 0.65s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
+}
+@keyframes stageDepthFade {
+  from { opacity: 0; transform: scale(0.975); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.opening-controls-dock {
+  animation: dockLiftUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.14s both;
+}
+@keyframes dockLiftUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.act-header-banner {
+  animation: headerSlideIn 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes headerSlideIn {
+  from { opacity: 0; transform: translateX(-8px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.prominent-guide-banner {
+  animation: guideBannerDrop 0.36s cubic-bezier(0.22, 1, 0.36, 1) 0.04s both;
+}
+@keyframes guideBannerDrop {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.customer-scene-card {
+  animation: sceneCardReveal 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes sceneCardReveal {
+  from { opacity: 0; transform: translateX(-10px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.notes-tracker-panel {
+  animation: panelSideReveal 0.42s cubic-bezier(0.22, 1, 0.36, 1) 0.06s both;
+}
+@keyframes panelSideReveal {
+  from { opacity: 0; transform: translateX(10px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.summary-certificate-frame {
+  animation: certUnfold 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes certUnfold {
+  from { opacity: 0; transform: translateY(14px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.epilogue-stage {
+  animation: subviewEnterAnim 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* D. Respons Interaksi Taktil Alami pada Kartu, Rempah, & Tombol */
+.interactive-item-card:active,
+.sort-item-card:active,
+.pantry-card:active,
+.brew-choice-card:active,
+.puzzle-piece-card:active,
+.match-card:active,
+.choice-item-btn:active,
+.decision-option-btn:active,
+.word-token-chip:active {
+  transform: scale(0.98);
+}
+
+.pantry-card.selected .pantry-check-dot {
+  animation: checkDotPop 0.26s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes checkDotPop {
+  0% { transform: scale(0.65); }
+  70% { transform: scale(1.14); }
+  100% { transform: scale(1); }
+}
+
+.word-placed-pill {
+  animation: popSnap 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.discovery-toast-card {
+  animation: toastSlideDown 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes toastSlideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Aksesibilitas: Hormati preferensi pengurangan gerak perangkat */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
 }

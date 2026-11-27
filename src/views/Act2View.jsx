@@ -251,7 +251,7 @@ export default function Act2View({ onCompleteAct, onOpenHelp, onSubStepChange, s
 
       {/* SUBBABAK 1: PUZZLE NASKAH RESEP */}
       {subTab === 'puzzle' && (
-        <div>
+        <div key="puzzle" className="subview-enter">
           <MiniGameGuideBanner
             tag="TANTANGAN 1"
             instruction="Susun 4 kepingan naskah resep wedang sesuai urutannya."
@@ -392,7 +392,7 @@ export default function Act2View({ onCompleteAct, onOpenHelp, onSubStepChange, s
 
       {/* SUBBABAK 2: URUTAN SEDUH (ALUR VISUAL 4 LANGKAH — 1 KLIK PER TAHAP) */}
       {subTab === 'sequence' && (
-        <div className="brew-flow-wrapper">
+        <div key="sequence" className="brew-flow-wrapper subview-enter">
           <MiniGameGuideBanner
             tag="TANTANGAN 2"
             instruction={
@@ -510,7 +510,7 @@ export default function Act2View({ onCompleteAct, onOpenHelp, onSubStepChange, s
 
       {/* SUBBABAK 3: KHASIAT & RAGA (REMPAH ASLI NUSANTARA) */}
       {subTab === 'matching' && (
-        <div>
+        <div key="matching" className="subview-enter">
           <MiniGameGuideBanner
             tag="TANTANGAN 3"
             instruction="Pasangkan kondisi pengunjung dengan bahan rempah yang tepat."

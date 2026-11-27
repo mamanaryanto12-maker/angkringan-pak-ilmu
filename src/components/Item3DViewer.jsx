@@ -34,11 +34,11 @@ export default function Item3DViewer({
     // 1. Scene
     const scene = new THREE.Scene();
 
-    // 2. Camera Setup (Jarak pandang proporsional, seimbang & tidak terpotong)
+    // 2. Camera Setup (Jarak pandang lebih dekat & proporsional agar detail 3D tampak jelas tanpa terpotong)
     const width = container.clientWidth || 300;
     const heightPx = typeof height === 'number' ? height : parseInt(height, 10) || 220;
     const camera = new THREE.PerspectiveCamera(34, width / heightPx, 0.05, 50);
-    camera.position.set(0.28, 0.48, 2.40);
+    camera.position.set(0.24, 0.44, compact ? 2.12 : 2.25);
 
     // 3. Renderer dengan ACESFilmic Tone Mapping & High Precision
     const renderer = new THREE.WebGLRenderer({
@@ -174,8 +174,8 @@ export default function Item3DViewer({
         const size = bbox.getSize(new THREE.Vector3());
         const maxDim = Math.max(size.x, size.y, size.z) || 1.0;
 
-        // Skala proporsional: seluruh bentuk objek tampak utuh, indah, dan tidak terpotong
-        const targetScale = (compact ? 0.95 : 1.08) / maxDim;
+        // Skala proporsional besar agar bentuk, tekstur, dan material 3D tampak jelas tanpa terpotong
+        const targetScale = (compact ? 1.16 : 1.18) / maxDim;
         root.scale.setScalar(targetScale);
 
         // Recenter
