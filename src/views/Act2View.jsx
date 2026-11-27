@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { ArrowRight, CheckCircle2, AlertCircle, Puzzle, ListOrdered, GitCompare, ArrowUp, ArrowDown, Check, BookOpen } from 'lucide-react';
+import { ArrowRight, CheckCircle2, AlertCircle, Puzzle, ListOrdered, GitCompare, RotateCcw, Check, BookOpen } from 'lucide-react';
 import { soundManager } from '../utils/audio.js';
 import { ACT_2_PUZZLE_VARIANTS, ACT_2_SEQUENCE_VARIANTS, MATCHING_PAIRS_POOL, shuffleArray, derangeSequence } from '../data/gameData.js';
 import MiniGameGuideBanner from '../components/MiniGameGuideBanner.jsx';
@@ -12,9 +12,15 @@ const SLOT_METADATA = [
   { title: 'Bagian 4 • Penutup', hint: 'Aduk & sajikan hangat', icon: '/assets/tools/naskah_penutup.svg', color: 'var(--color-bata)' }
 ];
 
-export default function Act2View({ onCompleteAct, onOpenHelp, sessionIndex = 0 }) {
+const SEQ_SLOT_LABELS = ['Langkah 1', 'Langkah 2', 'Langkah 3', 'Langkah 4'];
+
+export default function Act2View({ onCompleteAct, onOpenHelp, onSubStepChange, sessionIndex = 0 }) {
   const [subTab, setSubTab] = useState('puzzle'); // 'puzzle' | 'sequence' | 'matching'
   const [isManuscriptModalOpen, setIsManuscriptModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (onSubStepChange) onSubStepChange(`act2:${subTab}`);
+  }, [subTab, onSubStepChange]);
 
   // 1. PUZZLE NASKAH
   const activePuzzle = useMemo(() => {
@@ -40,13 +46,16 @@ export default function Act2View({ onCompleteAct, onOpenHelp, sessionIndex = 0 }
     setIsManuscriptModalOpen(false);
   }, [activePuzzle]);
 
-  // 2. URUTAN SEDUH
+  // 2. URUTAN SEDUH (Alur Visual 4 Slot Berurutan — 1 Klik per Langkah)
   const activeSequence = ACT_2_SEQUENCE_VARIANTS[0];
-  const [sequenceOrder, setSequenceOrder] = useState(() => derangeSequence(activeSequence.steps));
+  const shuffledSeqPool = useMemo(() => derangeSequence(activeSequence.steps), [activeSequence, sessionIndex]);
+  const [placedSeq, setPlacedSeq] = useState([]); // array of placed step objects in order 1..4
+  const [wrongSeqId, setWrongSeqId] = useState(null);
   const [seqFeedback, setSeqFeedback] = useState(null);
 
   useEffect(() => {
-    setSequenceOrder(derangeSequence(activeSequence.steps));
+    setPlacedSeq([]);
+    setWrongSeqId(null);
     setSeqFeedback(null);
   }, [sessionIndex]);
 
@@ -120,28 +129,48 @@ export default function Act2View({ onCompleteAct, onOpenHelp, sessionIndex = 0 }
 
   const isPuzzleComplete = placedPieces.every(Boolean);
 
-  // Handlers Sequence
-  const moveSequenceItem = (idx, direction) => {
-    soundManager.playClickSound();
-    const newIdx = idx + direction;
-    if (newIdx < 0 || newIdx >= sequenceOrder.length) return;
+  // Handlers Sequence (Klik kartu langkah yang sesuai urutan aktif)
+  const nextSeqOrder = placedSeq.length + 1;
+  const isSequenceComplete = placedSeq.length === activeSequence.steps.length;
 
-    const updated = [...sequenceOrder];
-    [updated[idx], updated[newIdx]] = [updated[newIdx], updated[idx]];
-    setSequenceOrder(updated);
+  const handlePickSequenceStep = (step) => {
+    if (isSequenceComplete || placedSeq.some(s => s.id === step.id)) return;
 
-    if (updated.every((step, i) => step.correctOrder === i + 1)) {
+    if (step.correctOrder === nextSeqOrder) {
       soundManager.playPlaceSuccess();
-      setSeqFeedback({
-        type: 'success',
-        message: 'Urutan seduh dari mendengar tamu hingga menyajikan hangat telah runtut.'
-      });
+      const updated = [...placedSeq, step];
+      setPlacedSeq(updated);
+      setWrongSeqId(null);
+
+      if (updated.length === activeSequence.steps.length) {
+        setSeqFeedback({
+          type: 'success',
+          message: 'Urutan seduh lengkap! Wedang siap diracik.'
+        });
+      } else {
+        setSeqFeedback({
+          type: 'success',
+          message: `Tepat! Langkah ${nextSeqOrder}: ${step.label}.`
+        });
+      }
     } else {
-      setSeqFeedback(null);
+      soundManager.playGentleWrong();
+      setWrongSeqId(step.id);
+      const expected = activeSequence.steps.find(s => s.correctOrder === nextSeqOrder);
+      setSeqFeedback({
+        type: 'error',
+        message: `Belum pas untuk Langkah ${nextSeqOrder}. ${expected ? expected.wrongHint : 'Coba pilih langkah lain.'}`
+      });
+      setTimeout(() => setWrongSeqId(null), 650);
     }
   };
 
-  const isSequenceComplete = sequenceOrder.every((step, i) => step.correctOrder === i + 1);
+  const handleResetSequence = () => {
+    soundManager.playClickSound();
+    setPlacedSeq([]);
+    setWrongSeqId(null);
+    setSeqFeedback(null);
+  };
 
   // Handlers Matching
   const handleSelectCondition = (item) => {
@@ -361,82 +390,121 @@ export default function Act2View({ onCompleteAct, onOpenHelp, sessionIndex = 0 }
         </div>
       )}
 
-      {/* SUBBABAK 2: URUTAN SEDUH (DENGAN ILUSTRASI TAHAPAN JELAS) */}
+      {/* SUBBABAK 2: URUTAN SEDUH (ALUR VISUAL 4 LANGKAH — 1 KLIK PER TAHAP) */}
       {subTab === 'sequence' && (
-        <div style={{ maxWidth: '860px', margin: '0 auto', width: '100%' }}>
+        <div className="brew-flow-wrapper">
           <MiniGameGuideBanner
             tag="TANTANGAN 2"
-            instruction="Urutkan 4 langkah meracik wedang dari awal hingga siap disajikan."
-            hint="Gunakan tombol panah naik atau turun pada setiap kartu langkah."
+            instruction={
+              isSequenceComplete
+                ? 'Urutan seduh sudah lengkap! Lanjut ke Khasiat Rempah.'
+                : `Pilih kartu di bawah untuk mengisi Langkah ${nextSeqOrder} dari 4.`
+            }
+            hint="Susun proses dari awal menyapa tamu hingga menyajikan wedang hangat."
             onOpenHelp={onOpenHelp}
           />
 
           {seqFeedback && (
-            <div className="feedback-strip success" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div className={`feedback-strip ${seqFeedback.type}`} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <CheckCircle2 size={18} />
+                {seqFeedback.type === 'success' ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
                 <span>{seqFeedback.message}</span>
               </div>
               {isSequenceComplete && (
-                <button
-                  className="btn-primary-action pulse-ready"
-                  style={{ padding: '6px 14px', fontSize: '0.8rem', whiteSpace: 'nowrap' }}
-                  onClick={() => {
-                    soundManager.playClickSound();
-                    setSubTab('matching');
-                  }}
-                >
-                  <span>Ke Khasiat Rempah</span>
-                  <ArrowRight size={14} />
-                </button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <button
+                    className="btn-secondary-action"
+                    style={{ padding: '6px 12px', fontSize: '0.78rem' }}
+                    onClick={handleResetSequence}
+                  >
+                    <RotateCcw size={13} />
+                    <span>Ulangi</span>
+                  </button>
+                  <button
+                    className="btn-primary-action pulse-ready"
+                    style={{ padding: '6px 14px', fontSize: '0.8rem', whiteSpace: 'nowrap' }}
+                    onClick={() => {
+                      soundManager.playClickSound();
+                      setSubTab('matching');
+                    }}
+                  >
+                    <span>Ke Khasiat Rempah</span>
+                    <ArrowRight size={14} />
+                  </button>
+                </div>
               )}
             </div>
           )}
 
-          <div className="sequencing-list">
-            {sequenceOrder.map((step, idx) => {
-              const isStepCorrect = step.correctOrder === idx + 1;
+          {/* Bagian Atas: 4 Slot Alur Penyeduhan (1 -> 2 -> 3 -> 4) */}
+          <div className="brew-timeline-grid">
+            {SEQ_SLOT_LABELS.map((slotLabel, idx) => {
+              const placed = placedSeq[idx];
+              const isCurrentTarget = !isSequenceComplete && idx === placedSeq.length;
 
               return (
-                <div key={step.id} className={`sequence-card ${isStepCorrect ? 'is-aligned' : ''}`}>
-                  <div className="sequence-badge">{idx + 1}</div>
-
-                  <div className="sequence-visual-thumb">
-                    <img src={step.image} alt={step.label} />
+                <div
+                  key={slotLabel}
+                  className={`brew-slot-card ${placed ? 'filled' : ''} ${isCurrentTarget ? 'active-target' : ''}`}
+                >
+                  <div className="brew-slot-head">
+                    <span className={`brew-slot-num ${placed ? 'done' : isCurrentTarget ? 'active' : ''}`}>
+                      {placed ? <Check size={14} /> : idx + 1}
+                    </span>
+                    <span className="brew-slot-label">{slotLabel}</span>
                   </div>
 
-                  <div className="sequence-body">
-                    <div className="sequence-step-label">
-                      Tahap {idx + 1} • {step.label}
-                      {isStepCorrect && <Check size={14} color="var(--color-teal)" />}
+                  {placed ? (
+                    <div className="brew-slot-filled-body">
+                      <img src={placed.image} alt={placed.label} className="brew-slot-img" />
+                      <strong>{placed.label}</strong>
+                      <span className="brew-tool-chip">{placed.toolTag}</span>
                     </div>
-                    <p className="sequence-step-text">{step.text}</p>
-                  </div>
-
-                  <div className="sequence-controls">
-                    <button
-                      className="seq-btn"
-                      disabled={idx === 0}
-                      onClick={() => moveSequenceItem(idx, -1)}
-                      title="Naikkan urutan"
-                      aria-label={`Naikkan ${step.label}`}
-                    >
-                      <ArrowUp size={16} />
-                    </button>
-                    <button
-                      className="seq-btn"
-                      disabled={idx === sequenceOrder.length - 1}
-                      onClick={() => moveSequenceItem(idx, 1)}
-                      title="Turunkan urutan"
-                      aria-label={`Turunkan ${step.label}`}
-                    >
-                      <ArrowDown size={16} />
-                    </button>
-                  </div>
+                  ) : (
+                    <div className="brew-slot-empty-body">
+                      <span>{isCurrentTarget ? `Klik kartu Langkah ${idx + 1}` : 'Menunggu urutan'}</span>
+                    </div>
+                  )}
                 </div>
               );
             })}
           </div>
+
+          {/* Bagian Bawah: Pilihan Kartu Tahapan yang Belum Dipasang */}
+          {!isSequenceComplete && (
+            <div className="brew-pool-panel">
+              <div className="brew-pool-header">
+                <span className="panel-title-kicker orange">Pilihan Tahapan Seduh</span>
+                <span className="panel-hint-mini">Klik kartu untuk Langkah {nextSeqOrder}</span>
+              </div>
+
+              <div className="brew-choices-grid">
+                {shuffledSeqPool.map((step) => {
+                  const isUsed = placedSeq.some(s => s.id === step.id);
+                  const isWrong = wrongSeqId === step.id;
+
+                  return (
+                    <button
+                      key={step.id}
+                      type="button"
+                      disabled={isUsed}
+                      className={`brew-choice-card ${isUsed ? 'used' : ''} ${isWrong ? 'wrong-shake' : ''}`}
+                      onClick={() => handlePickSequenceStep(step)}
+                    >
+                      <div className="brew-choice-thumb">
+                        <img src={step.image} alt={step.label} />
+                      </div>
+                      <div className="brew-choice-info">
+                        <span className="brew-tool-chip">{step.toolTag}</span>
+                        <strong>{step.label}</strong>
+                        <p>{step.text}</p>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -482,7 +550,7 @@ export default function Act2View({ onCompleteAct, onOpenHelp, sessionIndex = 0 }
                     <div className="match-card-content">
                       <strong>{pair.condition}</strong>
                       <span className="match-card-sub">
-                        {isMatched ? 'Pasangan cocok' : (isSelected ? 'Pilih rempah cocok di kanan →' : 'Klik untuk memilih')}
+                        {isMatched ? 'Pasangan cocok' : (isSelected ? 'Pilih rempah cocok di kanan' : 'Klik untuk memilih')}
                       </span>
                     </div>
                     {isMatched && <CheckCircle2 size={18} color="var(--color-teal)" />}

@@ -109,8 +109,8 @@ export default function EpilogueView({ onCompleteEpilogue, onOpenHelp, sessionIn
         <div style={{ maxWidth: '780px', width: '100%', margin: '0 auto 12px auto' }}>
           <MiniGameGuideBanner
             tag="EPILOG"
-            instruction="Susun kepingan kata menjadi satu kalimat hikmah, lalu simpan ke Toples Kawruh."
-            hint="Ketuk kata-kata di bawah secara berurutan untuk menyusun pesan."
+            instruction="Susun kata di bawah menjadi satu kalimat hikmah, lalu simpan ke toples."
+            hint="Klik kata secara berurutan."
             onOpenHelp={onOpenHelp}
           />
         </div>
@@ -157,8 +157,8 @@ export default function EpilogueView({ onCompleteEpilogue, onOpenHelp, sessionIn
         {!isNoteSubmitted ? (
           <div className="word-puzzle-assembly">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <span style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                Ketuk Kata di Bawah untuk Menyusun Pesan Hikmah ({placedWords.length} / {currentVariant.tokens.length} kata):
+              <span style={{ fontSize: '0.88rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                Susun Kalimat Hikmah ({placedWords.length}/{currentVariant.tokens.length} kata)
               </span>
               {placedWords.length > 0 && (
                 <button
@@ -262,14 +262,14 @@ export default function EpilogueView({ onCompleteEpilogue, onOpenHelp, sessionIn
             )}
 
             {/* Tombol Masukkan ke Toples */}
-            <div style={{ marginTop: '22px' }}>
+            <div style={{ marginTop: '20px' }}>
               <button
                 className="btn-primary-action"
                 disabled={!isSentenceCorrect}
                 onClick={handleSubmitToJar}
-                style={{ padding: '14px 34px', fontSize: '1rem' }}
+                style={{ padding: '13px 30px', fontSize: '0.96rem' }}
               >
-                <span>Masukkan Pelajaran ke Toples Kawruh</span>
+                <span>Simpan ke Toples Kawruh</span>
                 <Sparkles size={18} />
               </button>
             </div>

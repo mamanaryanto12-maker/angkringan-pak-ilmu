@@ -1,13 +1,13 @@
 // ==========================================================================
 // ANGKRINGAN PAK ILMU — SUMBER DATA TUNGGAL PERMAINAN
-// Gredupedia #7: Karsa Kala Saka Rasa Tujumu Makna
+// Gredupedia #7: Karsa Kala Saka Rasa Tumuju Makna
 // Prinsip Konten: Ringkas, Edukatif, Tanpa Klaim Medis Berlebihan, Konsisten
 // ==========================================================================
 
 export const GAME_INFO = {
   title: "Angkringan Pak Ilmu",
   subtitle: "Pesanan yang Tak Biasa",
-  exhibition: "Karsa Kala Saka Rasa Tujumu Makna",
+  exhibition: "Karsa Kala Saka Rasa Tumuju Makna",
   zone: "Zona Dhandanggula",
   targetDuration: "5–7 Menit"
 };
@@ -267,21 +267,21 @@ export const ACT_1_VARIANTS = [
         num: 1,
         objectId: "ceret",
         foundAt: "Ceret Tembaga",
-        text: "Kenali dulu dingin yang dibawa tamu, lalu siapkan air mendidih matang."
+        text: "Siapkan air mendidih matang di ceret."
       },
       {
         id: "note-2",
         num: 2,
         objectId: "serai",
         foundAt: "Batang Serai Wangi",
-        text: "Memarkan jahe dan serai perlahan agar wangi segarnya larut bersama."
+        text: "Memarkan jahe dan serai agar aromanya keluar."
       },
       {
         id: "note-3",
         num: 3,
         objectId: "cangkir",
         foundAt: "Cangkir Blirik",
-        text: "Sajikan dalam cangkir blirik hangat dengan sapaan yang tulus."
+        text: "Sajikan hangat dengan sapaan yang ramah."
       }
     ]
   },
@@ -306,21 +306,21 @@ export const ACT_1_VARIANTS = [
         num: 1,
         objectId: "serai",
         foundAt: "Batang Serai Wangi",
-        text: "Aroma serai dan kayu manis membantu pikiran terasa lebih tenang."
+        text: "Serai dan kayu manis menenangkan pikiran."
       },
       {
         id: "note-2",
         num: 2,
         objectId: "ceret",
         foundAt: "Ceret Tembaga",
-        text: "Seduh dengan air matang agar keharuman rempah tidak menguap sia-sia."
+        text: "Seduh dengan air matang yang mendidih."
       },
       {
         id: "note-3",
         num: 3,
         objectId: "cengkeh",
         foundAt: "Bunga Cengkeh",
-        text: "Tambahkan cengkeh secukupnya lalu beri manis gula aren seimbang."
+        text: "Tambahkan cengkeh dan gula aren secukupnya."
       }
     ]
   },
@@ -345,21 +345,21 @@ export const ACT_1_VARIANTS = [
         num: 1,
         objectId: "jahe",
         foundAt: "Jahe Emprit Bakar",
-        text: "Bakar jahe sejenak dan memarkan di cobek sebelum diseduh."
+        text: "Memarkan jahe bakar di cobek dulu."
       },
       {
         id: "note-2",
         num: 2,
         objectId: "kunyit",
         foundAt: "Rimpang Kunyit",
-        text: "Padukan kunyit dan serai untuk rasa hangat yang nyaman di perut."
+        text: "Padukan kunyit dan serai untuk hangat lembut."
       },
       {
         id: "note-3",
         num: 3,
         objectId: "gula_aren",
         foundAt: "Gula Jawa Aren",
-        text: "Larutkan gula aren asli sebagai penambah tenaga bagi pejalan malam."
+        text: "Larutkan gula aren untuk menambah tenaga."
       }
     ]
   }
@@ -467,29 +467,37 @@ export const ACT_2_SEQUENCE_VARIANTS = [
       {
         id: "seq-1",
         correctOrder: 1,
-        label: "Dengar",
-        text: "Sapa dan dengarkan kebutuhan pengunjung terlebih dahulu.",
+        label: "Dengar Tamu",
+        toolTag: "Sapaan Awal",
+        text: "Tanyakan kondisi dan kebutuhan tamu dulu.",
+        wrongHint: "Mulai dari menyapa dan mendengar kebutuhan tamu.",
         image: "/assets/steps/step1_dengar.svg"
       },
       {
         id: "seq-2",
         correctOrder: 2,
-        label: "Memarkan",
-        text: "Memarkan jahe bakar dan batang serai di atas cobek.",
+        label: "Memarkan Rempah",
+        toolTag: "Jahe + Serai + Cobek",
+        text: "Memarkan jahe dan serai di atas cobek.",
+        wrongHint: "Setelah tahu kebutuhan tamu, olah rempah di cobek dulu.",
         image: "/assets/steps/step2_memar.svg"
       },
       {
         id: "seq-3",
         correctOrder: 3,
-        label: "Seduh",
-        text: "Tuang air mendidih dari ceret tembaga agar sarinya larut.",
+        label: "Seduh Air Panas",
+        toolTag: "Ceret Tembaga",
+        text: "Tuang air mendidih dari ceret agar sari larut.",
+        wrongHint: "Setelah rempah dimemarkan, baru tuang air panas dari ceret.",
         image: "/assets/steps/step3_seduh.svg"
       },
       {
         id: "seq-4",
         correctOrder: 4,
-        label: "Sajikan",
-        text: "Larutkan gula aren dan sajikan hangat dalam cangkir blirik.",
+        label: "Aduk & Sajikan",
+        toolTag: "Gula Aren + Cangkir",
+        text: "Aduk gula aren dan sajikan hangat di cangkir.",
+        wrongHint: "Terakhir, larutkan gula aren lalu sajikan hangat ke tamu.",
         image: "/assets/steps/step4_saji.svg"
       }
     ]
@@ -919,5 +927,128 @@ export const EPILOGUE_DATA = {
     name: "Peracik Kawruh Dhandanggula",
     motto: "Karsa Kala: Saka Rasa, Tumuju Makna",
     authority: "Pameran Karya Teknologi Pendidikan #7"
+  }
+};
+
+// --------------------------------------------------------------------------
+// 7. PANDUAN BANTUAN KONTEKSTUAL PER HALAMAN & SUB-AKTIVITAS
+// --------------------------------------------------------------------------
+export const CONTEXTUAL_HELP_GUIDES = {
+  intro: {
+    title: "Halaman Pembuka",
+    goal: "Kenali gerobak Angkringan Pak Ilmu lalu mulai permainan.",
+    steps: [
+      "Geser gerobak 3D untuk memutar, atau gunakan scroll untuk memperbesar/memperkecil.",
+      "Klik tombol 'Buka Angkringan' di bawah gerobak untuk masuk ke Babak 1."
+    ],
+    tip: "Durasi permainan sekitar 5–7 menit dan terdiri dari 3 babak singkat."
+  },
+  "act1:explore": {
+    title: "Babak 1 — Meja Gerobak",
+    goal: "Temukan 3 sobekan resep yang tersembunyi di antara 8 benda di meja.",
+    steps: [
+      "Klik setiap benda 3D di meja gerobak untuk memeriksa fungsinya.",
+      "Amati panel 'Sobekan Resep' di sebelah kanan hingga terkumpul 3/3.",
+      "Setelah 3 sobekan ditemukan dan minimal 4 benda diperiksa, klik 'Lanjut ke Penataan'."
+    ],
+    tip: "Sobekan resep tersembunyi pada 3 benda acak. Periksa benda yang belum bertanda centang."
+  },
+  "act1:sort": {
+    title: "Babak 1 — Penataan",
+    goal: "Kelompokkan seluruh benda ke Wadah Rempah atau Rak Peralatan.",
+    steps: [
+      "Lihat setiap benda 3D di bagian atas.",
+      "Klik '+ Rempah' untuk bahan tumbuhan/nira (jahe, serai, gula aren, cengkeh, kayu manis, kunyit).",
+      "Klik '+ Peralatan' untuk perkakas seduh (ceret, cangkir, cobek, sendok, saringan).",
+      "Jika semua benda sudah tertata, klik 'Lanjut ke Babak 2'."
+    ],
+    tip: "Kamu juga bisa menarik (drag) kartu benda langsung ke kotak Wadah Rempah atau Rak Peralatan."
+  },
+  "act2:puzzle": {
+    title: "Babak 2 — Puzzle Naskah",
+    goal: "Susun 4 potongan naskah resep kuno ke urutan yang benar.",
+    steps: [
+      "Klik satu kepingan naskah di panel kiri.",
+      "Klik slot tujuan (Bagian 1 sampai 4) di panel kanan untuk memasangnya.",
+      "Cocokkan label Pembuka, Isi 1, Isi 2, dan Penutup serta sambungan tanda (...)."
+    ],
+    tip: "Bagian 1 dimulai dari sapaan/bahan awal; Bagian 4 diakhiri menyajikan wedang."
+  },
+  "act2:sequence": {
+    title: "Babak 2 — Urutan Seduh",
+    goal: "Susun 4 tahapan meracik wedang dari langkah 1 hingga langkah 4.",
+    steps: [
+      "Lihat kotak nomor yang sedang disorot (dimulai dari Langkah 1).",
+      "Klik kartu tahapan di bawah yang paling tepat untuk urutan tersebut.",
+      "Ulangi hingga keempat langkah (1 → 2 → 3 → 4) terisi lengkap."
+    ],
+    tip: "Urutan alami meracik: Dengar Tamu → Memarkan Rempah → Seduh Air Panas → Aduk & Sajikan."
+  },
+  "act2:matching": {
+    title: "Babak 2 — Khasiat Rempah",
+    goal: "Pasangkan setiap kondisi pengunjung dengan rempah yang paling sesuai.",
+    steps: [
+      "Klik satu kartu 'Kondisi Pengunjung' di kolom kiri.",
+      "Klik kartu 'Bahan Rempah' yang cocok di kolom kanan.",
+      "Selesaikan seluruh pasangan lalu klik 'Lanjut ke Babak 3'."
+    ],
+    tip: "Jahe untuk badan dingin, Serai untuk pikiran penat, Gula Aren untuk tenaga, Kayu Manis untuk tenggorokan."
+  },
+  "act3:1": {
+    title: "Babak 3 — Memahami Kebutuhan Tamu",
+    goal: "Pahami cerita tamu malam ini dan pilih tanggapan yang paling tepat.",
+    steps: [
+      "Baca kondisi dan keluhan tamu pada kartu di sisi kiri.",
+      "Pilih satu jawaban di sisi kanan yang paling sesuai dengan kondisinya.",
+      "Setelah jawaban tepat, klik 'Lanjut Meracik'."
+    ],
+    tip: "Utamakan minuman hangat dan sikap ramah untuk tamu yang kedinginan atau kelelahan."
+  },
+  "act3:2": {
+    title: "Babak 3 — Racikan Bebas",
+    goal: "Racik kombinasi rempah dan suhu minuman sesuai kebutuhan tamu.",
+    steps: [
+      "Klik kartu rempah 3D untuk memilih minimal 2 bahan (klik lagi untuk membatalkan).",
+      "Pilih suhu sajian (Hangat Panas, Hangat Teduh, atau Es Dingin).",
+      "Perhatikan kotak penilaian kesesuaian di bawah, lalu klik 'Lanjut Penyajian'."
+    ],
+    tip: "Kamu bebas bereksperimen. Paduan 2–3 rempah hangat umumnya paling pas untuk malam dingin."
+  },
+  "act3:3": {
+    title: "Babak 3 — Tutur Kata Penyajian",
+    goal: "Pilih ucapan yang tulus saat menyerahkan minuman kepada tamu.",
+    steps: [
+      "Pilih salah satu tutur kata penyajian di sisi kanan.",
+      "Klik 'Sajikan Wedang' untuk menyerahkan cangkir dan melihat reaksi tamu."
+    ],
+    tip: "Tutur kata yang hangat dan penuh perhatian membuat tamu merasa dihargai."
+  },
+  "act3:4": {
+    title: "Babak 3 — Reaksi Pengunjung",
+    goal: "Simak tanggapan tamu atas racikanmu lalu lanjut ke Epilog.",
+    steps: [
+      "Baca reaksi tamu dan catatan pembelajaran singkat.",
+      "Klik tombol 'Menuju Epilog: Toples Kawruh' untuk tahap penutup."
+    ],
+    tip: "Setiap sesi baru menghadirkan tamu dengan cerita berbeda."
+  },
+  epilogue: {
+    title: "Epilog — Toples Kawruh Pak Ilmu",
+    goal: "Rangkai kata menjadi satu kalimat hikmah lalu simpan ke Toples Kawruh.",
+    steps: [
+      "Klik kata-kata acak secara berurutan agar membentuk kalimat bermakna.",
+      "Klik kata di kotak susunan jika ingin membatalkannya, atau klik 'Atur Ulang'.",
+      "Setelah kalimat tepat, klik 'Simpan ke Toples Kawruh'."
+    ],
+    tip: "Mulai kalimat dari subjek utamanya (misalnya 'Pengetahuan' atau 'Karya')."
+  },
+  summary: {
+    title: "Halaman Selesai — Piagam Peracik",
+    goal: "Lihat ringkasan perjalananmu atau mulai sesi baru dengan tamu berbeda.",
+    steps: [
+      "Klik 'Buka Jurnal Catatan' untuk membaca kembali temuanmu.",
+      "Klik 'Mulai Sesi Baru' untuk memainkan variasi tamu dan resep berikutnya."
+    ],
+    tip: "Tersedia 3 variasi tamu berbeda setiap kali kamu memulai sesi baru."
   }
 };

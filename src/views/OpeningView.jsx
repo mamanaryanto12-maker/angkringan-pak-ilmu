@@ -26,7 +26,7 @@ export default function OpeningView({
         />
 
         <p className="opening-theme-identity">
-          Karsa Kala Saka Rasa Tujumu Makna
+          Karsa Kala Saka Rasa Tumuju Makna
         </p>
 
         <img
@@ -43,7 +43,7 @@ export default function OpeningView({
         </div>
 
         <p className="opening-brief-hook">
-          Jaga gerobak angkringan, pahami kisah setiap pengunjung, dan racik kehangatan yang tepat makna.
+          Jaga gerobak Pak Ilmu, pahami kebutuhan tamu, dan racik wedang hangat.
         </p>
       </div>
 

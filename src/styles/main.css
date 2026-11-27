@@ -490,9 +490,9 @@ button:focus-visible, [tabindex]:focus-visible {
   height: 36px;
   padding: 0 12px;
   border-radius: var(--radius-sm);
-  background: var(--color-gold-soft);
-  border: 1px solid var(--color-gold-deep);
-  color: #704B04;
+  background: var(--bg-cream);
+  border: 1.5px solid var(--border-strong);
+  color: var(--text-primary);
   font-weight: 700;
   font-size: 0.8rem;
   display: inline-flex;
@@ -500,8 +500,28 @@ button:focus-visible, [tabindex]:focus-visible {
   gap: 6px;
 }
 .btn-nav-help:hover {
-  background: var(--color-gold);
-  color: var(--text-primary);
+  background: #FFF;
+  border-color: var(--color-teal);
+  color: var(--color-teal-dark);
+}
+.btn-nav-bantuan {
+  height: 36px;
+  padding: 0 14px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--color-orange) 0%, var(--color-bata) 100%);
+  border: 1.5px solid var(--color-bata-dark);
+  color: #FFF;
+  font-weight: 800;
+  font-size: 0.82rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 8px rgba(194, 42, 24, 0.28);
+}
+.btn-nav-bantuan:hover {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(194, 42, 24, 0.36);
 }
 .btn-nav-icon {
   width: 36px;
@@ -570,9 +590,10 @@ button:focus-visible, [tabindex]:focus-visible {
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
+  gap: 6px;
   padding: 12px 24px 16px;
-  max-width: 1320px;
+  max-width: 1240px;
   width: 100%;
   margin: 0 auto;
 }
@@ -2139,100 +2160,206 @@ button:focus-visible, [tabindex]:focus-visible {
   gap: 10px;
 }
 
-/* Sequencing */
-.sequencing-list {
+/* Sequencing (Redesigned: Visual 4-Step Brewing Timeline + 1-Click Cards) */
+.brew-flow-wrapper {
+  max-width: 1040px;
+  width: 100%;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  max-width: 920px;
-  margin: 0 auto;
+  gap: 12px;
 }
-.sequence-card {
+.brew-timeline-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+.brew-slot-card {
   background: rgba(255, 253, 248, 0.96);
-  border: 1.5px solid var(--border-natural);
-  border-radius: var(--radius-sm);
-  padding: 10px 18px;
+  border: 2px dashed var(--border-strong);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  min-height: 158px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+.brew-slot-card.active-target {
+  border-color: var(--color-orange);
+  background: var(--color-gold-soft);
+  box-shadow: 0 0 0 3px rgba(217, 101, 20, 0.16);
+}
+.brew-slot-card.filled {
+  border-style: solid;
+  border-color: var(--color-teal);
+  background: var(--bg-paper);
+  box-shadow: var(--shadow-soft);
+  animation: popSnap 0.25s ease;
+}
+.brew-slot-head {
   display: flex;
   align-items: center;
-  gap: 16px;
-  box-shadow: var(--shadow-soft);
+  gap: 8px;
 }
-.sequence-card.is-aligned {
-  border: 2px solid var(--color-teal);
-  background: var(--bg-paper);
-}
-.sequence-badge {
-  width: 36px;
-  height: 36px;
+.brew-slot-num {
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
-  background: var(--color-teal);
+  background: var(--border-strong);
   color: #FFF;
+  font-size: 0.78rem;
   font-weight: 800;
-  font-size: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
-.sequence-visual-thumb {
-  width: 66px;
-  height: 66px;
-  border-radius: 8px;
+.brew-slot-num.active {
+  background: var(--color-orange);
+}
+.brew-slot-num.done {
+  background: var(--color-teal);
+}
+.brew-slot-label {
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+.brew-slot-filled-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+  margin-top: 2px;
+}
+.brew-slot-img {
+  width: 58px;
+  height: 58px;
+  object-fit: contain;
+}
+.brew-slot-filled-body strong {
+  font-size: 0.86rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+.brew-slot-empty-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  padding: 8px 4px;
+}
+.brew-slot-card.active-target .brew-slot-empty-body {
+  color: var(--color-bata);
+}
+.brew-tool-chip {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--color-teal-dark);
+  background: var(--color-teal-soft);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+.brew-pool-panel {
+  background: rgba(255, 253, 248, 0.96);
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  box-shadow: var(--shadow-medium);
+}
+.brew-pool-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-natural);
+}
+.brew-choices-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+.brew-choice-card {
+  text-align: left;
   background: var(--bg-cream);
-  border: 1.5px solid var(--border-natural);
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: var(--shadow-soft);
+}
+.brew-choice-card:hover:not(:disabled) {
+  border-color: var(--color-orange);
+  background: var(--bg-paper);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-medium);
+}
+.brew-choice-card.used {
+  opacity: 0.35;
+  cursor: default;
+  background: var(--bg-parchment);
+  border-style: dashed;
+}
+.brew-choice-card.wrong-shake {
+  border-color: var(--color-bata);
+  background: var(--color-bata-soft);
+  animation: wrongShake 0.35s ease;
+}
+@keyframes wrongShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+.brew-choice-thumb {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  background: var(--bg-paper);
+  border: 1px solid var(--border-natural);
   padding: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
-.sequence-visual-thumb img {
+.brew-choice-thumb img {
   width: 100%;
   height: 100%;
   object-fit: contain;
 }
-.sequence-body {
-  flex: 1;
+.brew-choice-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
-.sequence-step-label {
-  font-size: 0.76rem;
+.brew-choice-info strong {
+  font-size: 0.94rem;
   font-weight: 800;
-  color: var(--color-bata);
-  text-transform: uppercase;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 2px;
-}
-.sequence-step-text {
-  font-size: 0.98rem;
-  font-weight: 600;
   color: var(--text-primary);
-  line-height: 1.4;
 }
-.sequence-controls {
-  display: flex;
-  gap: 6px;
+.brew-choice-info p {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.35;
 }
-.seq-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 6px;
-  background: var(--bg-cream);
-  border: 1px solid var(--border-strong);
-  color: var(--text-primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.seq-btn:hover:not(:disabled) {
-  background: var(--color-teal);
-  color: #FFF;
-  border-color: var(--color-teal);
-}
-.seq-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
+@media (max-width: 780px) {
+  .brew-timeline-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .brew-choices-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Matching Pairs (Khasiat Rempah) */
@@ -2321,10 +2448,11 @@ button:focus-visible, [tabindex]:focus-visible {
 /* --- 11. BABAK 3: SUASANA MALIOBORO HUJAN & PERACIKAN BEBAS --- */
 .customer-encounter-panel {
   display: grid;
-  grid-template-columns: 390px 1fr;
+  grid-template-columns: 350px minmax(0, 1fr);
   gap: 16px;
-  align-items: stretch;
-  margin-top: 2px;
+  align-items: start;
+  width: 100%;
+  margin: 0;
 }
 
 .customer-scene-card {
@@ -2392,11 +2520,10 @@ button:focus-visible, [tabindex]:focus-visible {
 }
 
 .customer-scene-info {
-  padding: 12px 16px;
+  padding: 12px 16px 14px;
   display: flex;
   flex-direction: column;
-  flex: 1;
-  justify-content: space-between;
+  gap: 6px;
 }
 .customer-head-line {
   display: flex;
@@ -2439,11 +2566,11 @@ button:focus-visible, [tabindex]:focus-visible {
   background: rgba(255, 253, 248, 0.96);
   border: 1.5px solid var(--border-strong);
   border-radius: var(--radius-md);
-  padding: 14px 18px;
+  padding: 16px 18px;
   box-shadow: var(--shadow-medium);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  gap: 12px;
 }
 
 .phase-stack {

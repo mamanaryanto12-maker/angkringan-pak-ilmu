@@ -24,7 +24,7 @@ export default function WalkthroughModal({ isOpen, onClose, onStartFromWalkthrou
                 Peta Alur Permainan
               </h2>
               <p style={{ fontSize: '0.8rem', color: 'var(--color-teal-dark)', fontWeight: 600 }}>
-                Angkringan Pak Ilmu • Karsa Kala Saka Rasa Tujumu Makna
+                Angkringan Pak Ilmu • Karsa Kala Saka Rasa Tumuju Makna
               </p>
             </div>
           </div>

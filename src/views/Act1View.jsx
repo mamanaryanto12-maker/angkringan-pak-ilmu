@@ -12,12 +12,16 @@ export default function Act1View({
   inspectedObjects,
   setInspectedObjects,
   onOpenHelp,
-  onOpen3DGallery,
+  onSubStepChange,
   sessionIndex = 0
 }) {
   const [activeTab, setActiveTab] = useState('explore'); // 'explore' | 'sort'
   const [selectedObject, setSelectedObject] = useState(null);
   const [lastDiscoveredNote, setLastDiscoveredNote] = useState(null);
+
+  useEffect(() => {
+    if (onSubStepChange) onSubStepChange(`act1:${activeTab}`);
+  }, [activeTab, onSubStepChange]);
 
   const activeVariant = useMemo(() => {
     return ACT_1_VARIANTS[sessionIndex % ACT_1_VARIANTS.length];
@@ -179,20 +183,19 @@ export default function Act1View({
       {/* ============================================================ */}
       {activeTab === 'explore' && (
         <div className="act1-view-wrap">
-          {/* Panduan Utama yang Jelas, Singkat, dan Menonjol */}
+          {/* Panduan Utama Ringkas */}
           <MiniGameGuideBanner
             tag="LANGKAH 1"
-            instruction="Temukan 3 sobekan resep pada benda di meja gerobak."
-            hint="Ketuk benda untuk mengamati dan membaca catatannya."
+            instruction="Temukan 3 sobekan resep di meja gerobak."
+            hint="Klik benda 3D untuk memeriksa."
             onOpenHelp={onOpenHelp}
           />
 
-          {/* Notifikasi Temuan Sobekan Resep */}
+          {/* Notifikasi Ringkas Temuan Sobekan Resep */}
           {lastDiscoveredNote && (
             <div className="discovery-toast-card">
               <div className="discovery-toast-text">
-                <h5>Sobekan Resep Bagian #{lastDiscoveredNote.num} Ditemukan!</h5>
-                <p>“{lastDiscoveredNote.text}”</p>
+                <h5>Sobekan Resep #{lastDiscoveredNote.num} ditemukan di {lastDiscoveredNote.foundAt}</h5>
               </div>
               <button
                 className="toast-close-mini"
@@ -210,24 +213,10 @@ export default function Act1View({
               <div className="countertop-awning" />
 
               <div className="countertop-bar-header">
-                <span className="countertop-label">Peralatan & Bahan di Meja</span>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span className="countertop-badge-status">
-                    {inspectedObjects.length} dari {totalItems} diperiksa
-                  </span>
-                  {onOpen3DGallery && (
-                    <button
-                      type="button"
-                      className="btn-secondary-action"
-                      style={{ padding: '4px 10px', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '5px' }}
-                      onClick={() => onOpen3DGallery('serai')}
-                      title="Buka Galeri 3D Perkakas & Rempah"
-                    >
-                      <Box size={13} color="var(--color-orange)" />
-                      <span>Galeri 3D</span>
-                    </button>
-                  )}
-                </div>
+                <span className="countertop-label">Meja Gerobak</span>
+                <span className="countertop-badge-status">
+                  {inspectedObjects.length}/{totalItems} diperiksa
+                </span>
               </div>
 
               {/* Grid Objek Visual Meja Gerobak */}
@@ -278,9 +267,8 @@ export default function Act1View({
               </div>
             </div>
 
-            {/* Panel Kanan: Inspeksi Benda Aktif & Sobekan Resep Terkumpul */}
+            {/* Panel Kanan: Info Singkat Benda & Sobekan Resep */}
             <aside className="notes-tracker-panel">
-              {/* Kartu Detail Benda yang Sedang Diperiksa */}
               {selectedObject && (
                 <div className="sidebar-inspect-card">
                   <div className="sidebar-inspect-header">
@@ -288,46 +276,19 @@ export default function Act1View({
                       <img
                         src={selectedObject.image}
                         alt=""
-                        style={{ width: '28px', height: '28px', objectFit: 'contain', flexShrink: 0 }}
+                        style={{ width: '26px', height: '26px', objectFit: 'contain', flexShrink: 0 }}
                       />
-                      <div style={{ minWidth: 0 }}>
-                        <span className="sidebar-inspect-tag">{selectedObject.tag}</span>
-                        <h4 className="sidebar-inspect-name">{selectedObject.name}</h4>
-                      </div>
+                      <h4 className="sidebar-inspect-name">{selectedObject.name}</h4>
                     </div>
                     <button
                       className="sidebar-inspect-close"
                       onClick={() => setSelectedObject(null)}
-                      title="Tutup detail benda"
+                      title="Tutup info benda"
                     >
                       <X size={14} />
                     </button>
                   </div>
-
-                  <p className="sidebar-inspect-clue">
-                    <strong>Fungsi:</strong> {selectedObject.clue}
-                  </p>
-
-                  {selectedObject.model3d && onOpen3DGallery && (
-                    <button
-                      type="button"
-                      className="btn-secondary-action"
-                      style={{
-                        width: '100%',
-                        marginTop: '6px',
-                        padding: '5px 8px',
-                        fontSize: '0.74rem',
-                        justifyContent: 'center',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '5px'
-                      }}
-                      onClick={() => onOpen3DGallery(selectedObject.id)}
-                    >
-                      <Box size={13} color="var(--color-orange)" />
-                      <span>Perbesar Tampilan 3D</span>
-                    </button>
-                  )}
+                  <p className="sidebar-inspect-clue">{selectedObject.clue}</p>
                 </div>
               )}
 
@@ -342,15 +303,20 @@ export default function Act1View({
 
                   return (
                     <div key={num} className={`note-snippet-card ${note ? 'found' : 'empty'}`}>
-                      <div className="note-snippet-header">
-                        <span className="note-num-label">Bagian #{num}</span>
-                        <span className={`note-status-pill ${note ? 'done' : 'pending'}`}>
-                          {note ? 'Ditemukan' : 'Mencari...'}
-                        </span>
-                      </div>
-                      <p className="note-snippet-text">
-                        {note ? `“${note.text}”` : 'Periksa benda gerobak...'}
-                      </p>
+                      {note ? (
+                        <>
+                          <div className="note-snippet-header">
+                            <span className="note-num-label">#{num} • {note.foundAt}</span>
+                            <Check size={14} color="var(--color-teal)" />
+                          </div>
+                          <p className="note-snippet-text">{note.text}</p>
+                        </>
+                      ) : (
+                        <div className="note-snippet-header" style={{ marginBottom: 0 }}>
+                          <span className="note-num-label" style={{ color: 'var(--text-muted)' }}>Sobekan #{num}</span>
+                          <span className="note-status-pill pending">Belum ketemu</span>
+                        </div>
+                      )}
                     </div>
                   );
                 })}
@@ -388,8 +354,8 @@ export default function Act1View({
           {/* Panduan Utama Penataan */}
           <MiniGameGuideBanner
             tag="LANGKAH 2"
-            instruction="Pilah setiap benda ke Wadah Rempah atau Rak Peralatan."
-            hint="Lihat bentuk 3D benda, lalu klik tombol Rempah / Peralatan di bawahnya."
+            instruction="Pilah benda ke Wadah Rempah atau Rak Peralatan."
+            hint="Klik tombol di bawah benda atau seret ke kotak tujuan."
             onOpenHelp={onOpenHelp}
           />
 

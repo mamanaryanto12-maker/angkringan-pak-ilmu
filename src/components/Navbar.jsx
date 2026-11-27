@@ -80,12 +80,25 @@ export default function Navbar({
       {/* Kontrol Navigasi & Audio */}
       <div className="nav-actions">
         <button
+          className="btn-nav-bantuan"
+          onClick={() => {
+            soundManager.playClickSound();
+            onOpenHelp();
+          }}
+          title="Bantuan & Panduan Aktivitas Ini"
+          aria-label="Bantuan"
+        >
+          <HelpCircle size={16} />
+          <span>Bantuan</span>
+        </button>
+
+        <button
           className="btn-nav-help"
           onClick={() => {
             soundManager.playClickSound();
             onOpenWalkthrough();
           }}
-          title="Peta & Cara Bermain"
+          title="Peta Alur Permainan"
         >
           <Compass size={16} />
           <span>Peta</span>
@@ -126,18 +139,6 @@ export default function Navbar({
         >
           <BookOpen size={17} />
           {hasUnreadNotes && <span className="badge-dot" />}
-        </button>
-
-        <button
-          className="btn-nav-icon"
-          onClick={() => {
-            soundManager.playClickSound();
-            onOpenHelp();
-          }}
-          title="Bantuan & Petunjuk"
-          aria-label="Bantuan"
-        >
-          <HelpCircle size={17} />
         </button>
 
         {/* Audio Controls (Mute + Pengatur Volume) */}

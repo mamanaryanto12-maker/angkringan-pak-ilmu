@@ -57,6 +57,7 @@ export default function App() {
   const [isWalkthroughOpen, setIsWalkthroughOpen] = useState(false);
   const [isItems3DOpen, setIsItems3DOpen] = useState(false);
   const [selected3DItemId, setSelected3DItemId] = useState('serai');
+  const [activeSubStep, setActiveSubStep] = useState(null);
   const [isMuted, setIsMuted] = useState(soundManager.isMuted);
   const [volumeLevel, setVolumeLevel] = useState(soundManager.volume);
 
@@ -113,6 +114,7 @@ export default function App() {
   }, [seenWelcomeActs]);
 
   useEffect(() => {
+    setActiveSubStep(null);
     if (['act1', 'act2', 'act3', 'epilogue'].includes(currentStep)) {
       if (!seenWelcomeActs.includes(currentStep)) {
         setWelcomeModalAct(currentStep);
@@ -232,7 +234,7 @@ export default function App() {
             setInspectedObjects={setInspectedObjects}
             onOpenTicket={() => setIsTicketOpen(true)}
             onOpenHelp={() => setIsHelpOpen(true)}
-            onOpen3DGallery={handleOpen3DGallery}
+            onSubStepChange={setActiveSubStep}
             sessionIndex={sessionIndex}
           />
         )}
@@ -241,6 +243,7 @@ export default function App() {
           <Act2View
             onCompleteAct={handleCompleteAct2}
             onOpenHelp={() => setIsHelpOpen(true)}
+            onSubStepChange={setActiveSubStep}
             sessionIndex={sessionIndex}
           />
         )}
@@ -249,6 +252,7 @@ export default function App() {
           <Act3View
             onCompleteAct={handleCompleteAct3}
             onOpenHelp={() => setIsHelpOpen(true)}
+            onSubStepChange={setActiveSubStep}
             sessionIndex={sessionIndex}
           />
         )}
@@ -293,6 +297,7 @@ export default function App() {
         isOpen={isHelpOpen}
         onClose={() => setIsHelpOpen(false)}
         currentStep={currentStep}
+        activeSubStep={activeSubStep}
         onOpenActWelcome={() => setWelcomeModalAct(currentStep)}
       />
 

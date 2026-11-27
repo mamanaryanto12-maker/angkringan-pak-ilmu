@@ -6,9 +6,13 @@ import MiniGameGuideBanner from '../components/MiniGameGuideBanner.jsx';
 import VisitorSceneIllustration from '../components/VisitorSceneIllustration.jsx';
 import Item3DViewer from '../components/Item3DViewer.jsx';
 
-export default function Act3View({ onCompleteAct, onOpenHelp, sessionIndex = 0 }) {
+export default function Act3View({ onCompleteAct, onOpenHelp, onSubStepChange, sessionIndex = 0 }) {
   const [currentPhase, setCurrentPhase] = useState(1); // 1: needs, 2: recipe, 3: delivery, 4: serving cutscene
   const [serveCutsceneBeat, setServeCutsceneBeat] = useState('placing'); // 'placing' | 'tasting'
+
+  useEffect(() => {
+    if (onSubStepChange) onSubStepChange(`act3:${currentPhase}`);
+  }, [currentPhase, onSubStepChange]);
 
   const currentPersona = useMemo(() => {
     return ACT_3_PERSONAS[sessionIndex % ACT_3_PERSONAS.length];
@@ -108,12 +112,12 @@ export default function Act3View({ onCompleteAct, onOpenHelp, sessionIndex = 0 }
         </div>
       </div>
 
-      {/* Panduan Utama yang Jelas Sesuai Tahapan */}
+      {/* Panduan Utama Ringkas Sesuai Tahapan */}
       {currentPhase === 1 && (
         <MiniGameGuideBanner
           tag="TAHAP 1"
-          instruction={`Pahami keluhan ${currentPersona.name} lalu pilih solusi yang tepat.`}
-          hint="Amati situasi dan cerita pengunjung di panel kiri."
+          instruction={`Pahami cerita ${currentPersona.name}, lalu pilih jawaban yang tepat.`}
+          hint="Baca kondisi tamu di sisi kiri."
           onOpenHelp={onOpenHelp}
         />
       )}
@@ -121,8 +125,8 @@ export default function Act3View({ onCompleteAct, onOpenHelp, sessionIndex = 0 }
       {currentPhase === 2 && (
         <MiniGameGuideBanner
           tag="TAHAP 2"
-          instruction={`Pilih bahan rempah 3D dan suhu penyajian untuk ${currentPersona.name}.`}
-          hint="Ketuk kartu rempah untuk menambah atau mengurangi bahan."
+          instruction={`Racik rempah dan pilih suhu minuman untuk ${currentPersona.name}.`}
+          hint="Klik kartu rempah 3D untuk memilih bahan."
           onOpenHelp={onOpenHelp}
         />
       )}
@@ -130,8 +134,8 @@ export default function Act3View({ onCompleteAct, onOpenHelp, sessionIndex = 0 }
       {currentPhase === 3 && (
         <MiniGameGuideBanner
           tag="TAHAP 3"
-          instruction={`Pilih tutur kata tulus saat menyerahkan wedang kepada ${currentPersona.name}.`}
-          hint="Tutur kata yang hangat melengkapi kebaikan racikanmu."
+          instruction={`Pilih sapaan hangat saat menyajikan wedang kepada ${currentPersona.name}.`}
+          hint="Klik satu pilihan lalu tekan Sajikan Wedang."
           onOpenHelp={onOpenHelp}
         />
       )}
