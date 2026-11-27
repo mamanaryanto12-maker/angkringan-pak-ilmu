@@ -47,15 +47,20 @@ export default function Angkringan3DViewer({ modelPath = '/assets/models/angkrin
     const ambientLight = new THREE.AmbientLight(0xfff7ed, 1.2);
     scene.add(ambientLight);
 
-    // Key Light - Cahaya Hangat
-    const keyLight = new THREE.DirectionalLight(0xfff0db, 1.85);
-    keyLight.position.set(3.2, 4.4, 2.8);
+    // Key Light - Cahaya Hangat Utama (Arah selalu dari depan-kanan atas agar bayangan jatuh alami di belakang/bawah gerobak)
+    const keyLight = new THREE.DirectionalLight(0xfff0db, 1.9);
+    keyLight.position.set(2.4, 4.2, 2.8);
     keyLight.castShadow = true;
-    keyLight.shadow.mapSize.width = 1024;
-    keyLight.shadow.mapSize.height = 1024;
+    keyLight.shadow.mapSize.width = 2048;
+    keyLight.shadow.mapSize.height = 2048;
     keyLight.shadow.camera.near = 0.5;
-    keyLight.shadow.camera.far = 15;
-    keyLight.shadow.bias = -0.0005;
+    keyLight.shadow.camera.far = 14;
+    keyLight.shadow.camera.left = -2.6;
+    keyLight.shadow.camera.right = 2.6;
+    keyLight.shadow.camera.top = 2.6;
+    keyLight.shadow.camera.bottom = -2.6;
+    keyLight.shadow.bias = -0.0004;
+    keyLight.shadow.radius = 4;
     scene.add(keyLight);
 
     // Fill Light - Teal khas Palet Gredupedia dari sudut belakang
@@ -73,31 +78,43 @@ export default function Angkringan3DViewer({ modelPath = '/assets/models/angkrin
     angloLight.position.set(0.68, 1.0, 0.0);
     scene.add(angloLight);
 
-    // Bayangan Statis Terpusat di Permukaan Tanah (Terpisah dari Rotasi Gerobak)
-    // Menggunakan radial gradient simetris sehingga bayangan tetap diam di satu titik saat gerobak diputar
+    // 1. Real 3D Ground Shadow Receiver (Bayangan jatuh nyata di belakang/bawah gerobak, mengikuti siluet & roda)
+    const groundShadowGeo = new THREE.PlaneGeometry(8.5, 8.5);
+    const groundShadowMat = new THREE.ShadowMaterial({
+      color: 0x24160c,
+      opacity: 0.34,
+      depthWrite: false
+    });
+    const groundShadowMesh = new THREE.Mesh(groundShadowGeo, groundShadowMat);
+    groundShadowMesh.rotation.x = -Math.PI / 2;
+    groundShadowMesh.position.set(0, 0.001, 0);
+    groundShadowMesh.receiveShadow = true;
+    scene.add(groundShadowMesh);
+
+    // 2. Contact Shadow Lembut di Bawah Pijakan Roda (Agar gerobak menapak mantap & tidak melayang)
     const shadowCanvas = document.createElement('canvas');
     shadowCanvas.width = 256;
     shadowCanvas.height = 256;
     const ctx = shadowCanvas.getContext('2d');
-    const grad = ctx.createRadialGradient(128, 128, 8, 128, 128, 124);
-    grad.addColorStop(0.0, 'rgba(32, 20, 12, 0.44)');
-    grad.addColorStop(0.38, 'rgba(38, 24, 14, 0.28)');
-    grad.addColorStop(0.70, 'rgba(48, 30, 18, 0.10)');
+    const grad = ctx.createRadialGradient(128, 128, 10, 128, 128, 122);
+    grad.addColorStop(0.0, 'rgba(30, 18, 10, 0.36)');
+    grad.addColorStop(0.45, 'rgba(38, 24, 14, 0.18)');
+    grad.addColorStop(0.78, 'rgba(48, 30, 18, 0.05)');
     grad.addColorStop(1.0, 'rgba(48, 30, 18, 0.0)');
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, 256, 256);
 
     const contactShadowTex = new THREE.CanvasTexture(shadowCanvas);
-    const contactGeo = new THREE.PlaneGeometry(2.55, 2.55);
+    const contactGeo = new THREE.PlaneGeometry(2.1, 2.1);
     const contactMat = new THREE.MeshBasicMaterial({
       map: contactShadowTex,
       transparent: true,
-      opacity: 0.92,
+      opacity: 0.85,
       depthWrite: false
     });
     const contactShadowMesh = new THREE.Mesh(contactGeo, contactMat);
     contactShadowMesh.rotation.x = -Math.PI / 2;
-    contactShadowMesh.position.set(0, 0.002, 0);
+    contactShadowMesh.position.set(0, 0.003, 0);
     scene.add(contactShadowMesh);
 
     // Grup Turntable Terpisah: Hanya Gerobak yang Berputar, Bayangan Tetap Diam di Satu Titik
@@ -195,10 +212,20 @@ export default function Angkringan3DViewer({ modelPath = '/assets/models/angkrin
       const delta = Math.min(clock.getDelta(), 0.05);
       const elapsedTime = clock.elapsedTime;
 
-      // Putar gerobak secara halus pada porosnya sementara bayangan tetap diam di titik tanah
+      // Putar gerobak secara halus pada porosnya sementara bayangan jatuh tetap di belakang/bawah gerobak
       if (isAutoSpinning && modelRoot) {
         turntableGroup.rotation.y += delta * 0.28;
       }
+
+      // Jaga arah keyLight selalu dari depan-kanan atas sudut pandang kamera
+      // sehingga bayangan nyata tetap berada di belakang/bawah gerobak meski kamera diputar 360 derajat
+      const camAzimuth = Math.atan2(camera.position.x, camera.position.z);
+      const lightAngle = camAzimuth + 0.42; // sedikit ke kanan depan kamera
+      keyLight.position.set(
+        Math.sin(lightAngle) * 3.6,
+        4.3,
+        Math.cos(lightAngle) * 3.6
+      );
 
       // Kedipan hangat api lentera & bara arang
       lanternLight.intensity = 2.1 + Math.sin(elapsedTime * 4.5) * 0.18 + Math.cos(elapsedTime * 7.2) * 0.12;
